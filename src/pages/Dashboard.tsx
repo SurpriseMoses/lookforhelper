@@ -1,0 +1,348 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import Navbar from "@/components/landing/Navbar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { X } from "lucide-react";
+
+const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
+const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
+
+const Dashboard = () => {
+  const { user, role, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [profile, setProfile] = useState({ full_name: "", avatar_url: "" });
+  const [helperDetails, setHelperDetails] = useState({
+    age: "",
+    gender: "",
+    city: "",
+    country: "South Africa",
+    willing_to_work_abroad: false,
+    years_experience: "",
+    skills: [] as string[],
+    languages: [] as string[],
+    salary_expectation: "",
+    salary_negotiable: true,
+    about_me: "",
+    is_published: false,
+  });
+  const [saving, setSaving] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (p) setProfile({ full_name: p.full_name, avatar_url: p.avatar_url ?? "" });
+
+      if (role === "helper") {
+        const { data: h } = await supabase
+          .from("helper_details")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (h) {
+          setHelperDetails({
+            age: h.age?.toString() ?? "",
+            gender: h.gender ?? "",
+            city: h.city ?? "",
+            country: h.country ?? "South Africa",
+            willing_to_work_abroad: h.willing_to_work_abroad ?? false,
+            years_experience: h.years_experience?.toString() ?? "",
+            skills: h.skills ?? [],
+            languages: h.languages ?? [],
+            salary_expectation: h.salary_expectation ?? "",
+            salary_negotiable: h.salary_negotiable ?? true,
+            about_me: h.about_me ?? "",
+            is_published: h.is_published ?? false,
+          });
+        }
+      }
+      setDataLoading(false);
+    };
+    load();
+  }, [user, role]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      await supabase
+        .from("profiles")
+        .update({ full_name: profile.full_name })
+        .eq("user_id", user.id);
+
+      if (role === "helper") {
+        await supabase
+          .from("helper_details")
+          .update({
+            age: helperDetails.age ? parseInt(helperDetails.age) : null,
+            gender: helperDetails.gender || null,
+            city: helperDetails.city,
+            country: helperDetails.country,
+            willing_to_work_abroad: helperDetails.willing_to_work_abroad,
+            years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
+            skills: helperDetails.skills,
+            languages: helperDetails.languages,
+            salary_expectation: helperDetails.salary_expectation,
+            salary_negotiable: helperDetails.salary_negotiable,
+            about_me: helperDetails.about_me,
+            is_published: helperDetails.is_published,
+          })
+          .eq("user_id", user.id);
+      }
+
+      toast({ title: "Profile saved!" });
+    } catch (err: any) {
+      toast({ title: "Error saving", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    const path = `${user.id}/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("avatars").upload(path, file);
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await supabase.from("profiles").update({ avatar_url: url }).eq("user_id", user.id);
+    setProfile((p) => ({ ...p, avatar_url: url }));
+    toast({ title: "Photo uploaded!" });
+  };
+
+  const toggleSkill = (skill: string) => {
+    setHelperDetails((prev) => ({
+      ...prev,
+      skills: prev.skills.includes(skill)
+        ? prev.skills.filter((s) => s !== skill)
+        : [...prev.skills, skill],
+    }));
+  };
+
+  const toggleLanguage = (lang: string) => {
+    setHelperDetails((prev) => ({
+      ...prev,
+      languages: prev.languages.includes(lang)
+        ? prev.languages.filter((l) => l !== lang)
+        : [...prev.languages, lang],
+    }));
+  };
+
+  if (authLoading || dataLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container py-20 text-center text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="container max-w-2xl py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            {role === "helper" ? "Helper Dashboard" : "Seeker Dashboard"}
+          </h1>
+          <Button variant="outline" onClick={signOut}>Sign Out</Button>
+        </div>
+
+        {/* Profile basics */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xl font-bold text-muted-foreground/30">
+                    {profile.full_name?.charAt(0) ?? "?"}
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="avatar-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
+                  Upload photo
+                </Label>
+                <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Full Name</Label>
+              <Input
+                value={profile.full_name}
+                onChange={(e) => setProfile((p) => ({ ...p, full_name: e.target.value }))}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Helper-specific fields */}
+        {role === "helper" && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Helper Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Age</Label>
+                  <Input
+                    type="number"
+                    value={helperDetails.age}
+                    onChange={(e) => setHelperDetails((h) => ({ ...h, age: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Gender</Label>
+                  <Select value={helperDetails.gender} onValueChange={(v) => setHelperDetails((h) => ({ ...h, gender: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>City</Label>
+                  <Input value={helperDetails.city} onChange={(e) => setHelperDetails((h) => ({ ...h, city: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Country</Label>
+                  <Input value={helperDetails.country} onChange={(e) => setHelperDetails((h) => ({ ...h, country: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Years of Experience</Label>
+                  <Input
+                    type="number"
+                    value={helperDetails.years_experience}
+                    onChange={(e) => setHelperDetails((h) => ({ ...h, years_experience: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Salary Expectation</Label>
+                  <Input
+                    placeholder="e.g. R5,000/month"
+                    value={helperDetails.salary_expectation}
+                    onChange={(e) => setHelperDetails((h) => ({ ...h, salary_expectation: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={helperDetails.salary_negotiable}
+                  onCheckedChange={(v) => setHelperDetails((h) => ({ ...h, salary_negotiable: v }))}
+                />
+                <Label>Salary is negotiable</Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={helperDetails.willing_to_work_abroad}
+                  onCheckedChange={(v) => setHelperDetails((h) => ({ ...h, willing_to_work_abroad: v }))}
+                />
+                <Label>Willing to work abroad</Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Skills</Label>
+                <div className="flex flex-wrap gap-2">
+                  {SKILL_OPTIONS.map((skill) => (
+                    <Badge
+                      key={skill}
+                      variant={helperDetails.skills.includes(skill) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleSkill(skill)}
+                    >
+                      {skill}
+                      {helperDetails.skills.includes(skill) && <X className="ml-1 h-3 w-3" />}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Languages</Label>
+                <div className="flex flex-wrap gap-2">
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <Badge
+                      key={lang}
+                      variant={helperDetails.languages.includes(lang) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleLanguage(lang)}
+                    >
+                      {lang}
+                      {helperDetails.languages.includes(lang) && <X className="ml-1 h-3 w-3" />}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>About Me</Label>
+                <Textarea
+                  rows={4}
+                  placeholder="Tell employers about yourself..."
+                  value={helperDetails.about_me}
+                  onChange={(e) => setHelperDetails((h) => ({ ...h, about_me: e.target.value }))}
+                />
+              </div>
+
+              <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-4">
+                <Switch
+                  checked={helperDetails.is_published}
+                  onCheckedChange={(v) => setHelperDetails((h) => ({ ...h, is_published: v }))}
+                />
+                <div>
+                  <Label className="font-medium">Publish profile</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Make your profile visible to seekers on the platform.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Button onClick={handleSave} disabled={saving} className="w-full">
+          {saving ? "Saving..." : "Save Profile"}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
