@@ -33,8 +33,12 @@ const Dashboard = () => {
     skills: [] as string[],
     languages: [] as string[],
     salary_expectation: "",
+    salary_min: "",
+    salary_max: "",
     salary_negotiable: true,
     about_me: "",
+    video_introduction_url: "",
+    helper_references: [] as { name: string; contact: string; relationship: string }[],
     is_published: false,
   });
   const [saving, setSaving] = useState(false);
@@ -73,8 +77,12 @@ const Dashboard = () => {
             skills: h.skills ?? [],
             languages: h.languages ?? [],
             salary_expectation: h.salary_expectation ?? "",
+            salary_min: (h as any).salary_min?.toString() ?? "",
+            salary_max: (h as any).salary_max?.toString() ?? "",
             salary_negotiable: h.salary_negotiable ?? true,
             about_me: h.about_me ?? "",
+            video_introduction_url: (h as any).video_introduction_url ?? "",
+            helper_references: (h.helper_references as any[]) ?? [],
             is_published: h.is_published ?? false,
           });
         }
@@ -106,8 +114,12 @@ const Dashboard = () => {
             skills: helperDetails.skills,
             languages: helperDetails.languages,
             salary_expectation: helperDetails.salary_expectation,
+            salary_min: helperDetails.salary_min ? parseInt(helperDetails.salary_min) : null,
+            salary_max: helperDetails.salary_max ? parseInt(helperDetails.salary_max) : null,
             salary_negotiable: helperDetails.salary_negotiable,
             about_me: helperDetails.about_me,
+            video_introduction_url: helperDetails.video_introduction_url || null,
+            helper_references: helperDetails.helper_references,
             is_published: helperDetails.is_published,
           })
           .eq("user_id", user.id);
@@ -252,11 +264,21 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Salary Expectation</Label>
+                  <Label>Salary Min (ZAR/month)</Label>
                   <Input
-                    placeholder="e.g. R5,000/month"
-                    value={helperDetails.salary_expectation}
-                    onChange={(e) => setHelperDetails((h) => ({ ...h, salary_expectation: e.target.value }))}
+                    type="number"
+                    placeholder="e.g. 3000"
+                    value={helperDetails.salary_min}
+                    onChange={(e) => setHelperDetails((h) => ({ ...h, salary_min: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Salary Max (ZAR/month)</Label>
+                  <Input
+                    type="number"
+                    placeholder="e.g. 8000"
+                    value={helperDetails.salary_max}
+                    onChange={(e) => setHelperDetails((h) => ({ ...h, salary_max: e.target.value }))}
                   />
                 </div>
               </div>
@@ -319,6 +341,83 @@ const Dashboard = () => {
                   value={helperDetails.about_me}
                   onChange={(e) => setHelperDetails((h) => ({ ...h, about_me: e.target.value }))}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Video Introduction URL</Label>
+                <Input
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={helperDetails.video_introduction_url}
+                  onChange={(e) => setHelperDetails((h) => ({ ...h, video_introduction_url: e.target.value }))}
+                />
+                <p className="text-xs text-muted-foreground">Link to a short video introducing yourself (YouTube, Vimeo, etc.)</p>
+              </div>
+
+              {/* References */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>References</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setHelperDetails((h) => ({
+                        ...h,
+                        helper_references: [...h.helper_references, { name: "", contact: "", relationship: "" }],
+                      }))
+                    }
+                  >
+                    + Add Reference
+                  </Button>
+                </div>
+                {helperDetails.helper_references.map((ref, i) => (
+                  <div key={i} className="flex flex-col gap-2 rounded-lg border p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">Reference {i + 1}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setHelperDetails((h) => ({
+                            ...h,
+                            helper_references: h.helper_references.filter((_, idx) => idx !== i),
+                          }))
+                        }
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <Input
+                      placeholder="Name"
+                      value={ref.name}
+                      onChange={(e) => {
+                        const refs = [...helperDetails.helper_references];
+                        refs[i] = { ...refs[i], name: e.target.value };
+                        setHelperDetails((h) => ({ ...h, helper_references: refs }));
+                      }}
+                    />
+                    <Input
+                      placeholder="Contact (phone or email)"
+                      value={ref.contact}
+                      onChange={(e) => {
+                        const refs = [...helperDetails.helper_references];
+                        refs[i] = { ...refs[i], contact: e.target.value };
+                        setHelperDetails((h) => ({ ...h, helper_references: refs }));
+                      }}
+                    />
+                    <Input
+                      placeholder="Relationship (e.g. Previous employer)"
+                      value={ref.relationship}
+                      onChange={(e) => {
+                        const refs = [...helperDetails.helper_references];
+                        refs[i] = { ...refs[i], relationship: e.target.value };
+                        setHelperDetails((h) => ({ ...h, helper_references: refs }));
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
 
               <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-4">

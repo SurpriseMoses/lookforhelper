@@ -48,10 +48,13 @@ export type Database = {
           is_published: boolean | null
           languages: string[] | null
           salary_expectation: string | null
+          salary_max: number | null
+          salary_min: number | null
           salary_negotiable: boolean | null
           skills: string[] | null
           updated_at: string
           user_id: string
+          video_introduction_url: string | null
           willing_to_work_abroad: boolean | null
           years_experience: number | null
         }
@@ -67,10 +70,13 @@ export type Database = {
           is_published?: boolean | null
           languages?: string[] | null
           salary_expectation?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
           salary_negotiable?: boolean | null
           skills?: string[] | null
           updated_at?: string
           user_id: string
+          video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
           years_experience?: number | null
         }
@@ -86,10 +92,13 @@ export type Database = {
           is_published?: boolean | null
           languages?: string[] | null
           salary_expectation?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
           salary_negotiable?: boolean | null
           skills?: string[] | null
           updated_at?: string
           user_id?: string
+          video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
           years_experience?: number | null
         }
