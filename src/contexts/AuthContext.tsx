@@ -33,12 +33,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchRole(session.user.id);
-        } else {
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
+          // Use setTimeout to avoid potential deadlocks with Supabase auth
+          setTimeout(() => {
+            fetchRole(session.user.id);
+          }, 0);
+        } else if (!session) {
           setRole(null);
         }
         setLoading(false);
