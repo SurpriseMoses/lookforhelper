@@ -155,17 +155,50 @@ const HelperProfilePage = () => {
                     <p className="text-muted-foreground">{helper.languages.join(", ")}</p>
                   </div>
                 )}
-                {helper.salary_expectation && (
+                {((helper as any).salary_min || (helper as any).salary_max) && (
                   <div>
-                    <span className="text-sm font-medium text-foreground">Salary Expectation</span>
+                    <span className="text-sm font-medium text-foreground">Salary Range</span>
                     <p className="text-muted-foreground">
-                      {helper.salary_expectation}
+                      {(helper as any).salary_min ? `R${(helper as any).salary_min.toLocaleString()}` : "—"}
+                      {" – "}
+                      {(helper as any).salary_max ? `R${(helper as any).salary_max.toLocaleString()}` : "—"}
+                      /month
                       {helper.salary_negotiable && " (Negotiable)"}
                     </p>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Video Introduction */}
+            {(helper as any).video_introduction_url && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground">Video Introduction</h2>
+                <a
+                  href={(helper as any).video_introduction_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                >
+                  Watch video →
+                </a>
+              </div>
+            )}
+
+            {/* References */}
+            {(helper as any).helper_references?.length > 0 && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground">References</h2>
+                <div className="mt-2 space-y-2">
+                  {((helper as any).helper_references as { name: string; relationship: string }[]).map((ref, i) => (
+                    <div key={i} className="rounded-lg border p-3">
+                      <p className="text-sm font-medium text-foreground">{ref.name}</p>
+                      <p className="text-xs text-muted-foreground">{ref.relationship}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Contact CTA */}
             <div className="mt-8 rounded-xl border bg-muted/50 p-6 text-center">
