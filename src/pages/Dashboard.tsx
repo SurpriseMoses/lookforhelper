@@ -344,13 +344,53 @@ const Dashboard = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Video Introduction URL</Label>
-                <Input
-                  placeholder="https://youtube.com/watch?v=..."
-                  value={helperDetails.video_introduction_url}
-                  onChange={(e) => setHelperDetails((h) => ({ ...h, video_introduction_url: e.target.value }))}
-                />
-                <p className="text-xs text-muted-foreground">Link to a short video introducing yourself (YouTube, Vimeo, etc.)</p>
+                <Label>Video Introduction</Label>
+                {helperDetails.video_introduction_url && (
+                  <div className="rounded-lg border p-3 space-y-2">
+                    <video
+                      src={helperDetails.video_introduction_url}
+                      controls
+                      className="w-full max-h-48 rounded"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setHelperDetails((h) => ({ ...h, video_introduction_url: "" }))}
+                    >
+                      Remove video
+                    </Button>
+                  </div>
+                )}
+                <div>
+                  <Label htmlFor="video-upload" className="cursor-pointer inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                    {helperDetails.video_introduction_url ? "Replace video" : "Upload a video"}
+                  </Label>
+                  <input
+                    id="video-upload"
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file || !user) return;
+                      if (file.size > 50 * 1024 * 1024) {
+                        toast({ title: "File too large", description: "Max 50 MB", variant: "destructive" });
+                        return;
+                      }
+                      const path = `${user.id}/${Date.now()}-${file.name}`;
+                      const { error } = await supabase.storage.from("helper-videos").upload(path, file);
+                      if (error) {
+                        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+                        return;
+                      }
+                      const { data: urlData } = supabase.storage.from("helper-videos").getPublicUrl(path);
+                      setHelperDetails((h) => ({ ...h, video_introduction_url: urlData.publicUrl }));
+                      toast({ title: "Video uploaded!" });
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Upload a short video introducing yourself (max 50 MB)</p>
               </div>
 
               {/* References */}
