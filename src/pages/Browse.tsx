@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,52 +83,58 @@ const Browse = () => {
         </div>
 
         {/* Filters */}
-        <div className="mb-8 grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Search by city</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="e.g. Johannesburg"
-                value={cityFilter}
-                onChange={(e) => setCityFilter(e.target.value)}
-                className="pl-9"
-              />
+        <div className="mb-8 space-y-4 rounded-xl border bg-card p-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Search by city</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="e.g. Johannesburg"
+                  value={cityFilter}
+                  onChange={(e) => setCityFilter(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") fetchHelpers(); }}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Skill</Label>
+              <Select value={skillFilter} onValueChange={setSkillFilter}>
+                <SelectTrigger><SelectValue placeholder="All skills" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All skills</SelectItem>
+                  {SKILL_OPTIONS.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Gender</Label>
+              <Select value={genderFilter} onValueChange={setGenderFilter}>
+                <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Male">Male</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Sort by</Label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="experience">Most experienced</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Skill</Label>
-            <Select value={skillFilter} onValueChange={setSkillFilter}>
-              <SelectTrigger><SelectValue placeholder="All skills" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All skills</SelectItem>
-                {SKILL_OPTIONS.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Gender</Label>
-            <Select value={genderFilter} onValueChange={setGenderFilter}>
-              <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Any</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Male">Male</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Sort by</Label>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="experience">Most experienced</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Button onClick={fetchHelpers} className="w-full sm:w-auto gap-2">
+            <Search className="h-4 w-4" /> Search Helpers
+          </Button>
         </div>
 
         {/* Results */}
