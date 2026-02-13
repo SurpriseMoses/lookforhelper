@@ -18,8 +18,12 @@ interface HelperProfile {
   skills: string[] | null;
   languages: string[] | null;
   salary_expectation: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
   salary_negotiable: boolean | null;
   about_me: string | null;
+  video_introduction_url: string | null;
+  helper_references: { name: string; relationship: string }[] | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -33,15 +37,34 @@ const HelperProfilePage = () => {
 
   useEffect(() => {
     if (!userId) return;
-    supabase
-      .from("helper_details")
-      .select("*, profiles(full_name, avatar_url)")
-      .eq("user_id", userId)
-      .maybeSingle()
-      .then(({ data }) => {
-        setHelper(data as unknown as HelperProfile);
+
+    const fetchHelper = async () => {
+      const { data: helperData } = await supabase
+        .from("helper_details")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!helperData) {
         setLoading(false);
-      });
+        return;
+      }
+
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      setHelper({
+        ...helperData,
+        helper_references: helperData.helper_references as any,
+        profiles: profileData ?? null,
+      } as HelperProfile);
+      setLoading(false);
+    };
+
+    fetchHelper();
   }, [userId]);
 
   if (loading) {
@@ -155,13 +178,13 @@ const HelperProfilePage = () => {
                     <p className="text-muted-foreground">{helper.languages.join(", ")}</p>
                   </div>
                 )}
-                {((helper as any).salary_min || (helper as any).salary_max) && (
+                {(helper.salary_min || helper.salary_max) && (
                   <div>
                     <span className="text-sm font-medium text-foreground">Salary Range</span>
                     <p className="text-muted-foreground">
-                      {(helper as any).salary_min ? `R${(helper as any).salary_min.toLocaleString()}` : "—"}
+                      {helper.salary_min ? `R${helper.salary_min.toLocaleString()}` : "—"}
                       {" – "}
-                      {(helper as any).salary_max ? `R${(helper as any).salary_max.toLocaleString()}` : "—"}
+                      {helper.salary_max ? `R${helper.salary_max.toLocaleString()}` : "—"}
                       /month
                       {helper.salary_negotiable && " (Negotiable)"}
                     </p>
@@ -171,26 +194,23 @@ const HelperProfilePage = () => {
             </div>
 
             {/* Video Introduction */}
-            {(helper as any).video_introduction_url && (
-              <div>
+            {helper.video_introduction_url && (
+              <div className="mt-6">
                 <h2 className="font-display text-lg font-semibold text-foreground">Video Introduction</h2>
-                <a
-                  href={(helper as any).video_introduction_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                >
-                  Watch video →
-                </a>
+                <video
+                  src={helper.video_introduction_url}
+                  controls
+                  className="mt-2 w-full max-w-lg rounded-lg"
+                />
               </div>
             )}
 
             {/* References */}
-            {(helper as any).helper_references?.length > 0 && (
-              <div>
+            {helper.helper_references && helper.helper_references.length > 0 && (
+              <div className="mt-6">
                 <h2 className="font-display text-lg font-semibold text-foreground">References</h2>
                 <div className="mt-2 space-y-2">
-                  {((helper as any).helper_references as { name: string; relationship: string }[]).map((ref, i) => (
+                  {helper.helper_references.map((ref, i) => (
                     <div key={i} className="rounded-lg border p-3">
                       <p className="text-sm font-medium text-foreground">{ref.name}</p>
                       <p className="text-xs text-muted-foreground">{ref.relationship}</p>
