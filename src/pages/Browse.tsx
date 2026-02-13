@@ -47,7 +47,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, profiles(full_name, avatar_url)")
+      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -67,7 +67,29 @@ const Browse = () => {
     }
 
     const { data } = await query;
-    setHelpers((data as unknown as HelperWithProfile[]) ?? []);
+    const helperRows = data ?? [];
+
+    // Fetch profiles separately since there's no direct FK relationship
+    if (helperRows.length > 0) {
+      const userIds = helperRows.map((h: any) => h.user_id);
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, avatar_url")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(
+        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
+      );
+
+      setHelpers(
+        helperRows.map((h: any) => ({
+          ...h,
+          profiles: profileMap.get(h.user_id) ?? null,
+        })) as HelperWithProfile[]
+      );
+    } else {
+      setHelpers([]);
+    }
     setLoading(false);
   };
 
