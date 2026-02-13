@@ -69,20 +69,38 @@ const Browse = () => {
     const { data } = await query;
     const helperRows = data ?? [];
 
-    // Fetch profiles separately since there's no direct FK relationship
+    // Filter by active subscription (trial or active)
     if (helperRows.length > 0) {
       const userIds = helperRows.map((h: any) => h.user_id);
+
+      // Fetch subscriptions to filter eligible helpers
+      const { data: subsData } = await supabase
+        .from("helper_subscriptions")
+        .select("user_id")
+        .in("user_id", userIds)
+        .in("status", ["trial", "active"]);
+
+      const eligibleIds = new Set((subsData ?? []).map((s: any) => s.user_id));
+      const eligibleHelpers = helperRows.filter((h: any) => eligibleIds.has(h.user_id));
+
+      if (eligibleHelpers.length === 0) {
+        setHelpers([]);
+        setLoading(false);
+        return;
+      }
+
+      const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
       const { data: profilesData } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar_url")
-        .in("user_id", userIds);
+        .in("user_id", eligibleUserIds);
 
       const profileMap = new Map(
         (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
       );
 
       setHelpers(
-        helperRows.map((h: any) => ({
+        eligibleHelpers.map((h: any) => ({
           ...h,
           profiles: profileMap.get(h.user_id) ?? null,
         })) as HelperWithProfile[]
