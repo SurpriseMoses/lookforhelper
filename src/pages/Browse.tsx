@@ -41,6 +41,9 @@ const Browse = () => {
 
   useEffect(() => {
     fetchHelpers();
+    return () => {
+      setHelpers([]);
+    };
   }, [skillFilter, genderFilter, cityFilter, sortBy]);
 
   const fetchHelpers = async () => {
