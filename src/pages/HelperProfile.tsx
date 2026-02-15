@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, MessageSquare } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
+import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 
 interface HelperProfile {
   user_id: string;
@@ -221,14 +222,7 @@ const HelperProfilePage = () => {
             )}
 
             {/* Contact CTA */}
-            <div className="mt-8 rounded-xl border bg-muted/50 p-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Messaging is coming in v2. For now, browse and bookmark helpers.
-              </p>
-              <Button disabled className="mt-3 gap-2">
-                <MessageSquare className="h-4 w-4" /> Contact Helper
-              </Button>
-            </div>
+            <ContactHelperButton helperUserId={helper.user_id} />
           </CardContent>
         </Card>
       </div>

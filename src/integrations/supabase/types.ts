@@ -35,6 +35,30 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          created_at: string
+          helper_user_id: string
+          id: string
+          seeker_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          helper_user_id: string
+          id?: string
+          seeker_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          helper_user_id?: string
+          id?: string
+          seeker_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       helper_details: {
         Row: {
           about_me: string | null
@@ -139,6 +163,100 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      interviews: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          helper_response: string | null
+          helper_user_id: string
+          id: string
+          interview_type: string
+          location: string | null
+          meeting_link: string | null
+          notes: string | null
+          proposed_date: string
+          seeker_message: string | null
+          seeker_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          helper_response?: string | null
+          helper_user_id: string
+          id?: string
+          interview_type?: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          proposed_date: string
+          seeker_message?: string | null
+          seeker_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          helper_response?: string | null
+          helper_user_id?: string
+          id?: string
+          interview_type?: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          proposed_date?: string
+          seeker_message?: string | null
+          seeker_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interviews_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read: boolean
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
