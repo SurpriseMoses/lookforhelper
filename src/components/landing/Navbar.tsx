@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageSquare, Calendar } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
@@ -23,12 +25,28 @@ const Navbar = () => {
           <Button variant="ghost" asChild>
             <Link to="/browse">Browse Helpers</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/auth">Log In</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/auth?tab=signup">Sign Up</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button variant="ghost" asChild className="gap-1.5">
+                <Link to="/messages"><MessageSquare className="h-4 w-4" /> Messages</Link>
+              </Button>
+              <Button variant="ghost" asChild className="gap-1.5">
+                <Link to="/interviews"><Calendar className="h-4 w-4" /> Interviews</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" asChild>
+                <Link to="/auth">Log In</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/auth?tab=signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -48,12 +66,28 @@ const Navbar = () => {
             <Button variant="ghost" asChild className="justify-start">
               <Link to="/browse" onClick={() => setMobileOpen(false)}>Browse Helpers</Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link to="/auth" onClick={() => setMobileOpen(false)}>Log In</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/auth?tab=signup" onClick={() => setMobileOpen(false)}>Sign Up</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" asChild className="justify-start gap-1.5">
+                  <Link to="/messages" onClick={() => setMobileOpen(false)}><MessageSquare className="h-4 w-4" /> Messages</Link>
+                </Button>
+                <Button variant="ghost" asChild className="justify-start gap-1.5">
+                  <Link to="/interviews" onClick={() => setMobileOpen(false)}><Calendar className="h-4 w-4" /> Interviews</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link to="/auth" onClick={() => setMobileOpen(false)}>Log In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/auth?tab=signup" onClick={() => setMobileOpen(false)}>Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
