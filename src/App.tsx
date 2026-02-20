@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Messages from "./pages/Messages";
 import Interviews from "./pages/Interviews";
 import AdminDashboard from "./pages/AdminDashboard";
+import BottomNav from "./components/mobile/BottomNav";
 
 const queryClient = new QueryClient();
 
@@ -26,19 +27,22 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <SeekerSubscriptionProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/browse" element={<Browse />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/helper/:userId" element={<HelperProfile />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/interviews" element={<Interviews />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div className="pb-16 md:pb-0">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/browse" element={<Browse />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/helper/:userId" element={<HelperProfile />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/interviews" element={<Interviews />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+            <BottomNav />
           </SeekerSubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
