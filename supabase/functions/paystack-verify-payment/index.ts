@@ -15,6 +15,7 @@ serve(async (req) => {
   try {
     const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
     if (!PAYSTACK_SECRET_KEY) {
+      console.error("PAYSTACK_SECRET_KEY is not configured");
       return new Response(JSON.stringify({ error: "Paystack not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -25,8 +26,9 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Validate auth
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -36,6 +38,7 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
+      console.error("Auth error:", authError?.message);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -46,6 +49,8 @@ serve(async (req) => {
     const { action, reference } = body;
 
     if (action === "initialize") {
+      console.log("Initializing payment for user:", user.id, "email:", user.email);
+      
       const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
         method: "POST",
         headers: {
@@ -54,7 +59,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: 4900,
+          amount: 4900, // R49 in kobo
           currency: "ZAR",
           metadata: {
             user_id: user.id,
@@ -63,9 +68,24 @@ serve(async (req) => {
         }),
       });
 
-      const paystackData = await paystackRes.json();
+      const rawText = await paystackRes.text();
+      console.log("Paystack response status:", paystackRes.status);
+      console.log("Paystack response body:", rawText);
+
+      let paystackData;
+      try {
+        paystackData = JSON.parse(rawText);
+      } catch (e) {
+        console.error("Failed to parse Paystack response:", rawText.substring(0, 500));
+        return new Response(JSON.stringify({ error: "Invalid response from payment provider" }), {
+          status: 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       if (!paystackData.status) {
-        return new Response(JSON.stringify({ error: "Failed to initialize payment" }), {
+        console.error("Paystack error:", paystackData.message || "Unknown error");
+        return new Response(JSON.stringify({ error: paystackData.message || "Failed to initialize payment" }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -81,6 +101,7 @@ serve(async (req) => {
         });
 
       if (insertError) {
+        console.error("DB insert error:", insertError.message);
         return new Response(JSON.stringify({ error: insertError.message }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -108,7 +129,18 @@ serve(async (req) => {
         headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
       });
 
-      const paystackData = await paystackRes.json();
+      const rawText = await paystackRes.text();
+      console.log("Paystack verify response:", rawText);
+
+      let paystackData;
+      try {
+        paystackData = JSON.parse(rawText);
+      } catch (e) {
+        return new Response(JSON.stringify({ error: "Invalid response from payment provider" }), {
+          status: 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       if (paystackData.status && paystackData.data.status === "success") {
         await supabase
@@ -140,6 +172,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
+    console.error("Unhandled error:", err.message);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
