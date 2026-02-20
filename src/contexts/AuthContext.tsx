@@ -31,6 +31,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRole(data?.role ?? null);
   };
 
+  const processReferralCode = async (userId: string) => {
+    const code = localStorage.getItem("pending_referral_code");
+    if (!code) return;
+    localStorage.removeItem("pending_referral_code");
+
+    try {
+      // Find referrer by code
+      const { data: referrerProfile } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("referral_code", code)
+        .maybeSingle();
+
+      if (!referrerProfile || referrerProfile.user_id === userId) return;
+
+      // Update referred_by on the new user's profile
+      await supabase
+        .from("profiles")
+        .update({ referred_by: code })
+        .eq("user_id", userId);
+
+      // Create referral record
+      await supabase
+        .from("referrals")
+        .insert({
+          referrer_id: referrerProfile.user_id,
+          referred_user_id: userId,
+          referral_code: code,
+        });
+    } catch {
+      // Silently fail - referral is non-critical
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -41,6 +75,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(() => {
             fetchRole(session.user.id);
           }, 0);
+          // Process pending referral code after first sign-in
+          if (event === 'SIGNED_IN') {
+            setTimeout(() => processReferralCode(session.user.id), 500);
+          }
         } else if (!session) {
           setRole(null);
         }

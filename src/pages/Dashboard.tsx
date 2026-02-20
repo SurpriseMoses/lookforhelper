@@ -16,6 +16,7 @@ import { X } from "lucide-react";
 import VerificationCard from "@/components/dashboard/VerificationCard";
 import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
 import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
+import InviteEarnCard from "@/components/dashboard/InviteEarnCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -485,6 +486,8 @@ const Dashboard = () => {
           </Card>
           </>
         )}
+
+        <InviteEarnCard />
 
         <Button onClick={handleSave} disabled={saving} className="w-full">
           {saving ? "Saving..." : "Save Profile"}

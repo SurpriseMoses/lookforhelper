@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupName, setSignupName] = useState("");
   const [signupRole, setSignupRole] = useState<"seeker" | "helper">(defaultRole as "seeker" | "helper");
+  const [signupReferralCode, setSignupReferralCode] = useState(searchParams.get("ref") || "");
   const [isLoading, setIsLoading] = useState(false);
 
   const { signIn, signUp } = useAuth();
@@ -45,6 +47,13 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await signUp(signupEmail, signupPassword, signupName, signupRole);
+
+      // If a referral code was entered, create the referral record after signup
+      if (signupReferralCode.trim()) {
+        // We store the code in localStorage so we can process it after email verification
+        localStorage.setItem("pending_referral_code", signupReferralCode.trim().toUpperCase());
+      }
+
       toast({
         title: "Account created!",
         description: "Please check your email to verify your account before logging in.",
@@ -148,6 +157,15 @@ const Auth = () => {
                         <Label htmlFor="helper" className="cursor-pointer">Helper (looking for work)</Label>
                       </div>
                     </RadioGroup>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-referral">Referral Code (optional)</Label>
+                    <Input
+                      id="signup-referral"
+                      placeholder="e.g. A1B2C3D4"
+                      value={signupReferralCode}
+                      onChange={(e) => setSignupReferralCode(e.target.value)}
+                    />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Sign Up"}

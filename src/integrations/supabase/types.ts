@@ -418,6 +418,8 @@ export type Database = {
           id: string
           is_suspended: boolean
           is_verified: boolean
+          referral_code: string | null
+          referred_by: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string
@@ -431,6 +433,8 @@ export type Database = {
           id?: string
           is_suspended?: boolean
           is_verified?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -444,6 +448,8 @@ export type Database = {
           id?: string
           is_suspended?: boolean
           is_verified?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string
@@ -456,23 +462,29 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          referral_code: string | null
           referred_user_id: string
           referrer_id: string
           reward_given: boolean
+          status: string
         }
         Insert: {
           created_at?: string
           id?: string
+          referral_code?: string | null
           referred_user_id: string
           referrer_id: string
           reward_given?: boolean
+          status?: string
         }
         Update: {
           created_at?: string
           id?: string
+          referral_code?: string | null
           referred_user_id?: string
           referrer_id?: string
           reward_given?: boolean
+          status?: string
         }
         Relationships: []
       }
