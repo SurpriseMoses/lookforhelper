@@ -59,6 +59,36 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_reference: string | null
+          plan: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          payment_reference?: string | null
+          plan: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_reference?: string | null
+          plan?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       helper_details: {
         Row: {
           about_me: string | null
@@ -66,9 +96,13 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          featured_status: string
+          featured_type: string | null
+          featured_until: string | null
           gender: string | null
           helper_references: Json | null
           id: string
+          is_featured: boolean
           is_published: boolean | null
           languages: string[] | null
           salary_expectation: string | null
@@ -88,9 +122,13 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          featured_status?: string
+          featured_type?: string | null
+          featured_until?: string | null
           gender?: string | null
           helper_references?: Json | null
           id?: string
+          is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
           salary_expectation?: string | null
@@ -110,9 +148,13 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          featured_status?: string
+          featured_type?: string | null
+          featured_until?: string | null
           gender?: string | null
           helper_references?: Json | null
           id?: string
+          is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
           salary_expectation?: string | null
