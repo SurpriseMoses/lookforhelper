@@ -504,10 +504,12 @@ export type Database = {
       }
       seeker_subscriptions: {
         Row: {
+          amount: number | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
           id: string
+          payment_reference: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -515,10 +517,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          payment_reference?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -526,10 +530,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          payment_reference?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

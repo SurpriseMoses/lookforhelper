@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import VerificationCard from "@/components/dashboard/VerificationCard";
 import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
+import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -221,6 +222,9 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Seeker-specific */}
+        {role === "seeker" && <SeekerSubscriptionCard />}
 
         {/* Helper-specific fields */}
         {role === "helper" && (

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-import { Send, ArrowLeft, MessageSquare, Calendar, Flag } from "lucide-react";
+import { Send, ArrowLeft, MessageSquare, Calendar, Flag, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import InterviewRequestDialog from "@/components/messaging/InterviewRequestDialog";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
+import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
+import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 
 interface Conversation {
   id: string;
@@ -48,6 +50,8 @@ const Messages = () => {
   const [showInterview, setShowInterview] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { hasActiveSubscription } = useSeekerSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   // Load conversations
   useEffect(() => {
@@ -148,6 +152,11 @@ const Messages = () => {
 
   const handleSend = async () => {
     if (!newMessage.trim() || !activeConvo || !user || sending) return;
+    // Gate seekers without subscription
+    if (role === "seeker" && !hasActiveSubscription) {
+      setShowPaywall(true);
+      return;
+    }
     setSending(true);
     const { error } = await supabase.from("messages").insert({
       conversation_id: activeConvo,
@@ -268,14 +277,25 @@ const Messages = () => {
                   </h2>
                   <div className="ml-auto flex gap-2">
                     {role === "seeker" && activeHelperUserId && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowInterview(true)}
-                        className="gap-1"
-                      >
-                        <Calendar className="h-4 w-4" /> Book Interview
-                      </Button>
+                      hasActiveSubscription ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowInterview(true)}
+                          className="gap-1"
+                        >
+                          <Calendar className="h-4 w-4" /> Book Interview
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPaywall(true)}
+                          className="gap-1"
+                        >
+                          <Lock className="h-4 w-4" /> Book Interview
+                        </Button>
+                      )
                     )}
                     {activeConversation && (
                       <Button
@@ -359,6 +379,8 @@ const Messages = () => {
             contextId={activeConvo ?? undefined}
           />
         )}
+
+        <SeekerPaywallDialog open={showPaywall} onClose={() => setShowPaywall(false)} />
       </div>
     </div>
   );

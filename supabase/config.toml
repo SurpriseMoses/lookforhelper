@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.paystack-featured-boost]
 verify_jwt = false
+
+[functions.paystack-seeker-subscription]
+verify_jwt = false
