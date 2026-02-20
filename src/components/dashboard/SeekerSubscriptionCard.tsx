@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,36 +8,8 @@ import { format, differenceInDays } from "date-fns";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 
 const SeekerSubscriptionCard = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { hasActiveSubscription, expiresAt, loading, refresh } = useSeekerSubscription();
+  const { hasActiveSubscription, expiresAt, loading } = useSeekerSubscription();
   const [showPaywall, setShowPaywall] = useState(false);
-
-  // Check for returning from Paystack
-  useEffect(() => {
-    const ref = localStorage.getItem("seeker_sub_ref");
-    if (ref && user) {
-      localStorage.removeItem("seeker_sub_ref");
-      verifyPayment(ref);
-    }
-  }, [user]);
-
-  const verifyPayment = async (reference: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("paystack-seeker-subscription", {
-        body: { action: "verify", reference },
-      });
-      if (error) throw error;
-      if (data?.success) {
-        toast({ title: "Messaging unlocked!", description: "You now have 30 days of messaging access." });
-        refresh();
-      } else {
-        toast({ title: "Payment failed", description: "Please try again.", variant: "destructive" });
-      }
-    } catch (err: any) {
-      toast({ title: "Verification error", description: err.message, variant: "destructive" });
-    }
-  };
 
   if (loading) return null;
 
