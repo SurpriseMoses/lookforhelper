@@ -34,22 +34,17 @@ const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "D
 
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [skillFilter, setSkillFilter] = useState(searchParams.get("skill") ?? "all");
-  const [genderFilter, setGenderFilter] = useState(searchParams.get("gender") ?? "all");
-  const [cityFilter, setCityFilter] = useState(searchParams.get("city") ?? "");
-  const [sortBy, setSortBy] = useState(searchParams.get("sort") ?? "newest");
-
-  useEffect(() => {
-    fetchHelpers();
-    return () => {
-      setHelpers([]);
-    };
-  }, [skillFilter, genderFilter, cityFilter, sortBy]);
+  const [skillFilter, setSkillFilter] = useState("all");
+  const [genderFilter, setGenderFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   const fetchHelpers = async () => {
+    setHasSearched(true);
     setLoading(true);
     let query = supabase
       .from("helper_details")
@@ -200,7 +195,11 @@ const Browse = () => {
         </div>
 
         {/* Results */}
-        {loading ? (
+        {!hasSearched ? (
+          <div className="py-20 text-center text-muted-foreground">
+            Use the filters above and click "Search Helpers" to find helpers.
+          </div>
+        ) : loading ? (
           <div className="py-20 text-center text-muted-foreground">Loading helpers...</div>
         ) : helpers.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground">
