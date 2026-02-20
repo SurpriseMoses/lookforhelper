@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ShieldCheck, Upload, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { ShieldCheck, Upload, Clock, CheckCircle, XCircle, Loader2, Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface VerificationPayment {
   id: string;
@@ -22,6 +23,7 @@ interface VerificationRequest {
 }
 
 const VerificationCard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [payment, setPayment] = useState<VerificationPayment | null>(null);
@@ -240,6 +242,9 @@ const VerificationCard = () => {
                   disabled={uploading}
                 />
               </div>
+              <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+                <Home className="h-4 w-4" /> Go to Home
+              </Button>
             </div>
           </div>
         )}
