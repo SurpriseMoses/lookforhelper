@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
+import VerificationCard from "@/components/dashboard/VerificationCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -222,6 +223,8 @@ const Dashboard = () => {
 
         {/* Helper-specific fields */}
         {role === "helper" && (
+          <>
+          <VerificationCard />
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg">Helper Details</CardTitle>
@@ -474,6 +477,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
+          </>
         )}
 
         <Button onClick={handleSave} disabled={saving} className="w-full">

@@ -30,6 +30,7 @@ interface HelperProfile {
   profiles: {
     full_name: string;
     avatar_url: string | null;
+    is_verified?: boolean;
   } | null;
 }
 
@@ -57,7 +58,7 @@ const HelperProfilePage = () => {
 
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, is_verified")
         .eq("user_id", userId)
         .maybeSingle();
 
@@ -124,8 +125,13 @@ const HelperProfilePage = () => {
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                <h1 className="font-display text-2xl font-bold text-foreground">
+                <h1 className="font-display text-2xl font-bold text-foreground flex items-center gap-2 justify-center md:justify-start">
                   {helper.profiles?.full_name}
+                  {helper.profiles?.is_verified && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                      <CheckCircle className="h-3.5 w-3.5" /> Verified Identity
+                    </span>
+                  )}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground md:justify-start">
                   {helper.city && (

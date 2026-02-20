@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link } from "react-router-dom";
 
@@ -21,6 +21,7 @@ interface HelperWithProfile {
   skills: string[] | null;
   languages: string[] | null;
   about_me: string | null;
+  is_verified: boolean;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -95,19 +96,23 @@ const Browse = () => {
       const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, full_name, avatar_url")
+        .select("user_id, full_name, avatar_url, is_verified")
         .in("user_id", eligibleUserIds);
 
       const profileMap = new Map(
-        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }])
+        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified }])
       );
 
-      setHelpers(
-        eligibleHelpers.map((h: any) => ({
-          ...h,
-          profiles: profileMap.get(h.user_id) ?? null,
-        })) as HelperWithProfile[]
-      );
+      const results = eligibleHelpers.map((h: any) => ({
+        ...h,
+        is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
+        profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
+      })) as HelperWithProfile[];
+
+      // Sort: verified helpers first, then by original order
+      results.sort((a, b) => (b.is_verified ? 1 : 0) - (a.is_verified ? 1 : 0));
+
+      setHelpers(results);
     } else {
       setHelpers([]);
     }
@@ -207,8 +212,13 @@ const Browse = () => {
                     )}
                   </div>
                   <CardContent className="p-5">
-                    <h3 className="font-display text-lg font-semibold text-foreground">
+                    <h3 className="font-display text-lg font-semibold text-foreground flex items-center gap-2">
                       {helper.profiles?.full_name ?? "Helper"}
+                      {helper.is_verified && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
+                          <CheckCircle className="h-3 w-3" /> Verified
+                        </span>
+                      )}
                     </h3>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.city && (
