@@ -13,6 +13,7 @@ import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 import Messages from "./pages/Messages";
 import Interviews from "./pages/Interviews";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/helper/:userId" element={<HelperProfile />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/interviews" element={<Interviews />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -308,24 +308,84 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_suspended: boolean
+          is_verified: boolean
+          suspended_at: string | null
+          suspended_reason: string | null
           updated_at: string
           user_id: string
+          verified_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string
           id?: string
+          is_suspended?: boolean
+          is_verified?: boolean
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           user_id: string
+          verified_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string
           id?: string
+          is_suspended?: boolean
+          is_verified?: boolean
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          context_id: string | null
+          context_type: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reported_user_id: string
+          reporter_user_id: string
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          context_id?: string | null
+          context_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reported_user_id: string
+          reporter_user_id: string
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          context_id?: string | null
+          context_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_user_id?: string
+          reporter_user_id?: string
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
