@@ -10,8 +10,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText } from "lucide-react";
 import { format } from "date-fns";
+
+interface VerificationReq {
+  id: string;
+  user_id: string;
+  document_url: string;
+  status: string;
+  rejection_reason: string | null;
+  created_at: string;
+  helper_name: string;
+}
 
 interface Report {
   id: string;
@@ -53,13 +63,43 @@ const AdminDashboard = () => {
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [suspendReason, setSuspendReason] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [verificationRequests, setVerificationRequests] = useState<VerificationReq[]>([]);
+  const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (role === "admin") {
       loadReports();
       loadUsers();
+      loadVerificationRequests();
     }
   }, [role]);
+
+  const loadVerificationRequests = async () => {
+    const { data } = await supabase
+      .from("verification_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!data || data.length === 0) {
+      setVerificationRequests([]);
+      return;
+    }
+
+    const userIds = [...new Set(data.map((r) => r.user_id))];
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", userIds);
+
+    const nameMap = new Map((profiles ?? []).map((p) => [p.user_id, p.full_name]));
+
+    setVerificationRequests(
+      data.map((r) => ({
+        ...r,
+        helper_name: nameMap.get(r.user_id) ?? "Unknown",
+      }))
+    );
+  };
 
   const loadReports = async () => {
     const { data } = await supabase
@@ -173,6 +213,47 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleApproveVerification = async (reqId: string, userId: string) => {
+    const { error: reqError } = await supabase
+      .from("verification_requests")
+      .update({ status: "approved", reviewed_by: user?.id })
+      .eq("id", reqId);
+
+    if (reqError) {
+      toast({ title: "Error", description: reqError.message, variant: "destructive" });
+      return;
+    }
+
+    await supabase
+      .from("profiles")
+      .update({ is_verified: true, verified_at: new Date().toISOString() })
+      .eq("user_id", userId);
+
+    toast({ title: "Verification approved!" });
+    loadVerificationRequests();
+    loadUsers();
+  };
+
+  const handleRejectVerification = async (reqId: string) => {
+    const reason = rejectionReasons[reqId];
+    if (!reason) {
+      toast({ title: "Please provide a rejection reason", variant: "destructive" });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("verification_requests")
+      .update({ status: "rejected", rejection_reason: reason, reviewed_by: user?.id })
+      .eq("id", reqId);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Verification rejected" });
+      loadVerificationRequests();
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -246,6 +327,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="users" className="gap-1.5">
               <UserCheck className="h-4 w-4" /> Users
+            </TabsTrigger>
+            <TabsTrigger value="verifications" className="gap-1.5">
+              <ShieldCheck className="h-4 w-4" /> Verifications {verificationRequests.filter(v => v.status === "pending").length > 0 && `(${verificationRequests.filter(v => v.status === "pending").length})`}
             </TabsTrigger>
           </TabsList>
 
@@ -390,6 +474,80 @@ const AdminDashboard = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+          {/* Verifications Tab */}
+          <TabsContent value="verifications">
+            {verificationRequests.length === 0 ? (
+              <div className="py-10 text-center text-muted-foreground">
+                <ShieldCheck className="mx-auto h-8 w-8 mb-2 opacity-30" />
+                No verification requests yet.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {verificationRequests.map((vr) => (
+                  <Card key={vr.id}>
+                    <CardContent className="p-5 space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{vr.helper_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Submitted {format(new Date(vr.created_at), "MMM d, yyyy HH:mm")}
+                          </p>
+                        </div>
+                        <Badge className={STATUS_COLORS[vr.status] ?? ""}>
+                          {vr.status.charAt(0).toUpperCase() + vr.status.slice(1)}
+                        </Badge>
+                      </div>
+
+                      {/* Document viewer */}
+                      <div className="rounded-lg border p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">Identity Document</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            const { data } = await supabase.storage
+                              .from("identity-documents")
+                              .createSignedUrl(vr.document_url, 300);
+                            if (data?.signedUrl) {
+                              window.open(data.signedUrl, "_blank");
+                            }
+                          }}
+                          className="gap-1"
+                        >
+                          <Eye className="h-4 w-4" /> View Document
+                        </Button>
+                      </div>
+
+                      {vr.rejection_reason && (
+                        <p className="text-sm text-muted-foreground">Rejection reason: {vr.rejection_reason}</p>
+                      )}
+
+                      {vr.status === "pending" && (
+                        <div className="border-t pt-3 space-y-3">
+                          <Input
+                            placeholder="Rejection reason (required to reject)..."
+                            value={rejectionReasons[vr.id] ?? ""}
+                            onChange={(e) => setRejectionReasons((prev) => ({ ...prev, [vr.id]: e.target.value }))}
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => handleApproveVerification(vr.id, vr.user_id)} className="gap-1">
+                              <CheckCircle className="h-4 w-4" /> Approve
+                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => handleRejectVerification(vr.id)} className="gap-1">
+                              <XCircle className="h-4 w-4" /> Reject
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

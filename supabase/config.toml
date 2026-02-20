@@ -1,1 +1,4 @@
 project_id = "feqrqurnvujxqvxifkny"
+
+[functions.paystack-verify-payment]
+verify_jwt = false
