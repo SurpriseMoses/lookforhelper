@@ -24,6 +24,8 @@ interface HelperWithProfile {
   is_verified: boolean;
   is_featured: boolean;
   featured_until: string | null;
+  average_rating: number;
+  total_reviews: number;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -48,7 +50,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until")
+      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -107,6 +109,8 @@ const Browse = () => {
           ...h,
           is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
           is_featured: isFeaturedActive,
+          average_rating: Number(h.average_rating) || 0,
+          total_reviews: h.total_reviews || 0,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
@@ -118,7 +122,10 @@ const Browse = () => {
         if (bFeatured !== aFeatured) return bFeatured - aFeatured;
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
-        return bVerified - aVerified;
+        if (bVerified !== aVerified) return bVerified - aVerified;
+        // Then by average rating
+        if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
+        return 0;
       });
 
       setHelpers(results);
@@ -239,6 +246,13 @@ const Browse = () => {
                       )}
                     </h3>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                      {helper.total_reviews > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                          {helper.average_rating.toFixed(1)}
+                          <span className="text-xs">({helper.total_reviews})</span>
+                        </span>
+                      )}
                       {helper.city && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" /> {helper.city}

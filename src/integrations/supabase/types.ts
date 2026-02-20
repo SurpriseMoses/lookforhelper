@@ -93,6 +93,7 @@ export type Database = {
         Row: {
           about_me: string | null
           age: number | null
+          average_rating: number | null
           city: string | null
           country: string | null
           created_at: string
@@ -110,6 +111,7 @@ export type Database = {
           salary_min: number | null
           salary_negotiable: boolean | null
           skills: string[] | null
+          total_reviews: number | null
           updated_at: string
           user_id: string
           video_introduction_url: string | null
@@ -119,6 +121,7 @@ export type Database = {
         Insert: {
           about_me?: string | null
           age?: number | null
+          average_rating?: number | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -136,6 +139,7 @@ export type Database = {
           salary_min?: number | null
           salary_negotiable?: boolean | null
           skills?: string[] | null
+          total_reviews?: number | null
           updated_at?: string
           user_id: string
           video_introduction_url?: string | null
@@ -145,6 +149,7 @@ export type Database = {
         Update: {
           about_me?: string | null
           age?: number | null
+          average_rating?: number | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -162,11 +167,39 @@ export type Database = {
           salary_min?: number | null
           salary_negotiable?: boolean | null
           skills?: string[] | null
+          total_reviews?: number | null
           updated_at?: string
           user_id?: string
           video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
           years_experience?: number | null
+        }
+        Relationships: []
+      }
+      helper_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          helper_id: string
+          id: string
+          rating: number
+          seeker_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          helper_id: string
+          id?: string
+          rating: number
+          seeker_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          helper_id?: string
+          id?: string
+          rating?: number
+          seeker_id?: string
         }
         Relationships: []
       }
