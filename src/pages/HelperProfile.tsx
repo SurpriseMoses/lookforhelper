@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -27,6 +27,8 @@ interface HelperProfile {
   about_me: string | null;
   video_introduction_url: string | null;
   helper_references: { name: string; relationship: string }[] | null;
+  is_featured: boolean;
+  featured_until: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -62,8 +64,13 @@ const HelperProfilePage = () => {
         .eq("user_id", userId)
         .maybeSingle();
 
+      const now = new Date();
+      const isFeaturedActive = (helperData as any).is_featured && (helperData as any).featured_until && new Date((helperData as any).featured_until) > now;
+
       setHelper({
         ...helperData,
+        is_featured: isFeaturedActive,
+        featured_until: (helperData as any).featured_until,
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
       } as HelperProfile);
@@ -130,6 +137,11 @@ const HelperProfilePage = () => {
                   {helper.profiles?.is_verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
                       <CheckCircle className="h-3.5 w-3.5" /> Verified Identity
+                    </span>
+                  )}
+                  {helper.is_featured && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                      <Star className="h-3.5 w-3.5" /> Featured Helper
                     </span>
                   )}
                 </h1>

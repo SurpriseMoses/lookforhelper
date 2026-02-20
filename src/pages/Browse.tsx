@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link } from "react-router-dom";
 
@@ -22,6 +22,8 @@ interface HelperWithProfile {
   languages: string[] | null;
   about_me: string | null;
   is_verified: boolean;
+  is_featured: boolean;
+  featured_until: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -51,7 +53,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me")
+      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -103,14 +105,26 @@ const Browse = () => {
         (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified }])
       );
 
-      const results = eligibleHelpers.map((h: any) => ({
-        ...h,
-        is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
-        profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
-      })) as HelperWithProfile[];
+      const now = new Date();
+      const results = eligibleHelpers.map((h: any) => {
+        const isFeaturedActive = h.is_featured && h.featured_until && new Date(h.featured_until) > now;
+        return {
+          ...h,
+          is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
+          is_featured: isFeaturedActive,
+          profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
+        };
+      }) as HelperWithProfile[];
 
-      // Sort: verified helpers first, then by original order
-      results.sort((a, b) => (b.is_verified ? 1 : 0) - (a.is_verified ? 1 : 0));
+      // Sort: featured first, then verified, then newest
+      results.sort((a, b) => {
+        const aFeatured = a.is_featured ? 1 : 0;
+        const bFeatured = b.is_featured ? 1 : 0;
+        if (bFeatured !== aFeatured) return bFeatured - aFeatured;
+        const aVerified = a.is_verified ? 1 : 0;
+        const bVerified = b.is_verified ? 1 : 0;
+        return bVerified - aVerified;
+      });
 
       setHelpers(results);
     } else {
@@ -196,8 +210,13 @@ const Browse = () => {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {helpers.map((helper) => (
               <Link key={helper.user_id} to={`/helper/${helper.user_id}`}>
-                <Card className="overflow-hidden transition-shadow hover:shadow-lg cursor-pointer">
-                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                <Card className={`overflow-hidden transition-shadow hover:shadow-lg cursor-pointer ${helper.is_featured ? "ring-2 ring-amber-400/50" : ""}`}>
+                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    {helper.is_featured && (
+                      <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
+                        <Star className="h-3 w-3" /> Featured
+                      </span>
+                    )}
                     {helper.profiles?.avatar_url ? (
                       <img
                         src={helper.profiles.avatar_url}

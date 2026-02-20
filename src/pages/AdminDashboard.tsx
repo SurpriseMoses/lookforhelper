@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star } from "lucide-react";
 import { format } from "date-fns";
 
 interface VerificationReq {
@@ -65,14 +65,42 @@ const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [verificationRequests, setVerificationRequests] = useState<VerificationReq[]>([]);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
+  const [featuredStats, setFeaturedStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
 
   useEffect(() => {
     if (role === "admin") {
       loadReports();
       loadUsers();
       loadVerificationRequests();
+      loadFeaturedStats();
     }
   }, [role]);
+
+  const loadFeaturedStats = async () => {
+    const { data: payments } = await supabase
+      .from("featured_payments")
+      .select("status, amount");
+
+    const paidPayments = (payments ?? []).filter((p: any) => p.status === "paid");
+    const totalRevenue = paidPayments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+
+    const { data: helpers } = await supabase
+      .from("helper_details")
+      .select("is_featured, featured_until, featured_status")
+      .neq("featured_status", "none");
+
+    const now = new Date();
+    const allFeatured = helpers ?? [];
+    const active = allFeatured.filter((h: any) => h.is_featured && h.featured_until && new Date(h.featured_until) > now);
+    const expired = allFeatured.filter((h: any) => !h.is_featured || (h.featured_until && new Date(h.featured_until) <= now));
+
+    setFeaturedStats({
+      total: allFeatured.length,
+      active: active.length,
+      expired: expired.length,
+      revenue: totalRevenue,
+    });
+  };
 
   const loadVerificationRequests = async () => {
     const { data } = await supabase
@@ -331,6 +359,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="verifications" className="gap-1.5">
               <ShieldCheck className="h-4 w-4" /> Verifications {verificationRequests.filter(v => v.status === "pending").length > 0 && `(${verificationRequests.filter(v => v.status === "pending").length})`}
             </TabsTrigger>
+            <TabsTrigger value="featured" className="gap-1.5">
+              <Star className="h-4 w-4" /> Featured
+            </TabsTrigger>
           </TabsList>
 
           {/* Reports Tab */}
@@ -548,6 +579,36 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Featured Tab */}
+          <TabsContent value="featured">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{featuredStats.total}</p>
+                  <p className="text-xs text-muted-foreground">Total Featured</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{featuredStats.active}</p>
+                  <p className="text-xs text-muted-foreground">Active Featured</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{featuredStats.expired}</p>
+                  <p className="text-xs text-muted-foreground">Expired Featured</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-amber-600">R{featuredStats.revenue.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Total Revenue</p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
