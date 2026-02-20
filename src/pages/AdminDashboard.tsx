@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift } from "lucide-react";
 import { format } from "date-fns";
 
 interface VerificationReq {
@@ -67,6 +67,7 @@ const AdminDashboard = () => {
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
   const [featuredStats, setFeaturedStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
   const [seekerSubStats, setSeekerSubStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
+  const [referralStats, setReferralStats] = useState({ total: 0, pending: 0, completed: 0, rewarded: 0 });
 
   useEffect(() => {
     if (role === "admin") {
@@ -75,6 +76,7 @@ const AdminDashboard = () => {
       loadVerificationRequests();
       loadFeaturedStats();
       loadSeekerSubStats();
+      loadReferralStats();
     }
   }, [role]);
 
@@ -120,6 +122,20 @@ const AdminDashboard = () => {
       active: activeSubs.length,
       expired: expiredSubs.length,
       revenue: totalRevenue,
+    });
+  };
+
+  const loadReferralStats = async () => {
+    const { data } = await supabase
+      .from("referrals")
+      .select("status, reward_given");
+
+    const all = data ?? [];
+    setReferralStats({
+      total: all.length,
+      pending: all.filter((r: any) => r.status === "pending").length,
+      completed: all.filter((r: any) => r.status === "completed").length,
+      rewarded: all.filter((r: any) => r.reward_given).length,
     });
   };
 
@@ -385,6 +401,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="seeker-plans" className="gap-1.5">
               <MessageSquare className="h-4 w-4" /> Seeker Plans
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="gap-1.5">
+              <Gift className="h-4 w-4" /> Referrals
             </TabsTrigger>
           </TabsList>
 
@@ -660,6 +679,36 @@ const AdminDashboard = () => {
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-primary">R{seekerSubStats.revenue.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">Total Revenue</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Referrals Tab */}
+          <TabsContent value="referrals">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{referralStats.total}</p>
+                  <p className="text-xs text-muted-foreground">Total Referrals</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{referralStats.pending}</p>
+                  <p className="text-xs text-muted-foreground">Pending</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{referralStats.completed}</p>
+                  <p className="text-xs text-muted-foreground">Completed</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-primary">{referralStats.rewarded}</p>
+                  <p className="text-xs text-muted-foreground">Rewards Issued</p>
                 </CardContent>
               </Card>
             </div>
