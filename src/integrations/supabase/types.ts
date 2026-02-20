@@ -223,6 +223,50 @@ export type Database = {
           },
         ]
       }
+      job_hires: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          helper_confirmed: boolean
+          helper_user_id: string
+          id: string
+          interview_id: string
+          seeker_confirmed: boolean
+          seeker_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          helper_confirmed?: boolean
+          helper_user_id: string
+          id?: string
+          interview_id: string
+          seeker_confirmed?: boolean
+          seeker_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          helper_confirmed?: boolean
+          helper_user_id?: string
+          id?: string
+          interview_id?: string
+          seeker_confirmed?: boolean
+          seeker_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_hires_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: true
+            referencedRelation: "interviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -284,6 +328,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          interview_id: string
+          rating: number
+          reviewee_user_id: string
+          reviewer_user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          interview_id: string
+          rating: number
+          reviewee_user_id: string
+          reviewer_user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          interview_id?: string
+          rating?: number
+          reviewee_user_id?: string
+          reviewer_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: false
+            referencedRelation: "interviews"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seeker_subscriptions: {
         Row: {

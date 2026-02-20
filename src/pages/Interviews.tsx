@@ -8,8 +8,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Video, MapPin, Check, X, Clock } from "lucide-react";
+import { Calendar, Video, MapPin, Check, X, Clock, Star, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
+import ReviewDialog from "@/components/interviews/ReviewDialog";
+import HireConfirmation from "@/components/interviews/HireConfirmation";
 
 interface Interview {
   id: string;
@@ -41,11 +43,23 @@ const Interviews = () => {
   const [loading, setLoading] = useState(true);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [responseText, setResponseText] = useState("");
+  const [reviewTarget, setReviewTarget] = useState<{ interviewId: string; revieweeId: string; revieweeName: string } | null>(null);
+  const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) return;
     loadInterviews();
+    loadExistingReviews();
   }, [user]);
+
+  const loadExistingReviews = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("reviews")
+      .select("interview_id")
+      .eq("reviewer_user_id", user.id);
+    setExistingReviews(new Set((data ?? []).map((r) => r.interview_id)));
+  };
 
   const loadInterviews = async () => {
     if (!user) return;
@@ -108,6 +122,19 @@ const Interviews = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Interview cancelled" });
+      loadInterviews();
+    }
+  };
+
+  const handleMarkComplete = async (interviewId: string) => {
+    const { error } = await supabase
+      .from("interviews")
+      .update({ status: "completed" })
+      .eq("id", interviewId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Interview marked as completed!" });
       loadInterviews();
     }
   };
@@ -233,6 +260,53 @@ const Interviews = () => {
                         </Button>
                       </div>
                     )}
+
+                    {/* Mark as completed for accepted interviews */}
+                    {interview.status === "accepted" && (
+                      <div className="mt-4 border-t pt-4">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleMarkComplete(interview.id)}
+                          className="gap-1"
+                        >
+                          <CheckCircle className="h-4 w-4" /> Mark as Completed
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Review & Hire for completed interviews */}
+                    {interview.status === "completed" && (
+                      <div className="mt-4 border-t pt-4 space-y-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {!existingReviews.has(interview.id) ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setReviewTarget({
+                                  interviewId: interview.id,
+                                  revieweeId: isHelper ? interview.seeker_user_id : interview.helper_user_id,
+                                  revieweeName: interview.other_name,
+                                })
+                              }
+                              className="gap-1"
+                            >
+                              <Star className="h-4 w-4" /> Leave Review
+                            </Button>
+                          ) : (
+                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Star className="h-4 w-4 fill-amber-400 text-amber-400" /> Reviewed
+                            </span>
+                          )}
+                        </div>
+                        <HireConfirmation
+                          interviewId={interview.id}
+                          seekerUserId={interview.seeker_user_id}
+                          helperUserId={interview.helper_user_id}
+                        />
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -240,6 +314,20 @@ const Interviews = () => {
           </div>
         )}
       </div>
+
+      {/* Review Dialog */}
+      {reviewTarget && (
+        <ReviewDialog
+          open={!!reviewTarget}
+          onClose={() => {
+            setReviewTarget(null);
+            loadExistingReviews();
+          }}
+          interviewId={reviewTarget.interviewId}
+          revieweeUserId={reviewTarget.revieweeId}
+          revieweeName={reviewTarget.revieweeName}
+        />
+      )}
     </div>
   );
 };
