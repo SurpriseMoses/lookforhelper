@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
+import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
+import HelperReviewsList from "@/components/reviews/HelperReviewsList";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface HelperProfile {
@@ -29,6 +31,8 @@ interface HelperProfile {
   helper_references: { name: string; relationship: string }[] | null;
   is_featured: boolean;
   featured_until: string | null;
+  average_rating: number;
+  total_reviews: number;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -42,6 +46,8 @@ const HelperProfilePage = () => {
   const [helper, setHelper] = useState<HelperProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showReport, setShowReport] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -71,6 +77,8 @@ const HelperProfilePage = () => {
         ...helperData,
         is_featured: isFeaturedActive,
         featured_until: (helperData as any).featured_until,
+        average_rating: (helperData as any).average_rating ?? 0,
+        total_reviews: (helperData as any).total_reviews ?? 0,
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
       } as HelperProfile);
@@ -145,6 +153,18 @@ const HelperProfilePage = () => {
                     </span>
                   )}
                 </h1>
+                {/* Rating display */}
+                {helper.total_reviews > 0 && (
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <span className="text-sm font-semibold text-foreground">
+                      {Number(helper.average_rating).toFixed(1)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ({helper.total_reviews} {helper.total_reviews === 1 ? "review" : "reviews"})
+                    </span>
+                  </div>
+                )}
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground md:justify-start">
                   {helper.city && (
                     <span className="flex items-center gap-1">
@@ -243,13 +263,26 @@ const HelperProfilePage = () => {
               </div>
             )}
 
-            {/* Contact & Report */}
+            {/* Reviews */}
+            <HelperReviewsList helperUserId={helper.user_id} refreshKey={reviewRefreshKey} />
+
+            {/* Contact, Review & Report */}
             <div className="mt-8 flex items-center gap-3 flex-wrap">
               <ContactHelperButton helperUserId={helper.user_id} />
               {user && user.id !== helper.user_id && (
-                <Button variant="ghost" size="sm" onClick={() => setShowReport(true)} className="gap-1 text-muted-foreground">
-                  <Flag className="h-4 w-4" /> Report
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowReview(true)}
+                    className="gap-1"
+                  >
+                    <MessageSquarePlus className="h-4 w-4" /> Leave Review
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowReport(true)} className="gap-1 text-muted-foreground">
+                    <Flag className="h-4 w-4" /> Report
+                  </Button>
+                </>
               )}
             </div>
           </CardContent>
@@ -262,6 +295,16 @@ const HelperProfilePage = () => {
           onClose={() => setShowReport(false)}
           reportedUserId={userId}
           contextType="profile"
+        />
+      )}
+
+      {showReview && userId && (
+        <ReviewHelperDialog
+          open={showReview}
+          onClose={() => setShowReview(false)}
+          helperUserId={userId}
+          helperName={helper?.profiles?.full_name ?? "Helper"}
+          onReviewSubmitted={() => setReviewRefreshKey((k) => k + 1)}
         />
       )}
     </div>
