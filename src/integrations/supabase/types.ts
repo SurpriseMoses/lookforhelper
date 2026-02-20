@@ -484,6 +484,77 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_reference: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_reference?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_reference?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_requests: {
+        Row: {
+          created_at: string
+          document_url: string
+          id: string
+          payment_id: string
+          rejection_reason: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_url: string
+          id?: string
+          payment_id: string
+          rejection_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_url?: string
+          id?: string
+          payment_id?: string
+          rejection_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_requests_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "verification_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
