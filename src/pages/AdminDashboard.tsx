@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 
 interface VerificationReq {
@@ -66,6 +66,7 @@ const AdminDashboard = () => {
   const [verificationRequests, setVerificationRequests] = useState<VerificationReq[]>([]);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
   const [featuredStats, setFeaturedStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
+  const [seekerSubStats, setSeekerSubStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
 
   useEffect(() => {
     if (role === "admin") {
@@ -73,6 +74,7 @@ const AdminDashboard = () => {
       loadUsers();
       loadVerificationRequests();
       loadFeaturedStats();
+      loadSeekerSubStats();
     }
   }, [role]);
 
@@ -98,6 +100,25 @@ const AdminDashboard = () => {
       total: allFeatured.length,
       active: active.length,
       expired: expired.length,
+      revenue: totalRevenue,
+    });
+  };
+
+  const loadSeekerSubStats = async () => {
+    const { data: subs } = await supabase
+      .from("seeker_subscriptions")
+      .select("status, amount, current_period_end");
+
+    const all = subs ?? [];
+    const now = new Date();
+    const activeSubs = all.filter((s: any) => s.status === "active" && s.current_period_end && new Date(s.current_period_end) > now);
+    const expiredSubs = all.filter((s: any) => s.status === "expired" || (s.status === "active" && s.current_period_end && new Date(s.current_period_end) <= now));
+    const totalRevenue = all.filter((s: any) => s.status === "active" || s.status === "expired").reduce((sum: number, s: any) => sum + Number(s.amount || 0), 0);
+
+    setSeekerSubStats({
+      total: all.filter((s: any) => s.status !== "free").length,
+      active: activeSubs.length,
+      expired: expiredSubs.length,
       revenue: totalRevenue,
     });
   };
@@ -362,6 +383,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="featured" className="gap-1.5">
               <Star className="h-4 w-4" /> Featured
             </TabsTrigger>
+            <TabsTrigger value="seeker-plans" className="gap-1.5">
+              <MessageSquare className="h-4 w-4" /> Seeker Plans
+            </TabsTrigger>
           </TabsList>
 
           {/* Reports Tab */}
@@ -605,6 +629,36 @@ const AdminDashboard = () => {
               <Card>
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-amber-600">R{featuredStats.revenue.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Total Revenue</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Seeker Plans Tab */}
+          <TabsContent value="seeker-plans">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{seekerSubStats.total}</p>
+                  <p className="text-xs text-muted-foreground">Total Subscriptions</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{seekerSubStats.active}</p>
+                  <p className="text-xs text-muted-foreground">Active</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{seekerSubStats.expired}</p>
+                  <p className="text-xs text-muted-foreground">Expired</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-primary">R{seekerSubStats.revenue.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">Total Revenue</p>
                 </CardContent>
               </Card>

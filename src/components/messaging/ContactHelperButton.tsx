@@ -4,7 +4,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Lock } from "lucide-react";
+import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
+import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 
 interface Props {
   helperUserId: string;
@@ -14,7 +16,9 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasActiveSubscription } = useSeekerSubscription();
   const [loading, setLoading] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const handleContact = async () => {
     if (!user) {
@@ -23,6 +27,12 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
     }
     if (role !== "seeker") {
       toast({ title: "Only seekers can message helpers", variant: "destructive" });
+      return;
+    }
+
+    // Check subscription
+    if (!hasActiveSubscription) {
+      setShowPaywall(true);
       return;
     }
 
@@ -57,15 +67,27 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
     setLoading(false);
   };
 
+  const isLocked = role === "seeker" && !hasActiveSubscription;
+
   return (
-    <div className="mt-8 rounded-xl border bg-muted/50 p-6 text-center">
-      <p className="text-sm text-muted-foreground">
-        Interested in this helper? Send them a message to get started.
-      </p>
-      <Button onClick={handleContact} disabled={loading} className="mt-3 gap-2">
-        <MessageSquare className="h-4 w-4" /> {loading ? "Starting..." : "Contact Helper"}
-      </Button>
-    </div>
+    <>
+      <div className="mt-8 rounded-xl border bg-muted/50 p-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {isLocked
+            ? "Messaging requires an active plan (R25 / 30 days)"
+            : "Interested in this helper? Send them a message to get started."}
+        </p>
+        <Button onClick={handleContact} disabled={loading} className="mt-3 gap-2">
+          {isLocked ? (
+            <><Lock className="h-4 w-4" /> Unlock Messaging</>
+          ) : (
+            <><MessageSquare className="h-4 w-4" /> {loading ? "Starting..." : "Contact Helper"}</>
+          )}
+        </Button>
+      </div>
+
+      <SeekerPaywallDialog open={showPaywall} onClose={() => setShowPaywall(false)} />
+    </>
   );
 };
 

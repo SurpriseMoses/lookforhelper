@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SeekerSubscriptionProvider } from "@/contexts/SeekerSubscriptionContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Browse from "./pages/Browse";
@@ -24,19 +25,21 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/browse" element={<Browse />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/helper/:userId" element={<HelperProfile />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/interviews" element={<Interviews />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <SeekerSubscriptionProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/browse" element={<Browse />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/helper/:userId" element={<HelperProfile />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/interviews" element={<Interviews />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </SeekerSubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
