@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
+import ReportUserDialog from "@/components/moderation/ReportUserDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HelperProfile {
   user_id: string;
@@ -33,8 +35,10 @@ interface HelperProfile {
 
 const HelperProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
+  const { user } = useAuth();
   const [helper, setHelper] = useState<HelperProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -221,11 +225,27 @@ const HelperProfilePage = () => {
               </div>
             )}
 
-            {/* Contact CTA */}
-            <ContactHelperButton helperUserId={helper.user_id} />
+            {/* Contact & Report */}
+            <div className="mt-8 flex items-center gap-3 flex-wrap">
+              <ContactHelperButton helperUserId={helper.user_id} />
+              {user && user.id !== helper.user_id && (
+                <Button variant="ghost" size="sm" onClick={() => setShowReport(true)} className="gap-1 text-muted-foreground">
+                  <Flag className="h-4 w-4" /> Report
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
+
+      {showReport && userId && (
+        <ReportUserDialog
+          open={showReport}
+          onClose={() => setShowReport(false)}
+          reportedUserId={userId}
+          contextType="profile"
+        />
+      )}
     </div>
   );
 };

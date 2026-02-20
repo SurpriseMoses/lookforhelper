@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-import { Send, ArrowLeft, MessageSquare, Calendar } from "lucide-react";
+import { Send, ArrowLeft, MessageSquare, Calendar, Flag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import InterviewRequestDialog from "@/components/messaging/InterviewRequestDialog";
+import ReportUserDialog from "@/components/moderation/ReportUserDialog";
 
 interface Conversation {
   id: string;
@@ -45,6 +46,7 @@ const Messages = () => {
   const [sending, setSending] = useState(false);
   const [loadingConvos, setLoadingConvos] = useState(true);
   const [showInterview, setShowInterview] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load conversations
@@ -275,6 +277,16 @@ const Messages = () => {
                         <Calendar className="h-4 w-4" /> Book Interview
                       </Button>
                     )}
+                    {activeConversation && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowReport(true)}
+                        className="gap-1 text-muted-foreground"
+                      >
+                        <Flag className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
 
@@ -330,6 +342,21 @@ const Messages = () => {
             onClose={() => setShowInterview(false)}
             helperUserId={activeHelperUserId}
             conversationId={activeConvo}
+          />
+        )}
+
+        {/* Report Dialog */}
+        {showReport && activeConversation && (
+          <ReportUserDialog
+            open={showReport}
+            onClose={() => setShowReport(false)}
+            reportedUserId={
+              activeConversation.seeker_user_id === user.id
+                ? activeConversation.helper_user_id
+                : activeConversation.seeker_user_id
+            }
+            contextType="message"
+            contextId={activeConvo ?? undefined}
           />
         )}
       </div>
