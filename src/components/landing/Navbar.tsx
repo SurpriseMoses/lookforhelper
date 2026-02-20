@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X, MessageSquare, Calendar, Shield } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,6 +34,7 @@ const Navbar = () => {
               <Button variant="ghost" asChild className="gap-1.5">
                 <Link to="/interviews"><Calendar className="h-4 w-4" /> Interviews</Link>
               </Button>
+              <NotificationBell />
               <Button variant="outline" asChild>
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
