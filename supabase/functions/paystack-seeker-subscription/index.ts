@@ -67,21 +67,30 @@ serve(async (req) => {
     if (action === "initialize") {
       console.log("Initializing seeker subscription for user:", user.id);
 
+      // Get the origin from the request headers for callback
+      const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || "";
+      const callbackUrl = origin ? `${origin}/dashboard` : "";
+
+      const initBody: Record<string, unknown> = {
+        email: user.email,
+        amount: PLAN_AMOUNT,
+        currency: "ZAR",
+        metadata: {
+          user_id: user.id,
+          feature_type: "seeker_subscription",
+        },
+      };
+      if (callbackUrl) {
+        initBody.callback_url = callbackUrl;
+      }
+
       const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: user.email,
-          amount: PLAN_AMOUNT,
-          currency: "ZAR",
-          metadata: {
-            user_id: user.id,
-            feature_type: "seeker_subscription",
-          },
-        }),
+        body: JSON.stringify(initBody),
       });
 
       const rawText = await paystackRes.text();
