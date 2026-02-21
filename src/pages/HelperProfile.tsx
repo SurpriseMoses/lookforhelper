@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -49,6 +49,7 @@ const HelperProfilePage = () => {
   const [showReport, setShowReport] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+  const [hireCount, setHireCount] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -84,6 +85,15 @@ const HelperProfilePage = () => {
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
       } as HelperProfile);
+
+      // Fetch confirmed hire count
+      const { count } = await supabase
+        .from("hires")
+        .select("id", { count: "exact", head: true })
+        .eq("helper_id", userId)
+        .eq("status", "confirmed");
+      setHireCount(count ?? 0);
+
       setLoading(false);
     };
 
@@ -174,6 +184,13 @@ const HelperProfilePage = () => {
                     </span>
                     <span className="text-sm text-muted-foreground">
                       ({helper.total_reviews} {helper.total_reviews === 1 ? "review" : "reviews"})
+                    </span>
+                  </div>
+                )}
+                {hireCount > 0 && (
+                  <div className="mt-1">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                      <Briefcase className="h-3.5 w-3.5" /> Hired {hireCount} {hireCount === 1 ? "time" : "times"}
                     </span>
                   </div>
                 )}

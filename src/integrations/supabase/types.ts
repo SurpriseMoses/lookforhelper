@@ -248,6 +248,53 @@ export type Database = {
         }
         Relationships: []
       }
+      hires: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by_helper: boolean
+          confirmed_by_seeker: boolean
+          conversation_id: string | null
+          created_at: string
+          helper_id: string
+          id: string
+          seeker_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by_helper?: boolean
+          confirmed_by_seeker?: boolean
+          conversation_id?: string | null
+          created_at?: string
+          helper_id: string
+          id?: string
+          seeker_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by_helper?: boolean
+          confirmed_by_seeker?: boolean
+          conversation_id?: string | null
+          created_at?: string
+          helper_id?: string
+          id?: string
+          seeker_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hires_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       interviews: {
         Row: {
           conversation_id: string | null

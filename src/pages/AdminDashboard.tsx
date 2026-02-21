@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 
 interface VerificationReq {
@@ -69,6 +69,7 @@ const AdminDashboard = () => {
   const [seekerSubStats, setSeekerSubStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
   const [referralStats, setReferralStats] = useState({ total: 0, pending: 0, completed: 0, rewarded: 0 });
   const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
+  const [hireStats, setHireStats] = useState({ total: 0, confirmed: 0, pending: 0 });
 
   useEffect(() => {
     if (role === "admin") {
@@ -79,6 +80,7 @@ const AdminDashboard = () => {
       loadSeekerSubStats();
       loadReferralStats();
       loadBgCheckStats();
+      loadHireStats();
     }
   }, [role]);
 
@@ -138,6 +140,16 @@ const AdminDashboard = () => {
       pending: all.filter((r: any) => r.status === "pending").length,
       completed: all.filter((r: any) => r.status === "completed").length,
       rewarded: all.filter((r: any) => r.reward_given).length,
+    });
+  };
+
+  const loadHireStats = async () => {
+    const { data } = await supabase.from("hires").select("status");
+    const all = data ?? [];
+    setHireStats({
+      total: all.length,
+      confirmed: all.filter((h: any) => h.status === "confirmed").length,
+      pending: all.filter((h: any) => h.status === "pending").length,
     });
   };
 
@@ -414,6 +426,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="referrals" className="gap-1.5">
               <Gift className="h-4 w-4" /> Referrals
+            </TabsTrigger>
+            <TabsTrigger value="hires" className="gap-1.5">
+              <Briefcase className="h-4 w-4" /> Hires
             </TabsTrigger>
             <TabsTrigger value="bg-checks" className="gap-1.5">
               <Search className="h-4 w-4" /> BG Checks
@@ -722,6 +737,30 @@ const AdminDashboard = () => {
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-primary">{referralStats.rewarded}</p>
                   <p className="text-xs text-muted-foreground">Rewards Issued</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Hires Tab */}
+          <TabsContent value="hires">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{hireStats.total}</p>
+                  <p className="text-xs text-muted-foreground">Total Hires</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-emerald-600">{hireStats.confirmed}</p>
+                  <p className="text-xs text-muted-foreground">Confirmed</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-amber-600">{hireStats.pending}</p>
+                  <p className="text-xs text-muted-foreground">Pending</p>
                 </CardContent>
               </Card>
             </div>

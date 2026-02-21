@@ -18,6 +18,7 @@ import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
 import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
 import InviteEarnCard from "@/components/dashboard/InviteEarnCard";
 import BackgroundCheckCard from "@/components/dashboard/BackgroundCheckCard";
+import MyHiresCard from "@/components/dashboard/MyHiresCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -489,6 +490,7 @@ const Dashboard = () => {
           </>
         )}
 
+        <MyHiresCard />
         <InviteEarnCard />
 
         <Button onClick={handleSave} disabled={saving} className="w-full">
