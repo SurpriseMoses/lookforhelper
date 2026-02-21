@@ -211,7 +211,7 @@ const Browse = () => {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="available_now">Available Now only</SelectItem>
+                  <SelectItem value="available_now">Available Now</SelectItem>
                   <SelectItem value="within_30_days">Available within 30 days</SelectItem>
                 </SelectContent>
               </Select>
