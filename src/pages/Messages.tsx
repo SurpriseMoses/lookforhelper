@@ -14,6 +14,7 @@ import InterviewRequestDialog from "@/components/messaging/InterviewRequestDialo
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import MarkAsHiredButton from "@/components/messaging/MarkAsHiredButton";
 
 interface Conversation {
   id: string;
@@ -298,14 +299,21 @@ const Messages = () => {
                       )
                     )}
                     {activeConversation && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowReport(true)}
-                        className="gap-1 text-muted-foreground"
-                      >
-                        <Flag className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <MarkAsHiredButton
+                          conversationId={activeConvo!}
+                          helperUserId={activeConversation.helper_user_id}
+                          seekerUserId={activeConversation.seeker_user_id}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowReport(true)}
+                          className="gap-1 text-muted-foreground"
+                        >
+                          <Flag className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
