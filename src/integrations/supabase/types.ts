@@ -94,6 +94,9 @@ export type Database = {
           about_me: string | null
           age: number | null
           average_rating: number | null
+          background_check_available: boolean
+          background_check_requested: boolean
+          background_check_status: string
           city: string | null
           country: string | null
           created_at: string
@@ -122,6 +125,9 @@ export type Database = {
           about_me?: string | null
           age?: number | null
           average_rating?: number | null
+          background_check_available?: boolean
+          background_check_requested?: boolean
+          background_check_status?: string
           city?: string | null
           country?: string | null
           created_at?: string
@@ -150,6 +156,9 @@ export type Database = {
           about_me?: string | null
           age?: number | null
           average_rating?: number | null
+          background_check_available?: boolean
+          background_check_requested?: boolean
+          background_check_status?: string
           city?: string | null
           country?: string | null
           created_at?: string
