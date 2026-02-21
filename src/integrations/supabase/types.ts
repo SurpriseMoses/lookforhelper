@@ -258,6 +258,7 @@ export type Database = {
           interview_type: string
           location: string | null
           meeting_link: string | null
+          meeting_method: string | null
           notes: string | null
           proposed_date: string
           seeker_message: string | null
@@ -274,6 +275,7 @@ export type Database = {
           interview_type?: string
           location?: string | null
           meeting_link?: string | null
+          meeting_method?: string | null
           notes?: string | null
           proposed_date: string
           seeker_message?: string | null
@@ -290,6 +292,7 @@ export type Database = {
           interview_type?: string
           location?: string | null
           meeting_link?: string | null
+          meeting_method?: string | null
           notes?: string | null
           proposed_date?: string
           seeker_message?: string | null
