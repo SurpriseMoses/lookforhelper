@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search } from "lucide-react";
 import { format } from "date-fns";
 
 interface VerificationReq {
@@ -68,6 +68,7 @@ const AdminDashboard = () => {
   const [featuredStats, setFeaturedStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
   const [seekerSubStats, setSeekerSubStats] = useState({ total: 0, active: 0, expired: 0, revenue: 0 });
   const [referralStats, setReferralStats] = useState({ total: 0, pending: 0, completed: 0, rewarded: 0 });
+  const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
 
   useEffect(() => {
     if (role === "admin") {
@@ -77,6 +78,7 @@ const AdminDashboard = () => {
       loadFeaturedStats();
       loadSeekerSubStats();
       loadReferralStats();
+      loadBgCheckStats();
     }
   }, [role]);
 
@@ -137,6 +139,14 @@ const AdminDashboard = () => {
       completed: all.filter((r: any) => r.status === "completed").length,
       rewarded: all.filter((r: any) => r.reward_given).length,
     });
+  };
+
+  const loadBgCheckStats = async () => {
+    const { data } = await supabase
+      .from("helper_details")
+      .select("background_check_requested");
+    const requested = (data ?? []).filter((d: any) => d.background_check_requested === true);
+    setBgCheckStats({ requested: requested.length });
   };
 
   const loadVerificationRequests = async () => {
@@ -404,6 +414,9 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="referrals" className="gap-1.5">
               <Gift className="h-4 w-4" /> Referrals
+            </TabsTrigger>
+            <TabsTrigger value="bg-checks" className="gap-1.5">
+              <Search className="h-4 w-4" /> BG Checks
             </TabsTrigger>
           </TabsList>
 
@@ -712,6 +725,33 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Background Checks Tab */}
+          <TabsContent value="bg-checks">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-foreground">{bgCheckStats.requested}</p>
+                  <p className="text-xs text-muted-foreground">Helpers Interested</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
+                  <p className="text-xs text-muted-foreground mt-2">Feature Status</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-muted-foreground">R149</p>
+                  <p className="text-xs text-muted-foreground">Planned Price</p>
+                </CardContent>
+              </Card>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              This list shows helpers who clicked "Notify Me" and are interested in Background Checks when the feature launches.
+            </p>
           </TabsContent>
         </Tabs>
       </div>

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -31,6 +31,7 @@ interface HelperProfile {
   helper_references: { name: string; relationship: string }[] | null;
   is_featured: boolean;
   featured_until: string | null;
+  background_check_status: string;
   average_rating: number;
   total_reviews: number;
   profiles: {
@@ -79,6 +80,7 @@ const HelperProfilePage = () => {
         featured_until: (helperData as any).featured_until,
         average_rating: (helperData as any).average_rating ?? 0,
         total_reviews: (helperData as any).total_reviews ?? 0,
+        background_check_status: (helperData as any).background_check_status ?? "not_available",
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
       } as HelperProfile);
@@ -153,6 +155,16 @@ const HelperProfilePage = () => {
                     </span>
                   )}
                 </h1>
+                {/* Background Check Badge */}
+                {helper.background_check_status === "approved" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                    <Search className="h-3.5 w-3.5" /> Background Checked
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                    <Search className="h-3.5 w-3.5" /> Background Check — Coming Soon
+                  </span>
+                )}
                 {/* Rating display */}
                 {helper.total_reviews > 0 && (
                   <div className="mt-1 flex items-center gap-1.5">

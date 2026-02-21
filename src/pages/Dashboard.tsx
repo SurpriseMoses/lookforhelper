@@ -17,6 +17,7 @@ import VerificationCard from "@/components/dashboard/VerificationCard";
 import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
 import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
 import InviteEarnCard from "@/components/dashboard/InviteEarnCard";
+import BackgroundCheckCard from "@/components/dashboard/BackgroundCheckCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -231,6 +232,7 @@ const Dashboard = () => {
         {role === "helper" && (
           <>
           <VerificationCard />
+          <BackgroundCheckCard />
           <FeaturedBoostCard />
           <Card className="mb-6">
             <CardHeader>
