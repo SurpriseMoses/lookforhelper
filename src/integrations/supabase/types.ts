@@ -267,6 +267,7 @@ export type Database = {
           confirmed_by_seeker: boolean
           conversation_id: string | null
           created_at: string
+          ended_at: string | null
           helper_id: string
           id: string
           seeker_id: string
@@ -279,6 +280,7 @@ export type Database = {
           confirmed_by_seeker?: boolean
           conversation_id?: string | null
           created_at?: string
+          ended_at?: string | null
           helper_id: string
           id?: string
           seeker_id: string
@@ -291,6 +293,7 @@ export type Database = {
           confirmed_by_seeker?: boolean
           conversation_id?: string | null
           created_at?: string
+          ended_at?: string | null
           helper_id?: string
           id?: string
           seeker_id?: string
