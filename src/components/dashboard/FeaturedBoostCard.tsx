@@ -74,7 +74,7 @@ const FeaturedBoostCard = () => {
     }
   };
 
-  const handleBoost = async (plan: "7_days" | "30_days") => {
+  const handleBoost = async (plan: "7_days" | "21_days" | "30_days") => {
     if (!user) return;
     setPaying(true);
     try {
@@ -140,7 +140,16 @@ const FeaturedBoostCard = () => {
                 className="gap-2"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "Boost 7 Days — R49"}
+                {paying ? "Processing..." : "7 Days — R49"}
+              </Button>
+              <Button
+                onClick={() => handleBoost("21_days")}
+                disabled={paying}
+                variant="outline"
+                className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+              >
+                <Star className="h-4 w-4" />
+                {paying ? "Processing..." : "21 Days — R99"}
               </Button>
               <Button
                 onClick={() => handleBoost("30_days")}
@@ -149,7 +158,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "Boost 30 Days — R149"}
+                {paying ? "Processing..." : "30 Days — R139"}
               </Button>
             </div>
           </div>
