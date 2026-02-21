@@ -93,6 +93,8 @@ export type Database = {
         Row: {
           about_me: string | null
           age: number | null
+          availability_status: string
+          available_from: string | null
           average_rating: number | null
           background_check_available: boolean
           background_check_requested: boolean
@@ -109,6 +111,7 @@ export type Database = {
           is_featured: boolean
           is_published: boolean | null
           languages: string[] | null
+          preferred_hours: string | null
           salary_expectation: string | null
           salary_max: number | null
           salary_min: number | null
@@ -119,11 +122,14 @@ export type Database = {
           user_id: string
           video_introduction_url: string | null
           willing_to_work_abroad: boolean | null
+          work_type: string[] | null
           years_experience: number | null
         }
         Insert: {
           about_me?: string | null
           age?: number | null
+          availability_status?: string
+          available_from?: string | null
           average_rating?: number | null
           background_check_available?: boolean
           background_check_requested?: boolean
@@ -140,6 +146,7 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
+          preferred_hours?: string | null
           salary_expectation?: string | null
           salary_max?: number | null
           salary_min?: number | null
@@ -150,11 +157,14 @@ export type Database = {
           user_id: string
           video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
+          work_type?: string[] | null
           years_experience?: number | null
         }
         Update: {
           about_me?: string | null
           age?: number | null
+          availability_status?: string
+          available_from?: string | null
           average_rating?: number | null
           background_check_available?: boolean
           background_check_requested?: boolean
@@ -171,6 +181,7 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
+          preferred_hours?: string | null
           salary_expectation?: string | null
           salary_max?: number | null
           salary_min?: number | null
@@ -181,6 +192,7 @@ export type Database = {
           user_id?: string
           video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
+          work_type?: string[] | null
           years_experience?: number | null
         }
         Relationships: []

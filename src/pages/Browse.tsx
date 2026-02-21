@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link } from "react-router-dom";
 
@@ -26,6 +26,9 @@ interface HelperWithProfile {
   featured_until: string | null;
   average_rating: number;
   total_reviews: number;
+  availability_status: string;
+  available_from: string | null;
+  work_type: string[] | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -44,13 +47,15 @@ const Browse = () => {
   const [genderFilter, setGenderFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [workTypeFilter, setWorkTypeFilter] = useState("all");
 
   const fetchHelpers = async () => {
     setHasSearched(true);
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews")
+      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -61,6 +66,14 @@ const Browse = () => {
     }
     if (cityFilter) {
       query = query.ilike("city", `%${cityFilter}%`);
+    }
+    if (availabilityFilter === "available_now") {
+      query = query.eq("availability_status", "available_now");
+    } else if (availabilityFilter === "within_30_days") {
+      query = query.in("availability_status", ["available_now", "available_soon"]);
+    }
+    if (workTypeFilter !== "all") {
+      query = query.contains("work_type", [workTypeFilter]);
     }
 
     if (sortBy === "newest") {
@@ -111,6 +124,9 @@ const Browse = () => {
           is_featured: isFeaturedActive,
           average_rating: Number(h.average_rating) || 0,
           total_reviews: h.total_reviews || 0,
+          availability_status: h.availability_status ?? "not_available",
+          available_from: h.available_from ?? null,
+          work_type: h.work_type ?? [],
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
@@ -123,6 +139,10 @@ const Browse = () => {
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
         if (bVerified !== aVerified) return bVerified - aVerified;
+        // Available now rank higher
+        const aAvail = a.availability_status === "available_now" ? 1 : 0;
+        const bAvail = b.availability_status === "available_now" ? 1 : 0;
+        if (bAvail !== aAvail) return bAvail - aAvail;
         // Then by average rating
         if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
         return 0;
@@ -148,7 +168,7 @@ const Browse = () => {
 
         {/* Filters */}
         <div className="mb-8 space-y-4 rounded-xl border bg-card p-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
               <div className="relative">
@@ -182,6 +202,31 @@ const Browse = () => {
                   <SelectItem value="all">Any</SelectItem>
                   <SelectItem value="Female">Female</SelectItem>
                   <SelectItem value="Male">Male</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Availability</Label>
+              <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="available_now">Available Now only</SelectItem>
+                  <SelectItem value="within_30_days">Available within 30 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Work Type</Label>
+              <Select value={workTypeFilter} onValueChange={setWorkTypeFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="full_time">Full-time</SelectItem>
+                  <SelectItem value="part_time">Part-time</SelectItem>
+                  <SelectItem value="live_in">Live-in</SelectItem>
+                  <SelectItem value="live_out">Live-out</SelectItem>
+                  <SelectItem value="temporary">Temporary</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -245,6 +290,16 @@ const Browse = () => {
                         </span>
                       )}
                     </h3>
+                    {helper.availability_status === "available_now" && (
+                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                        <Circle className="h-2 w-2 fill-emerald-500 text-emerald-500" /> Available Now
+                      </span>
+                    )}
+                    {helper.availability_status === "available_soon" && (
+                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700">
+                        <Circle className="h-2 w-2 fill-amber-500 text-amber-500" /> Available soon
+                      </span>
+                    )}
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.total_reviews > 0 && (
                         <span className="flex items-center gap-1">

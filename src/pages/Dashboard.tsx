@@ -19,6 +19,7 @@ import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCar
 import InviteEarnCard from "@/components/dashboard/InviteEarnCard";
 import BackgroundCheckCard from "@/components/dashboard/BackgroundCheckCard";
 import MyHiresCard from "@/components/dashboard/MyHiresCard";
+import AvailabilityCard from "@/components/dashboard/AvailabilityCard";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -232,6 +233,7 @@ const Dashboard = () => {
         {/* Helper-specific fields */}
         {role === "helper" && (
           <>
+          <AvailabilityCard />
           <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
