@@ -1,25 +1,54 @@
 import { Search, MessageSquare, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-
-const steps = [
-  {
-    icon: Search,
-    title: "Browse",
-    description: "Search through verified helper profiles. Filter by skills, location, experience, and more.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Connect",
-    description: "View detailed profiles and connect with helpers that match your household needs.",
-  },
-  {
-    icon: CheckCircle,
-    title: "Hire",
-    description: "Interview, verify references, and hire with confidence through our trusted platform.",
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
+import { useState } from "react";
+import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 
 const HowItWorks = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { hasActiveSubscription } = useSeekerSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  const handleUnlockChat = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (hasActiveSubscription) {
+      navigate("/messages");
+    } else {
+      setShowPaywall(true);
+    }
+  };
+
+  const steps = [
+    {
+      icon: Search,
+      title: "Browse",
+      description: "Search and filter helpers based on your needs.",
+      buttonLabel: "Browse Helpers",
+      onClick: () => navigate("/browse"),
+    },
+    {
+      icon: MessageSquare,
+      title: "Connect",
+      description: "Pay R25 to unlock chat and contact helpers for 30 days.",
+      buttonLabel: hasActiveSubscription ? "Go to Messages" : "Unlock Chat",
+      onClick: handleUnlockChat,
+    },
+    {
+      icon: CheckCircle,
+      title: "Hire",
+      description: "Confirm and manage your hired helper.",
+      buttonLabel: "My Hires",
+      onClick: () => navigate("/dashboard"),
+    },
+  ];
+
   return (
     <section className="py-20 md:py-28">
       <div className="container">
@@ -52,10 +81,19 @@ const HowItWorks = () => {
                 {step.title}
               </h3>
               <p className="mt-2 text-muted-foreground">{step.description}</p>
+              <Button
+                size="lg"
+                className="mt-5 w-full max-w-[220px]"
+                onClick={step.onClick}
+              >
+                {step.buttonLabel}
+              </Button>
             </motion.div>
           ))}
         </div>
       </div>
+
+      <SeekerPaywallDialog open={showPaywall} onClose={() => setShowPaywall(false)} />
     </section>
   );
 };
