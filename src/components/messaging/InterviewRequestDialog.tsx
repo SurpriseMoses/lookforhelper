@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Video, MapPin } from "lucide-react";
+import { Video, MapPin, Phone, MessageCircle } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -17,10 +17,19 @@ interface Props {
   conversationId: string;
 }
 
+type MeetingMethod = "whatsapp" | "phone" | "google_meet";
+
+const METHOD_LABELS: Record<MeetingMethod, string> = {
+  whatsapp: "WhatsApp Call",
+  phone: "Phone Call",
+  google_meet: "Google Meet",
+};
+
 const InterviewRequestDialog = ({ open, onClose, helperUserId, conversationId }: Props) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [type, setType] = useState<"video" | "in_person">("video");
+  const [meetingMethod, setMeetingMethod] = useState<MeetingMethod>("google_meet");
   const [proposedDate, setProposedDate] = useState("");
   const [location, setLocation] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
@@ -31,26 +40,27 @@ const InterviewRequestDialog = ({ open, onClose, helperUserId, conversationId }:
     if (!user || !proposedDate) return;
     setSubmitting(true);
 
+    const methodLabel = type === "video" ? METHOD_LABELS[meetingMethod] : "In-Person";
+
     const { error } = await supabase.from("interviews").insert({
       seeker_user_id: user.id,
       helper_user_id: helperUserId,
       conversation_id: conversationId,
       interview_type: type,
+      meeting_method: type === "video" ? meetingMethod : null,
       proposed_date: new Date(proposedDate).toISOString(),
       location: type === "in_person" ? location : null,
-      meeting_link: type === "video" ? meetingLink : null,
-      seeker_message: message || null,
-    });
+      meeting_link: type === "video" && meetingMethod === "google_meet" ? meetingLink : null,
+    } as any);
 
     if (error) {
       toast({ title: "Failed to send request", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Interview request sent!" });
-      // Also send a message in the conversation
       await supabase.from("messages").insert({
         conversation_id: conversationId,
         sender_id: user.id,
-        content: `📅 Interview request sent: ${type === "video" ? "Video Call" : "In-Person"} on ${new Date(proposedDate).toLocaleDateString("en-ZA", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}`,
+        content: `📅 Interview request sent: ${methodLabel} on ${new Date(proposedDate).toLocaleDateString("en-ZA", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}`,
       });
       onClose();
     }
@@ -72,7 +82,7 @@ const InterviewRequestDialog = ({ open, onClose, helperUserId, conversationId }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="video">
-                  <span className="flex items-center gap-2"><Video className="h-4 w-4" /> Video Call</span>
+                  <span className="flex items-center gap-2"><Video className="h-4 w-4" /> Remote / Video</span>
                 </SelectItem>
                 <SelectItem value="in_person">
                   <span className="flex items-center gap-2"><MapPin className="h-4 w-4" /> In-Person</span>
@@ -80,6 +90,28 @@ const InterviewRequestDialog = ({ open, onClose, helperUserId, conversationId }:
               </SelectContent>
             </Select>
           </div>
+
+          {type === "video" && (
+            <div className="space-y-2">
+              <Label>Meeting Method</Label>
+              <Select value={meetingMethod} onValueChange={(v) => setMeetingMethod(v as MeetingMethod)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="google_meet">
+                    <span className="flex items-center gap-2"><Video className="h-4 w-4" /> Google Meet</span>
+                  </SelectItem>
+                  <SelectItem value="whatsapp">
+                    <span className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp Call</span>
+                  </SelectItem>
+                  <SelectItem value="phone">
+                    <span className="flex items-center gap-2"><Phone className="h-4 w-4" /> Phone Call</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Proposed Date & Time</Label>
@@ -90,9 +122,9 @@ const InterviewRequestDialog = ({ open, onClose, helperUserId, conversationId }:
             />
           </div>
 
-          {type === "video" && (
+          {type === "video" && meetingMethod === "google_meet" && (
             <div className="space-y-2">
-              <Label>Meeting Link (optional)</Label>
+              <Label>Google Meet Link (optional)</Label>
               <Input
                 placeholder="e.g. https://meet.google.com/..."
                 value={meetingLink}

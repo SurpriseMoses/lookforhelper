@@ -8,16 +8,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Video, MapPin, Check, X, Clock, Star, CheckCircle } from "lucide-react";
+import { Calendar, Video, MapPin, Check, X, Clock, Star, CheckCircle, Phone, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import ReviewDialog from "@/components/interviews/ReviewDialog";
 import HireConfirmation from "@/components/interviews/HireConfirmation";
+
+const METHOD_LABELS: Record<string, string> = {
+  whatsapp: "WhatsApp Call",
+  phone: "Phone Call",
+  google_meet: "Google Meet",
+};
+
+const METHOD_ICONS: Record<string, typeof Video> = {
+  whatsapp: MessageCircle,
+  phone: Phone,
+  google_meet: Video,
+};
 
 interface Interview {
   id: string;
   seeker_user_id: string;
   helper_user_id: string;
   interview_type: string;
+  meeting_method: string | null;
   status: string;
   proposed_date: string;
   location: string | null;
@@ -194,7 +207,15 @@ const Interviews = () => {
                         <h3 className="font-medium text-foreground">{interview.other_name}</h3>
                         <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                           {interview.interview_type === "video" ? (
-                            <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Video Call</span>
+                            (() => {
+                              const method = interview.meeting_method || "google_meet";
+                              const MethodIcon = METHOD_ICONS[method] || Video;
+                              return (
+                                <span className="flex items-center gap-1">
+                                  <MethodIcon className="h-4 w-4" /> {METHOD_LABELS[method] || "Video Call"}
+                                </span>
+                              );
+                            })()
                           ) : (
                             <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> In-Person</span>
                           )}
