@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -32,6 +32,10 @@ interface HelperProfile {
   is_featured: boolean;
   featured_until: string | null;
   background_check_status: string;
+  availability_status: string;
+  available_from: string | null;
+  work_type: string[] | null;
+  preferred_hours: string | null;
   average_rating: number;
   total_reviews: number;
   profiles: {
@@ -82,6 +86,10 @@ const HelperProfilePage = () => {
         average_rating: (helperData as any).average_rating ?? 0,
         total_reviews: (helperData as any).total_reviews ?? 0,
         background_check_status: (helperData as any).background_check_status ?? "not_available",
+        availability_status: (helperData as any).availability_status ?? "not_available",
+        available_from: (helperData as any).available_from ?? null,
+        work_type: (helperData as any).work_type ?? [],
+        preferred_hours: (helperData as any).preferred_hours ?? null,
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
       } as HelperProfile);
@@ -193,6 +201,37 @@ const HelperProfilePage = () => {
                       <Briefcase className="h-3.5 w-3.5" /> Hired {hireCount} {hireCount === 1 ? "time" : "times"}
                     </span>
                   </div>
+                )}
+                {/* Availability Status */}
+                <div className="mt-2">
+                  {helper.availability_status === "available_now" && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                      <Circle className="h-2.5 w-2.5 fill-emerald-500 text-emerald-500" /> Available Now
+                    </span>
+                  )}
+                  {helper.availability_status === "available_soon" && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                      <Circle className="h-2.5 w-2.5 fill-amber-500 text-amber-500" /> Available from {helper.available_from ? new Date(helper.available_from).toLocaleDateString() : "soon"}
+                    </span>
+                  )}
+                  {helper.availability_status === "not_available" && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                      <Circle className="h-2.5 w-2.5 fill-red-400 text-red-400" /> Not currently available
+                    </span>
+                  )}
+                </div>
+                {/* Work type & preferred hours */}
+                {helper.work_type && helper.work_type.length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {helper.work_type.map((wt) => (
+                      <Badge key={wt} variant="secondary" className="text-xs capitalize">
+                        {wt.replace("_", "-")}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {helper.preferred_hours && (
+                  <p className="mt-1 text-xs text-muted-foreground">Schedule: {helper.preferred_hours}</p>
                 )}
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground md:justify-start">
                   {helper.city && (
