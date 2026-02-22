@@ -208,6 +208,35 @@ serve(async (req) => {
       );
     }
 
+    if (action === "reactivate") {
+      const { data: sub } = await supabase
+        .from("helper_subscriptions")
+        .select("featured_cancelled, featured_active")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!sub || !sub.featured_cancelled) {
+        return new Response(JSON.stringify({ error: "No cancelled subscription to reactivate" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await supabase
+        .from("helper_subscriptions")
+        .update({
+          featured_cancelled: false,
+          featured_cancelled_at: null,
+          status: "active",
+        })
+        .eq("user_id", user.id);
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(JSON.stringify({ error: "Invalid action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
