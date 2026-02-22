@@ -37,6 +37,7 @@ const HelperListingCard = () => {
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [reactivating, setReactivating] = useState(false);
   const [listing, setListing] = useState<ListingStatus | null>(null);
 
   useEffect(() => {
@@ -117,6 +118,27 @@ const HelperListingCard = () => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    setReactivating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paystack-helper-listing", {
+        body: { action: "reactivate" },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast({
+          title: "Subscription reactivated",
+          description: "Your listing will continue after the current period.",
+        });
+        loadStatus();
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setReactivating(false);
     }
   };
 
@@ -206,6 +228,20 @@ const HelperListingCard = () => {
               </div>
             )}
 
+            {isExpiringSoon && isCancelled && (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
+                <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-600" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Your visibility ends in {daysLeft} day{daysLeft !== 1 ? "s" : ""} — Reactivate now
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    Resume billing to stay visible to seekers.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {isExpiringSoon && !isCancelled && (
               <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
                 <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-600" />
@@ -220,14 +256,26 @@ const HelperListingCard = () => {
               </div>
             )}
 
-            {/* Show renew button for trial users or cancelled/expiring users */}
-            {(isTrialActive || (isCancelled && isExpiringSoon)) && (
+            {/* Trial users: activate */}
+            {isTrialActive && !isFeaturedActive && (
               <Button onClick={handleActivate} disabled={paying} className="w-full">
-                {paying ? "Processing..." : isTrialActive ? "Activate Listing — R25/month" : "Reactivate Listing — R25"}
+                {paying ? "Processing..." : "Activate Listing — R25/month"}
               </Button>
             )}
 
-            {/* Cancel button for active non-cancelled subscriptions */}
+            {/* Active + cancelled: reactivate */}
+            {isFeaturedActive && isCancelled && (
+              <div className="space-y-2">
+                <Button onClick={handleReactivate} disabled={reactivating} className="w-full">
+                  {reactivating ? "Processing..." : "Reactivate Subscription"}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Resume automatic billing to keep your profile featured after expiry.
+                </p>
+              </div>
+            )}
+
+            {/* Active + not cancelled: cancel */}
             {isFeaturedActive && !isCancelled && !isTrialActive && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -272,7 +320,7 @@ const HelperListingCard = () => {
               </p>
             </div>
             <Button onClick={handleActivate} disabled={paying} className="w-full">
-              {paying ? "Processing..." : "Activate Listing — R25/month"}
+              {paying ? "Processing..." : "Subscribe — R25/month"}
             </Button>
           </>
         )}
