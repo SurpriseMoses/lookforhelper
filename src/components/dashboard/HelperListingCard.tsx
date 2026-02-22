@@ -120,17 +120,17 @@ const HelperListingCard = () => {
     }
   };
 
-  if (loading || !listing) return null;
+  if (loading) return null;
 
   const now = new Date();
-  const isTrialActive = listing.status === "trial" && !isPast(new Date(listing.trial_end));
-  const isFeaturedActive = listing.featured_active && listing.featured_expires_at && !isPast(new Date(listing.featured_expires_at));
-  const isCancelled = listing.featured_cancelled;
+  const isTrialActive = listing ? listing.status === "trial" && !isPast(new Date(listing.trial_end)) : false;
+  const isFeaturedActive = listing ? listing.featured_active && listing.featured_expires_at && !isPast(new Date(listing.featured_expires_at)) : false;
+  const isCancelled = listing ? listing.featured_cancelled : false;
   const isVisible = isTrialActive || isFeaturedActive;
 
-  const expiryDate = isFeaturedActive
+  const expiryDate = isFeaturedActive && listing
     ? new Date(listing.featured_expires_at!)
-    : isTrialActive
+    : isTrialActive && listing
     ? new Date(listing.trial_end)
     : null;
 
