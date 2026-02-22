@@ -9,5 +9,8 @@ verify_jwt = false
 [functions.paystack-seeker-subscription]
 verify_jwt = false
 
+[functions.paystack-helper-listing]
+verify_jwt = false
+
 [functions.send-notification-email]
 verify_jwt = false
