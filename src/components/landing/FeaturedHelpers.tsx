@@ -38,7 +38,30 @@ const FeaturedHelpers = () => {
           .order("average_rating", { ascending: false })
           .limit(10);
 
-        // Fetch listing-active helpers (active subscription, not already boosted)
+        const boostedUserIds = new Set((boostedData || []).map((h) => h.user_id));
+
+        // Fetch verified helpers (not already boosted)
+        const { data: verifiedProfiles } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("is_verified", true);
+
+        const verifiedUserIds = new Set((verifiedProfiles || []).map((p) => p.user_id));
+        const verifiedOnlyIds = [...verifiedUserIds].filter((id) => !boostedUserIds.has(id));
+
+        let verifiedHelpers: typeof boostedData = [];
+        if (verifiedOnlyIds.length > 0) {
+          const { data } = await supabase
+            .from("helper_details")
+            .select("user_id, skills, years_experience, city, average_rating, is_featured, featured_until, availability_status")
+            .eq("is_published", true)
+            .in("user_id", verifiedOnlyIds)
+            .order("average_rating", { ascending: false })
+            .limit(10);
+          verifiedHelpers = data || [];
+        }
+
+        // Fetch listing-active helpers (active subscription, not already boosted or verified-listed)
         const { data: listingData } = await supabase
           .from("helper_subscriptions")
           .select("user_id, status, current_period_end")
@@ -48,8 +71,8 @@ const FeaturedHelpers = () => {
           .filter((s) => s.current_period_end && new Date(s.current_period_end) > new Date())
           .map((s) => s.user_id);
 
-        const boostedUserIds = new Set((boostedData || []).map((h) => h.user_id));
-        const listingOnlyIds = activeListingUserIds.filter((id) => !boostedUserIds.has(id));
+        const alreadyIncluded = new Set([...boostedUserIds, ...verifiedOnlyIds.filter((id) => (verifiedHelpers || []).some((h) => h.user_id === id))]);
+        const listingOnlyIds = activeListingUserIds.filter((id) => !alreadyIncluded.has(id));
 
         let listingHelpers: typeof boostedData = [];
         if (listingOnlyIds.length > 0) {
@@ -63,8 +86,8 @@ const FeaturedHelpers = () => {
           listingHelpers = data || [];
         }
 
-        // Combine: boosted first, then listing subscribers
-        const allHelpers = [...(boostedData || []), ...listingHelpers].slice(0, 10);
+        // Combine: boosted first, then verified, then listing subscribers
+        const allHelpers = [...(boostedData || []), ...verifiedHelpers, ...listingHelpers].slice(0, 10);
 
         if (allHelpers.length === 0) {
           setLoading(false);
