@@ -20,6 +20,7 @@ import InviteEarnCard from "@/components/dashboard/InviteEarnCard";
 import BackgroundCheckCard from "@/components/dashboard/BackgroundCheckCard";
 import MyHiresCard from "@/components/dashboard/MyHiresCard";
 import AvailabilityCard from "@/components/dashboard/AvailabilityCard";
+import HelperListingCard from "@/components/dashboard/HelperListingCard";
 import SeekerHiresSection from "@/components/dashboard/SeekerHiresSection";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
@@ -239,8 +240,9 @@ const Dashboard = () => {
         {/* Helper-specific fields */}
         {role === "helper" && (
           <>
+          <HelperListingCard />
           <AvailabilityCard />
-          <VerificationCard />
+           <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
           <Card className="mb-6">
