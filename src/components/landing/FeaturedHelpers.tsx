@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Star } from "lucide-react";
+import { MapPin, Clock, Star, ShieldCheck, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,9 @@ interface FeaturedHelper {
   average_rating: number;
   full_name: string;
   avatar_url: string | null;
+  is_verified: boolean;
+  is_boosted: boolean;
+  availability_status: string;
 }
 
 const FeaturedHelpers = () => {
@@ -24,32 +27,63 @@ const FeaturedHelpers = () => {
     const fetchFeatured = async () => {
       try {
         const now = new Date().toISOString();
-        const { data: helperData } = await supabase
+
+        // Fetch boosted helpers (active boost with valid featured_until)
+        const { data: boostedData } = await supabase
           .from("helper_details")
-          .select("user_id, skills, years_experience, city, average_rating")
+          .select("user_id, skills, years_experience, city, average_rating, is_featured, featured_until, availability_status")
           .eq("is_published", true)
           .eq("is_featured", true)
           .gte("featured_until", now)
           .order("average_rating", { ascending: false })
-          .limit(6);
+          .limit(10);
 
-        if (!helperData || helperData.length === 0) {
+        // Fetch listing-active helpers (active subscription, not already boosted)
+        const { data: listingData } = await supabase
+          .from("helper_subscriptions")
+          .select("user_id, status, current_period_end")
+          .eq("status", "active");
+
+        const activeListingUserIds = (listingData || [])
+          .filter((s) => s.current_period_end && new Date(s.current_period_end) > new Date())
+          .map((s) => s.user_id);
+
+        const boostedUserIds = new Set((boostedData || []).map((h) => h.user_id));
+        const listingOnlyIds = activeListingUserIds.filter((id) => !boostedUserIds.has(id));
+
+        let listingHelpers: typeof boostedData = [];
+        if (listingOnlyIds.length > 0) {
+          const { data } = await supabase
+            .from("helper_details")
+            .select("user_id, skills, years_experience, city, average_rating, is_featured, featured_until, availability_status")
+            .eq("is_published", true)
+            .in("user_id", listingOnlyIds)
+            .order("average_rating", { ascending: false })
+            .limit(10);
+          listingHelpers = data || [];
+        }
+
+        // Combine: boosted first, then listing subscribers
+        const allHelpers = [...(boostedData || []), ...listingHelpers].slice(0, 10);
+
+        if (allHelpers.length === 0) {
           setLoading(false);
           return;
         }
 
-        const userIds = helperData.map((h) => h.user_id);
+        const userIds = allHelpers.map((h) => h.user_id);
         const { data: profiles } = await supabase
           .from("profiles")
-          .select("user_id, full_name, avatar_url")
+          .select("user_id, full_name, avatar_url, is_verified")
           .in("user_id", userIds);
 
         const profileMap = new Map(
           (profiles || []).map((p) => [p.user_id, p])
         );
 
-        const merged: FeaturedHelper[] = helperData.map((h) => {
+        const merged: FeaturedHelper[] = allHelpers.map((h) => {
           const profile = profileMap.get(h.user_id);
+          const isBoosted = boostedUserIds.has(h.user_id);
           return {
             user_id: h.user_id,
             skills: h.skills || [],
@@ -58,6 +92,9 @@ const FeaturedHelpers = () => {
             average_rating: h.average_rating || 0,
             full_name: profile?.full_name || "Helper",
             avatar_url: profile?.avatar_url || null,
+            is_verified: profile?.is_verified || false,
+            is_boosted: isBoosted,
+            availability_status: h.availability_status || "not_available",
           };
         });
 
@@ -82,7 +119,7 @@ const FeaturedHelpers = () => {
             Featured Helpers
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-            Discover experienced and verified household helpers ready to work.
+            Helpers who chose to increase their visibility and get hired faster.
           </p>
         </div>
 
@@ -96,8 +133,8 @@ const FeaturedHelpers = () => {
               transition={{ delay: i * 0.1, duration: 0.5 }}
             >
               <Link to={`/helper/${helper.user_id}`}>
-                <Card className="overflow-hidden transition-shadow hover:shadow-lg ring-2 ring-amber-400/50">
-                  <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center">
+                <Card className={`overflow-hidden transition-shadow hover:shadow-lg ${helper.is_boosted ? "ring-2 ring-primary/50" : ""}`}>
+                  <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center relative">
                     {helper.avatar_url ? (
                       <img
                         src={helper.avatar_url}
@@ -110,6 +147,13 @@ const FeaturedHelpers = () => {
                         {helper.full_name.charAt(0)}
                       </div>
                     )}
+                    {helper.is_boosted && (
+                      <div className="absolute top-2 left-2">
+                        <Badge className="bg-primary text-primary-foreground text-xs gap-1">
+                          <Zap className="h-3 w-3" /> Boosted
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                   <CardContent className="p-5">
                     <div className="flex items-center justify-between">
@@ -117,13 +161,13 @@ const FeaturedHelpers = () => {
                         {helper.full_name}
                       </h3>
                       {helper.average_rating > 0 && (
-                        <span className="flex items-center gap-1 text-sm text-amber-500">
+                        <span className="flex items-center gap-1 text-sm text-primary">
                           <Star className="h-3.5 w-3.5 fill-current" />
                           {helper.average_rating}
                         </span>
                       )}
                     </div>
-                    <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                       {helper.city && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" />
@@ -134,6 +178,17 @@ const FeaturedHelpers = () => {
                         <Clock className="h-3.5 w-3.5" />
                         {helper.years_experience} yrs exp
                       </span>
+                      {helper.is_verified && (
+                        <span className="flex items-center gap-1 text-primary">
+                          <ShieldCheck className="h-3.5 w-3.5" />
+                          Verified
+                        </span>
+                      )}
+                      {helper.availability_status === "available_now" && (
+                        <Badge variant="secondary" className="text-xs">
+                          Available Now
+                        </Badge>
+                      )}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {helper.skills.slice(0, 3).map((skill) => (
