@@ -4,8 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Clock, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, Clock, AlertTriangle, XCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 
 interface ListingStatus {
@@ -14,6 +25,10 @@ interface ListingStatus {
   trial_end: string;
   current_period_start: string | null;
   current_period_end: string | null;
+  featured_active: boolean;
+  featured_expires_at: string | null;
+  featured_cancelled: boolean;
+  featured_cancelled_at: string | null;
 }
 
 const HelperListingCard = () => {
@@ -21,13 +36,13 @@ const HelperListingCard = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [listing, setListing] = useState<ListingStatus | null>(null);
 
   useEffect(() => {
     if (!user) return;
     loadStatus();
 
-    // Check for pending payment reference on return from Paystack
     const ref = localStorage.getItem("helper_listing_ref");
     if (ref) {
       localStorage.removeItem("helper_listing_ref");
@@ -39,11 +54,11 @@ const HelperListingCard = () => {
     if (!user) return;
     const { data } = await supabase
       .from("helper_subscriptions")
-      .select("status, trial_start, trial_end, current_period_start, current_period_end")
+      .select("status, trial_start, trial_end, current_period_start, current_period_end, featured_active, featured_expires_at, featured_cancelled, featured_cancelled_at")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (data) setListing(data);
+    if (data) setListing(data as ListingStatus);
     setLoading(false);
   };
 
@@ -84,21 +99,57 @@ const HelperListingCard = () => {
     }
   };
 
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paystack-helper-listing", {
+        body: { action: "cancel" },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast({
+          title: "Subscription cancelled",
+          description: "Your listing will remain active until the current period ends.",
+        });
+        loadStatus();
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (loading || !listing) return null;
 
   const now = new Date();
   const isTrialActive = listing.status === "trial" && !isPast(new Date(listing.trial_end));
-  const isActive = listing.status === "active" && listing.current_period_end && !isPast(new Date(listing.current_period_end));
-  const isVisible = isTrialActive || isActive;
+  const isFeaturedActive = listing.featured_active && listing.featured_expires_at && !isPast(new Date(listing.featured_expires_at));
+  const isCancelled = listing.featured_cancelled;
+  const isVisible = isTrialActive || isFeaturedActive;
 
-  const expiryDate = isActive
-    ? new Date(listing.current_period_end!)
+  const expiryDate = isFeaturedActive
+    ? new Date(listing.featured_expires_at!)
     : isTrialActive
     ? new Date(listing.trial_end)
     : null;
 
   const daysLeft = expiryDate ? differenceInDays(expiryDate, now) : 0;
   const isExpiringSoon = daysLeft <= 5 && daysLeft >= 0;
+
+  // Determine display status
+  let statusLabel = "Not Active";
+  let statusVariant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+  if (isFeaturedActive && !isCancelled) {
+    statusLabel = "Active";
+    statusVariant = "default";
+  } else if (isFeaturedActive && isCancelled) {
+    statusLabel = "Cancelled";
+    statusVariant = "outline";
+  } else if (isTrialActive) {
+    statusLabel = "Free Trial";
+    statusVariant = "default";
+  }
 
   return (
     <Card className="mb-6">
@@ -119,13 +170,19 @@ const HelperListingCard = () => {
       <CardContent className="space-y-4">
         {isVisible ? (
           <>
-            <p className="text-sm text-muted-foreground">
-              Your profile is visible to seekers in search results.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Your profile is visible to seekers in search results.
+              </p>
+              <Badge variant={statusVariant} className="text-xs">
+                {statusLabel}
+              </Badge>
+            </div>
+
             <div className="flex items-center gap-2 text-sm">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span>
-                {isTrialActive ? "Free trial" : "Listing"} expires{" "}
+                {isCancelled ? "Active until" : isTrialActive ? "Free trial ends" : "Next billing date"}:{" "}
                 <span className="font-medium">
                   {expiryDate ? format(expiryDate, "dd MMM yyyy") : "—"}
                 </span>
@@ -134,7 +191,22 @@ const HelperListingCard = () => {
                 )}
               </span>
             </div>
-            {isExpiringSoon && (
+
+            {isCancelled && (
+              <div className="flex items-start gap-2 rounded-lg border border-muted bg-muted/50 p-3">
+                <XCircle className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Subscription cancelled
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Your listing remains visible until {expiryDate ? format(expiryDate, "dd MMM yyyy") : "expiry"}. You will not be charged again.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {isExpiringSoon && !isCancelled && (
               <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
                 <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-600" />
                 <div>
@@ -147,10 +219,45 @@ const HelperListingCard = () => {
                 </div>
               </div>
             )}
-            {(isExpiringSoon || isTrialActive) && (
+
+            {/* Show renew button for trial users or cancelled/expiring users */}
+            {(isTrialActive || (isCancelled && isExpiringSoon)) && (
               <Button onClick={handleActivate} disabled={paying} className="w-full">
-                {paying ? "Processing..." : isTrialActive ? "Activate Listing — R25/month" : "Renew Listing — R25"}
+                {paying ? "Processing..." : isTrialActive ? "Activate Listing — R25/month" : "Reactivate Listing — R25"}
               </Button>
+            )}
+
+            {/* Cancel button for active non-cancelled subscriptions */}
+            {isFeaturedActive && !isCancelled && !isTrialActive && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="w-full text-destructive hover:text-destructive">
+                    Cancel Subscription
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cancel your listing subscription?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Your featured listing will remain active until{" "}
+                      <span className="font-medium text-foreground">
+                        {expiryDate ? format(expiryDate, "dd MMM yyyy") : "the end of your current period"}
+                      </span>
+                      . You will not be charged again.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCancel}
+                      disabled={cancelling}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {cancelling ? "Cancelling..." : "Yes, Cancel"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </>
         ) : (

@@ -152,6 +152,10 @@ serve(async (req) => {
             status: "active",
             current_period_start: startDate.toISOString(),
             current_period_end: endDate.toISOString(),
+            featured_active: true,
+            featured_expires_at: endDate.toISOString(),
+            featured_cancelled: false,
+            featured_cancelled_at: null,
           })
           .eq("user_id", user.id);
 
@@ -169,6 +173,39 @@ serve(async (req) => {
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+    }
+
+    if (action === "cancel") {
+      // Cancel subscription - keep active until expiry
+      const { data: sub } = await supabase
+        .from("helper_subscriptions")
+        .select("featured_expires_at, featured_active")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!sub || !sub.featured_active) {
+        return new Response(JSON.stringify({ error: "No active listing to cancel" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await supabase
+        .from("helper_subscriptions")
+        .update({
+          featured_cancelled: true,
+          featured_cancelled_at: new Date().toISOString(),
+          status: "cancelled",
+        })
+        .eq("user_id", user.id);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          featured_expires_at: sub.featured_expires_at,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(JSON.stringify({ error: "Invalid action" }), {
