@@ -266,9 +266,30 @@ const HelperListingCard = () => {
             {/* Active + cancelled: reactivate */}
             {isFeaturedActive && isCancelled && (
               <div className="space-y-2">
-                <Button onClick={handleReactivate} disabled={reactivating} className="w-full">
-                  {reactivating ? "Processing..." : "Reactivate Subscription"}
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="w-full">
+                      Reactivate Subscription
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reactivate your subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Your automatic billing will resume and your profile will stay visible to seekers after the current period ends. You will be charged R25 on the next billing cycle.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Not Now</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleReactivate}
+                        disabled={reactivating}
+                      >
+                        {reactivating ? "Processing..." : "Yes, Reactivate"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <p className="text-xs text-muted-foreground text-center">
                   Resume automatic billing to keep your profile featured after expiry.
                 </p>
