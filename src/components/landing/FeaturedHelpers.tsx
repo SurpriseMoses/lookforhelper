@@ -64,11 +64,11 @@ const FeaturedHelpers = () => {
         // Fetch listing-active helpers (active subscription, not already boosted or verified-listed)
         const { data: listingData } = await supabase
           .from("helper_subscriptions")
-          .select("user_id, status, current_period_end")
-          .eq("status", "active");
+          .select("user_id, featured_active, featured_expires_at")
+          .eq("featured_active", true);
 
         const activeListingUserIds = (listingData || [])
-          .filter((s) => s.current_period_end && new Date(s.current_period_end) > new Date())
+          .filter((s) => s.featured_expires_at && new Date(s.featured_expires_at) > new Date())
           .map((s) => s.user_id);
 
         const alreadyIncluded = new Set([...boostedUserIds, ...verifiedOnlyIds.filter((id) => (verifiedHelpers || []).some((h) => h.user_id === id))]);

@@ -229,6 +229,10 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          featured_active: boolean
+          featured_cancelled: boolean
+          featured_cancelled_at: string | null
+          featured_expires_at: string | null
           id: string
           status: string
           trial_end: string
@@ -240,6 +244,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          featured_active?: boolean
+          featured_cancelled?: boolean
+          featured_cancelled_at?: string | null
+          featured_expires_at?: string | null
           id?: string
           status?: string
           trial_end?: string
@@ -251,6 +259,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          featured_active?: boolean
+          featured_cancelled?: boolean
+          featured_cancelled_at?: string | null
+          featured_expires_at?: string | null
           id?: string
           status?: string
           trial_end?: string
