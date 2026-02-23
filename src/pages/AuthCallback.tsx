@@ -5,9 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 const AuthCallback = () => {
   const navigate = useNavigate();
 
+  const getRedirectPath = (user: any) => {
+    // Google OAuth users without explicit role need to complete profile
+    if (!user?.user_metadata?.role) {
+      return "/complete-profile";
+    }
+    return "/dashboard";
+  };
+
   useEffect(() => {
     const handleCallback = async () => {
-      // Supabase will detect tokens in the URL hash automatically
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
@@ -17,19 +24,17 @@ const AuthCallback = () => {
       }
 
       if (session) {
-        navigate("/dashboard");
+        navigate(getRedirectPath(session.user));
       } else {
-        // Session not ready yet — listen for auth state change
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (_event, session) => {
             if (session) {
               subscription.unsubscribe();
-              navigate("/dashboard");
+              navigate(getRedirectPath(session.user));
             }
           }
         );
 
-        // Timeout fallback
         setTimeout(() => {
           subscription.unsubscribe();
           navigate("/auth?tab=login");

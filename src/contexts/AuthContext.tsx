@@ -9,6 +9,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   role: AppRole | null;
+  profileComplete: boolean;
   signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -119,9 +120,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
+  // Profile is complete if the user signed up via email (role in metadata) or has explicitly set role
+  const profileComplete = !user || !!user.user_metadata?.role;
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, role, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, role, profileComplete, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

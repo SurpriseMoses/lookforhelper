@@ -11,6 +11,7 @@ import Browse from "./pages/Browse";
 import Dashboard from "./pages/Dashboard";
 import HelperProfile from "./pages/HelperProfile";
 import AuthCallback from "./pages/AuthCallback";
+import CompleteProfile from "./pages/CompleteProfile";
 import NotFound from "./pages/NotFound";
 import Messages from "./pages/Messages";
 import Interviews from "./pages/Interviews";
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/complete-profile" element={<CompleteProfile />} />
                 <Route path="/browse" element={<Browse />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/helper/:userId" element={<HelperProfile />} />
