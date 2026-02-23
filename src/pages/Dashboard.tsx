@@ -27,7 +27,7 @@ const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "D
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
 
 const Dashboard = () => {
-  const { user, role, loading: authLoading, signOut } = useAuth();
+  const { user, role, loading: authLoading, profileComplete, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -56,8 +56,10 @@ const Dashboard = () => {
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/auth");
+    } else if (!authLoading && user && !profileComplete) {
+      navigate("/complete-profile");
     }
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user, profileComplete, navigate]);
 
   useEffect(() => {
     if (!user) return;

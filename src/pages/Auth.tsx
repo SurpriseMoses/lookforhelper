@@ -37,6 +37,7 @@ const Auth = () => {
     if (error) {
       toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
     }
+    // Redirect is handled by AuthContext/AuthCallback — new Google users go to /complete-profile
   };
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
