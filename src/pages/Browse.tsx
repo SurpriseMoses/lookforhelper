@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HelperWithProfile {
   user_id: string;
@@ -42,6 +43,8 @@ const Browse = () => {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [skillFilter, setSkillFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
@@ -49,6 +52,13 @@ const Browse = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
+
+  const handleHelperClick = (e: React.MouseEvent, userId: string) => {
+    if (!user) {
+      e.preventDefault();
+      navigate("/auth");
+    }
+  };
 
   const fetchHelpers = async () => {
     setHasSearched(true);
@@ -260,7 +270,7 @@ const Browse = () => {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {helpers.map((helper) => (
-              <Link key={helper.user_id} to={`/helper/${helper.user_id}`}>
+              <Link key={helper.user_id} to={`/helper/${helper.user_id}`} onClick={(e) => handleHelperClick(e, helper.user_id)}>
                 <Card className={`overflow-hidden transition-shadow hover:shadow-lg cursor-pointer ${helper.is_featured ? "ring-2 ring-amber-400/50" : ""}`}>
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                     {helper.is_featured && (
