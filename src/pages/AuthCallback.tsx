@@ -10,7 +10,7 @@ const AuthCallback = () => {
     if (!user?.user_metadata?.role) {
       return "/complete-profile";
     }
-    return "/dashboard";
+    return "/";
   };
 
   useEffect(() => {
