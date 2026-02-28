@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
@@ -26,9 +26,16 @@ const Auth = () => {
   const [signupReferralCode, setSignupReferralCode] = useState(searchParams.get("ref") || "");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp, profileComplete } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Redirect authenticated users away from the auth page
+  useEffect(() => {
+    if (user) {
+      navigate(profileComplete ? "/dashboard" : "/complete-profile", { replace: true });
+    }
+  }, [user, profileComplete, navigate]);
 
   const handleGoogleSignIn = async () => {
     const { error } = await lovable.auth.signInWithOAuth("google", {
