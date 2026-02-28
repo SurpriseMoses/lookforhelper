@@ -20,6 +20,9 @@ const Footer = () => {
             <Link to="/auth" className="hover:text-foreground transition-colors">
               Sign In
             </Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
           </div>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Look For Helper. All rights reserved.
