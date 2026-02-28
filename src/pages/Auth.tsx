@@ -33,7 +33,7 @@ const Auth = () => {
   // Redirect authenticated users away from the auth page
   useEffect(() => {
     if (user) {
-      navigate(profileComplete ? "/dashboard" : "/complete-profile", { replace: true });
+      navigate(profileComplete ? "/" : "/complete-profile", { replace: true });
     }
   }, [user, profileComplete, navigate]);
 
@@ -50,7 +50,7 @@ const Auth = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const hasRole = session.user?.user_metadata?.role;
-        navigate(hasRole ? "/dashboard" : "/complete-profile", { replace: true });
+        navigate(hasRole ? "/" : "/complete-profile", { replace: true });
       }
     }
   };
