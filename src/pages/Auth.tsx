@@ -38,13 +38,21 @@ const Auth = () => {
   }, [user, profileComplete, navigate]);
 
   const handleGoogleSignIn = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
+    const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/auth/callback`,
     });
-    if (error) {
-      toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
+    if (result?.error) {
+      toast({ title: "Google sign-in failed", description: result.error.message, variant: "destructive" });
+      return;
     }
-    // Redirect is handled by AuthContext/AuthCallback — new Google users go to /complete-profile
+    // If not redirected, session was set in-page — navigate now
+    if (!result?.redirected) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const hasRole = session.user?.user_metadata?.role;
+        navigate(hasRole ? "/dashboard" : "/complete-profile", { replace: true });
+      }
+    }
   };
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
