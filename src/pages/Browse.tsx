@@ -159,6 +159,12 @@ const Browse = () => {
       });
 
       setHelpers(results);
+
+      // Track search appearances for all displayed helpers
+      if (results.length > 0) {
+        const ids = results.map((r) => r.user_id);
+        supabase.rpc("track_search_appearances", { helper_user_ids: ids }).then(() => {});
+      }
     } else {
       setHelpers([]);
     }

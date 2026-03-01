@@ -11,6 +11,11 @@ import ReportUserDialog from "@/components/moderation/ReportUserDialog";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
 import HelperReviewsList from "@/components/reviews/HelperReviewsList";
 import { useAuth } from "@/contexts/AuthContext";
+import ActivityIndicator from "@/components/profile/ActivityIndicator";
+import ResponseTimeBadge from "@/components/profile/ResponseTimeBadge";
+import TopHelperBadge from "@/components/profile/TopHelperBadge";
+import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
+import WhatsAppShareButton from "@/components/profile/WhatsAppShareButton";
 
 interface HelperProfile {
   user_id: string;
@@ -42,7 +47,9 @@ interface HelperProfile {
     full_name: string;
     avatar_url: string | null;
     is_verified?: boolean;
+    last_active_at?: string | null;
   } | null;
+  response_time?: { avg_response_minutes: number; response_count: number } | null;
 }
 
 const HelperProfilePage = () => {
@@ -72,9 +79,19 @@ const HelperProfilePage = () => {
 
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url, is_verified")
+        .select("full_name, avatar_url, is_verified, last_active_at")
         .eq("user_id", userId)
         .maybeSingle();
+
+      // Fetch response metrics
+      const { data: responseData } = await supabase
+        .from("response_metrics")
+        .select("avg_response_minutes, response_count")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      // Track profile view
+      await supabase.rpc("track_profile_view", { helper_user_id: userId });
 
       const now = new Date();
       const isFeaturedActive = (helperData as any).is_featured && (helperData as any).featured_until && new Date((helperData as any).featured_until) > now;
@@ -92,6 +109,7 @@ const HelperProfilePage = () => {
         preferred_hours: (helperData as any).preferred_hours ?? null,
         helper_references: helperData.helper_references as any,
         profiles: profileData ?? null,
+        response_time: responseData ?? null,
       } as HelperProfile);
 
       // Fetch confirmed hire count
@@ -172,7 +190,20 @@ const HelperProfilePage = () => {
                       <Star className="h-3.5 w-3.5" /> Featured Helper
                     </span>
                   )}
+                  <TopHelperBadge
+                    averageRating={Number(helper.average_rating)}
+                    completedHires={hireCount}
+                    isVerified={!!helper.profiles?.is_verified}
+                  />
                 </h1>
+                {/* Activity & Response badges */}
+                <div className="mt-1 flex flex-wrap gap-1.5 justify-center md:justify-start">
+                  <ActivityIndicator lastActiveAt={helper.profiles?.last_active_at ?? null} />
+                  <ResponseTimeBadge
+                    avgResponseMinutes={helper.response_time?.avg_response_minutes ?? null}
+                    responseCount={helper.response_time?.response_count ?? 0}
+                  />
+                </div>
                 {/* Background Check Badge */}
                 {helper.background_check_status === "approved" ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
@@ -334,9 +365,19 @@ const HelperProfilePage = () => {
             {/* Reviews */}
             <HelperReviewsList helperUserId={helper.user_id} refreshKey={reviewRefreshKey} />
 
-            {/* Contact, Review & Report */}
+            {/* Safety Tips */}
+            <SafetyTipsBox />
+
+            {/* Contact, Review, Share & Report */}
             <div className="mt-8 flex items-center gap-3 flex-wrap">
               <ContactHelperButton helperUserId={helper.user_id} />
+              <WhatsAppShareButton
+                fullName={helper.profiles?.full_name ?? "Helper"}
+                primarySkill={helper.skills?.[0]}
+                city={helper.city ?? undefined}
+                rating={Number(helper.average_rating)}
+                userId={helper.user_id}
+              />
               {user && user.id !== helper.user_id && (
                 <>
                   <Button

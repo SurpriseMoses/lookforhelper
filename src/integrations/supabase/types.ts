@@ -496,6 +496,33 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_analytics: {
+        Row: {
+          id: string
+          messages_received_last_7_days: number
+          profile_views_last_7_days: number
+          search_appearances_last_7_days: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          messages_received_last_7_days?: number
+          profile_views_last_7_days?: number
+          search_appearances_last_7_days?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          messages_received_last_7_days?: number
+          profile_views_last_7_days?: number
+          search_appearances_last_7_days?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -504,6 +531,7 @@ export type Database = {
           id: string
           is_suspended: boolean
           is_verified: boolean
+          last_active_at: string | null
           referral_code: string | null
           referred_by: string | null
           suspended_at: string | null
@@ -519,6 +547,7 @@ export type Database = {
           id?: string
           is_suspended?: boolean
           is_verified?: boolean
+          last_active_at?: string | null
           referral_code?: string | null
           referred_by?: string | null
           suspended_at?: string | null
@@ -534,6 +563,7 @@ export type Database = {
           id?: string
           is_suspended?: boolean
           is_verified?: boolean
+          last_active_at?: string | null
           referral_code?: string | null
           referred_by?: string | null
           suspended_at?: string | null
@@ -616,6 +646,30 @@ export type Database = {
           resolved_by?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      response_metrics: {
+        Row: {
+          avg_response_minutes: number
+          id: string
+          response_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_response_minutes?: number
+          id?: string
+          response_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_response_minutes?: number
+          id?: string
+          response_count?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -803,6 +857,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      track_profile_view: {
+        Args: { helper_user_id: string }
+        Returns: undefined
+      }
+      track_search_appearances: {
+        Args: { helper_user_ids: string[] }
+        Returns: undefined
+      }
+      update_last_active: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "seeker" | "helper" | "admin"
