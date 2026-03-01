@@ -22,6 +22,8 @@ import MyHiresCard from "@/components/dashboard/MyHiresCard";
 import AvailabilityCard from "@/components/dashboard/AvailabilityCard";
 import HelperListingCard from "@/components/dashboard/HelperListingCard";
 import SeekerHiresSection from "@/components/dashboard/SeekerHiresSection";
+import HelperPerformanceCard from "@/components/dashboard/HelperPerformanceCard";
+import useLastActive from "@/hooks/useLastActive";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -30,6 +32,7 @@ const Dashboard = () => {
   const { user, role, loading: authLoading, profileComplete, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  useLastActive();
 
   const [profile, setProfile] = useState({ full_name: "", avatar_url: "" });
   const [helperDetails, setHelperDetails] = useState({
@@ -247,6 +250,7 @@ const Dashboard = () => {
            <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
+          <HelperPerformanceCard />
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg">Helper Details</CardTitle>

@@ -15,6 +15,8 @@ import ReportUserDialog from "@/components/moderation/ReportUserDialog";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 import MarkAsHiredButton from "@/components/messaging/MarkAsHiredButton";
+import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
+import useLastActive from "@/hooks/useLastActive";
 
 interface Conversation {
   id: string;
@@ -39,6 +41,7 @@ interface Message {
 const Messages = () => {
   const { user, role, loading: authLoading } = useAuth();
   const { toast } = useToast();
+  useLastActive();
   const [searchParams] = useSearchParams();
   const initialConvoId = searchParams.get("conversation");
 
@@ -357,6 +360,11 @@ const Messages = () => {
                   <Button onClick={handleSend} disabled={sending || !newMessage.trim()} size="icon">
                     <Send className="h-4 w-4" />
                   </Button>
+                </div>
+
+                {/* Safety Tips */}
+                <div className="px-4 pb-2">
+                  <SafetyTipsBox />
                 </div>
               </>
             )}
