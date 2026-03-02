@@ -42,8 +42,8 @@ const CancellationPolicy = () => {
           <h2 className="text-xl font-semibold text-foreground mb-3">5. Contact Us</h2>
           <p className="text-muted-foreground">
             For cancellation or account deletion requests, contact:{" "}
-            <a href="mailto:support@lookforhelper.co.za" className="text-primary underline">
-              support@lookforhelper.co.za
+            <a href="mailto:help.lookforhelper@gmail.com" className="text-primary underline">
+              help.lookforhelper@gmail.com
             </a>
           </p>
         </section>
