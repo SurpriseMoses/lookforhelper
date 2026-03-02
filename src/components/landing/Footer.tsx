@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
+  const { user } = useAuth();
   return (
     <footer className="border-t bg-card py-10">
       <div className="container">
@@ -19,9 +21,11 @@ const Footer = () => {
               <Link to="/browse" className="hover:text-foreground transition-colors">
                 Browse Helpers
               </Link>
-              <Link to="/auth" className="hover:text-foreground transition-colors">
-                Sign In
-              </Link>
+              {!user && (
+                <Link to="/auth" className="hover:text-foreground transition-colors">
+                  Sign In
+                </Link>
+              )}
               <Link to="/terms" className="hover:text-foreground transition-colors">
                 Terms of Service
               </Link>
