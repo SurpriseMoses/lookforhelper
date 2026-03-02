@@ -49,8 +49,8 @@ const Footer = () => {
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span>
                 Email:{" "}
-                <a href="mailto:support@lookforhelper.co.za" className="text-primary hover:underline">
-                  support@lookforhelper.co.za
+                <a href="mailto:help.lookforhelper@gmail.com" className="text-primary hover:underline">
+                  help.lookforhelper@gmail.com
                 </a>
               </span>
               <span className="hidden md:inline">·</span>
