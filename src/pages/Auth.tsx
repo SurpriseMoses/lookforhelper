@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
@@ -22,6 +21,7 @@ const Auth = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
   const [signupName, setSignupName] = useState("");
   const [signupRole, setSignupRole] = useState<"seeker" | "helper">(defaultRole as "seeker" | "helper");
   const [signupReferralCode, setSignupReferralCode] = useState(searchParams.get("ref") || "");
@@ -72,6 +72,10 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (signupPassword !== signupConfirmPassword) {
+      toast({ title: "Passwords don't match", description: "Please make sure both passwords are the same.", variant: "destructive" });
+      return;
+    }
     setIsLoading(true);
     try {
       await signUp(signupEmail, signupPassword, signupName, signupRole);
@@ -123,24 +127,22 @@ const Auth = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="login-password"
-                        type={showLoginPassword ? "text" : "password"}
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        required
-                        className="pr-10"
+                    <Input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      required
+                    />
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={showLoginPassword}
+                        onChange={() => setShowLoginPassword(!showLoginPassword)}
+                        className="rounded border-input"
                       />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        tabIndex={-1}
-                      >
-                        {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                      Show password
+                    </label>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Log In"}
@@ -193,25 +195,34 @@ const Auth = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="signup-password"
-                        type={showSignupPassword ? "text" : "password"}
-                        value={signupPassword}
-                        onChange={(e) => setSignupPassword(e.target.value)}
-                        required
-                        minLength={6}
-                        className="pr-10"
+                    <Input
+                      id="signup-password"
+                      type={showSignupPassword ? "text" : "password"}
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="signup-confirm-password"
+                      type={showSignupPassword ? "text" : "password"}
+                      value={signupConfirmPassword}
+                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={showSignupPassword}
+                        onChange={() => setShowSignupPassword(!showSignupPassword)}
+                        className="rounded border-input"
                       />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        onClick={() => setShowSignupPassword(!showSignupPassword)}
-                        tabIndex={-1}
-                      >
-                        {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                      Show password
+                    </label>
                   </div>
                   <div className="space-y-3">
                     <Label>I am a...</Label>
