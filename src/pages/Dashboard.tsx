@@ -23,6 +23,7 @@ import AvailabilityCard from "@/components/dashboard/AvailabilityCard";
 import HelperListingCard from "@/components/dashboard/HelperListingCard";
 import SeekerHiresSection from "@/components/dashboard/SeekerHiresSection";
 import HelperPerformanceCard from "@/components/dashboard/HelperPerformanceCard";
+import DeleteAccountCard from "@/components/dashboard/DeleteAccountCard";
 import useLastActive from "@/hooks/useLastActive";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
@@ -512,6 +513,10 @@ const Dashboard = () => {
         <Button onClick={handleSave} disabled={saving} className="w-full">
           {saving ? "Saving..." : "Save Profile"}
         </Button>
+
+        <div className="mt-8">
+          <DeleteAccountCard />
+        </div>
       </div>
     </div>
   );
