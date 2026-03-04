@@ -22,6 +22,7 @@ import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import CancellationPolicy from "./pages/CancellationPolicy";
 import Contact from "./pages/Contact";
+import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/mobile/BottomNav";
 
 const queryClient = new QueryClient();
