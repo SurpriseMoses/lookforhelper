@@ -153,10 +153,13 @@ const Auth = () => {
                     <Input
                       id="login-password"
                       type={showLoginPassword ? "text" : "password"}
+                      name="login-pass-nofill"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
-                      autoComplete="off"
+                      autoComplete="current-password"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
                     />
                     <div className="flex items-center justify-between">
                       <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
