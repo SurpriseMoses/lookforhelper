@@ -139,10 +139,13 @@ const Auth = () => {
                     <Input
                       id="login-email"
                       type="email"
+                      name="login-email-nofill"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
-                      autoComplete="off"
+                      autoComplete="username"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
                     />
                   </div>
                   <div className="space-y-2">
