@@ -15,7 +15,7 @@ const Contact = () => {
             <div>
               <h2 className="text-lg font-semibold text-foreground mb-1">Email</h2>
               <a
-                href="mailto:help.lookforhelper@gmail.com"
+                href="mailto:help.lookforhelper@gmail.com?subject=General%20Enquiry%20-%20Look%20for%20Helper"
                 className="text-primary underline"
               >
                 help.lookforhelper@gmail.com
