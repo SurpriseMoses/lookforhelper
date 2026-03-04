@@ -203,7 +203,7 @@ const Auth = () => {
               </TabsContent>
 
               <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="mt-4 space-y-4">
+                <form onSubmit={handleSignup} className="mt-4 space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
