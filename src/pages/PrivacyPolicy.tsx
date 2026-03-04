@@ -93,7 +93,7 @@ const PrivacyPolicy = () => {
         <section className="mb-8">
           <h2 className="text-xl font-semibold text-foreground mb-3">7. Contact Us</h2>
           <p className="text-muted-foreground">If you have any questions about this Privacy Policy, contact:</p>
-          <p className="text-muted-foreground mt-1">Email: <a href="mailto:help.lookforhelper@gmail.com" className="text-primary underline">help.lookforhelper@gmail.com</a></p>
+          <p className="text-muted-foreground mt-1">Email: <a href="mailto:help.lookforhelper@gmail.com?subject=General%20Enquiry%20-%20Look%20for%20Helper" className="text-primary underline">help.lookforhelper@gmail.com</a></p>
         </section>
       </div>
     </div>
