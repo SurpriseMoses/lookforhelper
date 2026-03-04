@@ -114,7 +114,7 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="mt-4 space-y-4">
+                <form onSubmit={handleLogin} className="mt-4 space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
@@ -123,6 +123,7 @@ const Auth = () => {
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div className="space-y-2">
@@ -133,16 +134,26 @@ const Auth = () => {
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
+                      autoComplete="off"
                     />
-                    <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
-                      <input
-                        type="checkbox"
-                        checked={showLoginPassword}
-                        onChange={() => setShowLoginPassword(!showLoginPassword)}
-                        className="rounded border-input"
-                      />
-                      Show password
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+                        <input
+                          type="checkbox"
+                          checked={showLoginPassword}
+                          onChange={() => setShowLoginPassword(!showLoginPassword)}
+                          className="rounded border-input"
+                        />
+                        Show password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Log In"}
