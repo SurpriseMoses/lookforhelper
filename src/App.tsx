@@ -22,6 +22,7 @@ import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import CancellationPolicy from "./pages/CancellationPolicy";
 import Contact from "./pages/Contact";
+import ResetPassword from "./pages/ResetPassword";
 import BottomNav from "./components/mobile/BottomNav";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/refund-policy" element={<RefundPolicy />} />
                 <Route path="/cancellation-policy" element={<CancellationPolicy />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

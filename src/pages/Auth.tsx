@@ -57,6 +57,25 @@ const Auth = () => {
       }
     }
   };
+  const handleForgotPassword = async () => {
+    if (!loginEmail) {
+      toast({ title: "Enter your email", description: "Please type your email address in the email field first.", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(loginEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast({ title: "Reset link sent!", description: "Check your email (including spam) for the password reset link." });
+    } catch (err: any) {
+      toast({ title: "Failed to send reset link", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -114,7 +133,7 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="mt-4 space-y-4">
+                <form onSubmit={handleLogin} className="mt-4 space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
@@ -123,6 +142,7 @@ const Auth = () => {
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div className="space-y-2">
@@ -133,16 +153,26 @@ const Auth = () => {
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
+                      autoComplete="off"
                     />
-                    <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
-                      <input
-                        type="checkbox"
-                        checked={showLoginPassword}
-                        onChange={() => setShowLoginPassword(!showLoginPassword)}
-                        className="rounded border-input"
-                      />
-                      Show password
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+                        <input
+                          type="checkbox"
+                          checked={showLoginPassword}
+                          onChange={() => setShowLoginPassword(!showLoginPassword)}
+                          className="rounded border-input"
+                        />
+                        Show password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Log In"}
@@ -173,7 +203,7 @@ const Auth = () => {
               </TabsContent>
 
               <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="mt-4 space-y-4">
+                <form onSubmit={handleSignup} className="mt-4 space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
