@@ -1,0 +1,1 @@
+ALTER TABLE public.verification_requests ALTER COLUMN payment_id DROP NOT NULL;

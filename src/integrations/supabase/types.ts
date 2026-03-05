@@ -806,7 +806,7 @@ export type Database = {
           created_at: string
           document_url: string
           id: string
-          payment_id: string
+          payment_id: string | null
           rejection_reason: string | null
           reviewed_by: string | null
           status: string
@@ -817,7 +817,7 @@ export type Database = {
           created_at?: string
           document_url: string
           id?: string
-          payment_id: string
+          payment_id?: string | null
           rejection_reason?: string | null
           reviewed_by?: string | null
           status?: string
@@ -828,7 +828,7 @@ export type Database = {
           created_at?: string
           document_url?: string
           id?: string
-          payment_id?: string
+          payment_id?: string | null
           rejection_reason?: string | null
           reviewed_by?: string | null
           status?: string
