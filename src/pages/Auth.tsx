@@ -143,13 +143,15 @@ const Auth = () => {
                       id="login-email"
                       type="text"
                       inputMode="email"
-                      name={"lfh-e-" + Date.now()}
+                      name="lfh-contact-x9k2"
+                      value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
-                      autoComplete="one-time-code"
+                      autoComplete="off"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      placeholder="Enter your email"
                     />
                   </div>
                   <div className="space-y-2">
