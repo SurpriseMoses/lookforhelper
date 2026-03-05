@@ -135,21 +135,23 @@ const Auth = () => {
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="mt-4 space-y-4" autoComplete="off">
                   {/* Hidden decoy fields to absorb browser autofill */}
+                  <input type="text" name="fake-name" autoComplete="name" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
                   <input type="email" name="fake-email" autoComplete="email" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
-                  <input type="password" name="fake-password" autoComplete="current-password" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
-                      type="email"
-                      name="login-email-nofill"
+                      type="text"
+                      inputMode="email"
+                      name="lfh-contact-x9k2"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
-                      autoComplete="one-time-code"
+                      autoComplete="off"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      placeholder="Enter your email"
                     />
                   </div>
                   <div className="space-y-2">
