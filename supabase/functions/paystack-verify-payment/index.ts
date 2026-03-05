@@ -142,12 +142,34 @@ serve(async (req) => {
         });
       }
 
-      if (paystackData.status && paystackData.data.status === "success") {
+    if (paystackData.status && paystackData.data.status === "success") {
         await supabase
           .from("verification_payments")
           .update({ status: "paid" })
           .eq("payment_reference", reference)
           .eq("user_id", user.id);
+
+        // Set profile as verified now that payment is confirmed
+        await supabase
+          .from("profiles")
+          .update({ is_verified: true, verified_at: new Date().toISOString() })
+          .eq("user_id", user.id);
+
+        // Link payment to the approved verification request
+        const { data: paidPayment } = await supabase
+          .from("verification_payments")
+          .select("id")
+          .eq("payment_reference", reference)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (paidPayment) {
+          await supabase
+            .from("verification_requests")
+            .update({ payment_id: paidPayment.id })
+            .eq("user_id", user.id)
+            .eq("status", "approved");
+        }
 
         return new Response(
           JSON.stringify({ success: true, status: "paid" }),
