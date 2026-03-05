@@ -141,9 +141,9 @@ const Auth = () => {
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
-                      type="email"
-                      name="login-email-nofill"
-                      value={loginEmail}
+                      type="text"
+                      inputMode="email"
+                      name={"lfh-e-" + Date.now()}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
                       autoComplete="one-time-code"
