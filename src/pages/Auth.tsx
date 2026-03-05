@@ -134,6 +134,9 @@ const Auth = () => {
 
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="mt-4 space-y-4" autoComplete="off">
+                  {/* Hidden decoy fields to absorb browser autofill */}
+                  <input type="email" name="fake-email" autoComplete="email" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
+                  <input type="password" name="fake-password" autoComplete="current-password" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
@@ -143,9 +146,10 @@ const Auth = () => {
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
-                      autoComplete="username"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
+                      data-form-type="other"
                     />
                   </div>
                   <div className="space-y-2">
@@ -157,9 +161,10 @@ const Auth = () => {
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
-                      autoComplete="current-password"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
+                      data-form-type="other"
                     />
                     <div className="flex items-center justify-between">
                       <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
