@@ -896,8 +896,6 @@ export type Database = {
           similarity_score: number
         }[]
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
       track_profile_view: {
         Args: { helper_user_id: string }
         Returns: undefined
