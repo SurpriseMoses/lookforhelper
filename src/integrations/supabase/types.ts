@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cities: {
+        Row: {
+          city_name: string
+          country: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          province: string
+        }
+        Insert: {
+          city_name: string
+          country?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          province: string
+        }
+        Update: {
+          city_name?: string
+          country?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          province?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -857,6 +884,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_cities: {
+        Args: { result_limit?: number; search_term: string }
+        Returns: {
+          city_name: string
+          country: string
+          id: string
+          latitude: number
+          longitude: number
+          province: string
+          similarity_score: number
+        }[]
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       track_profile_view: {
         Args: { helper_user_id: string }
         Returns: undefined
