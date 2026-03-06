@@ -76,7 +76,17 @@ const Browse = () => {
       query = query.eq("gender", genderFilter);
     }
     if (cityFilter) {
-      query = query.ilike("city", `%${cityFilter}%`);
+      // Use fuzzy match - search for city and province
+      const { data: matchedCities } = await supabase.rpc("search_cities", {
+        search_term: cityFilter,
+        result_limit: 5,
+      });
+      if (matchedCities && matchedCities.length > 0) {
+        const cityNames = matchedCities.map((c: any) => c.city_name);
+        query = query.in("city", cityNames);
+      } else {
+        query = query.ilike("city", `%${cityFilter}%`);
+      }
     }
     if (availabilityFilter === "available_now") {
       query = query.eq("availability_status", "available_now");
