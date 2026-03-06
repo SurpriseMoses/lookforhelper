@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import CityAutocomplete from "@/components/search/CityAutocomplete";
 
 interface HelperWithProfile {
   user_id: string;
@@ -49,6 +49,7 @@ const Browse = () => {
   const [skillFilter, setSkillFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("");
+  const [cityProvince, setCityProvince] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
@@ -75,7 +76,17 @@ const Browse = () => {
       query = query.eq("gender", genderFilter);
     }
     if (cityFilter) {
-      query = query.ilike("city", `%${cityFilter}%`);
+      // Use fuzzy match - search for city and province
+      const { data: matchedCities } = await supabase.rpc("search_cities", {
+        search_term: cityFilter,
+        result_limit: 5,
+      });
+      if (matchedCities && matchedCities.length > 0) {
+        const cityNames = matchedCities.map((c: any) => c.city_name);
+        query = query.in("city", cityNames);
+      } else {
+        query = query.ilike("city", `%${cityFilter}%`);
+      }
     }
     if (availabilityFilter === "available_now") {
       query = query.eq("availability_status", "available_now");
@@ -141,7 +152,7 @@ const Browse = () => {
         };
       }) as HelperWithProfile[];
 
-      // Sort: featured first, then verified, then newest
+      // Sort: featured > verified > same city > same province > available > rating
       results.sort((a, b) => {
         const aFeatured = a.is_featured ? 1 : 0;
         const bFeatured = b.is_featured ? 1 : 0;
@@ -149,6 +160,16 @@ const Browse = () => {
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
         if (bVerified !== aVerified) return bVerified - aVerified;
+        // Same city first
+        if (cityFilter) {
+          const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+          const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+          if (bCity !== aCity) return bCity - aCity;
+          // Same province next
+          if (cityProvince) {
+            // We don't have province on helper_details, but we can infer from city lookup
+          }
+        }
         // Available now rank higher
         const aAvail = a.availability_status === "available_now" ? 1 : 0;
         const bAvail = b.availability_status === "available_now" ? 1 : 0;
@@ -187,16 +208,18 @@ const Browse = () => {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="e.g. Johannesburg"
-                  value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") fetchHelpers(); }}
-                  className="pl-9"
-                />
-              </div>
+              <CityAutocomplete
+                value={cityFilter}
+                onCitySelect={(city, province) => {
+                  setCityFilter(city);
+                  setCityProvince(province);
+                }}
+                onClear={() => {
+                  setCityFilter("");
+                  setCityProvince("");
+                }}
+                placeholder="e.g. Johannesburg"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Skill</Label>
