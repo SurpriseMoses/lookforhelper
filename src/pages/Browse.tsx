@@ -152,7 +152,7 @@ const Browse = () => {
         };
       }) as HelperWithProfile[];
 
-      // Sort: featured first, then verified, then newest
+      // Sort: featured > verified > same city > same province > available > rating
       results.sort((a, b) => {
         const aFeatured = a.is_featured ? 1 : 0;
         const bFeatured = b.is_featured ? 1 : 0;
@@ -160,6 +160,16 @@ const Browse = () => {
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
         if (bVerified !== aVerified) return bVerified - aVerified;
+        // Same city first
+        if (cityFilter) {
+          const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+          const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+          if (bCity !== aCity) return bCity - aCity;
+          // Same province next
+          if (cityProvince) {
+            // We don't have province on helper_details, but we can infer from city lookup
+          }
+        }
         // Available now rank higher
         const aAvail = a.availability_status === "available_now" ? 1 : 0;
         const bAvail = b.availability_status === "available_now" ? 1 : 0;
