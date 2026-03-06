@@ -208,16 +208,18 @@ const Browse = () => {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="e.g. Johannesburg"
-                  value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") fetchHelpers(); }}
-                  className="pl-9"
-                />
-              </div>
+              <CityAutocomplete
+                value={cityFilter}
+                onCitySelect={(city, province) => {
+                  setCityFilter(city);
+                  setCityProvince(province);
+                }}
+                onClear={() => {
+                  setCityFilter("");
+                  setCityProvince("");
+                }}
+                placeholder="e.g. Johannesburg"
+              />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Skill</Label>
