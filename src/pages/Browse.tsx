@@ -4,13 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import CityAutocomplete from "@/components/search/CityAutocomplete";
 
 interface HelperWithProfile {
   user_id: string;
@@ -49,6 +49,7 @@ const Browse = () => {
   const [skillFilter, setSkillFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("");
+  const [cityProvince, setCityProvince] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
