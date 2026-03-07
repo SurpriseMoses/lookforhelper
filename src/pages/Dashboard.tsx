@@ -366,6 +366,26 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              {/* Work Authorization */}
+              <div className="space-y-2">
+                <Label>Work Authorization Status</Label>
+                <Select
+                  value={helperDetails.work_authorization_status}
+                  onValueChange={(v) => setHelperDetails((h) => ({ ...h, work_authorization_status: v }))}
+                >
+                  <SelectTrigger><SelectValue placeholder="Select (optional)" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sa_citizen">South African Citizen</SelectItem>
+                    <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
+                    <SelectItem value="work_permit">Valid Work Permit</SelectItem>
+                    <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
+                    <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                    <SelectItem value="prefer_not_to_say">Prefer not to specify</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Optional — helps employers understand your work eligibility.</p>
+              </div>
+
               <div className="space-y-2">
                 <Label>About Me</Label>
                 <Textarea

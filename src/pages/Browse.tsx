@@ -154,6 +154,7 @@ const Browse = () => {
           availability_status: h.availability_status ?? "not_available",
           available_from: h.available_from ?? null,
           work_type: h.work_type ?? [],
+          work_authorization_status: (h as any).work_authorization_status ?? null,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
