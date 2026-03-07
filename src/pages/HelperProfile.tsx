@@ -262,6 +262,14 @@ const HelperProfilePage = () => {
                     </span>
                   )}
                 </div>
+                {/* Work Authorization Status */}
+                {helper.work_authorization_status && helper.work_authorization_status !== "prefer_not_to_say" && (
+                  <div className="mt-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                      <ShieldCheck className="h-3.5 w-3.5" /> Work Authorization: {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
+                    </span>
+                  </div>
+                )}
                 {/* Work type & preferred hours */}
                 {helper.work_type && helper.work_type.length > 0 && (
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
