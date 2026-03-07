@@ -30,6 +30,7 @@ interface HelperWithProfile {
   availability_status: string;
   available_from: string | null;
   work_type: string[] | null;
+  work_authorization_status: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
