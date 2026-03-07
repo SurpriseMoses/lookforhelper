@@ -281,6 +281,20 @@ const Browse = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Work Authorization</Label>
+              <Select value={workAuthFilter} onValueChange={setWorkAuthFilter}>
+                <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="sa_citizen">SA Citizen</SelectItem>
+                  <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
+                  <SelectItem value="work_permit">Work Permit</SelectItem>
+                  <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
+                  <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Sort by</Label>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -289,6 +303,12 @@ const Browse = () => {
                   <SelectItem value="experience">Most experienced</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 mt-2">
+            <div className="flex items-center gap-2">
+              <Switch checked={verifiedFilter} onCheckedChange={setVerifiedFilter} />
+              <Label className="text-sm cursor-pointer">Identity Verified only</Label>
             </div>
           </div>
           <Button onClick={fetchHelpers} className="w-full sm:w-auto gap-2">
