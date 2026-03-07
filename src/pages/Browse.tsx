@@ -99,6 +99,9 @@ const Browse = () => {
     if (workTypeFilter !== "all") {
       query = query.contains("work_type", [workTypeFilter]);
     }
+    if (workAuthFilter !== "all") {
+      query = query.eq("work_authorization_status", workAuthFilter);
+    }
 
     if (sortBy === "newest") {
       query = query.order("created_at", { ascending: false });
