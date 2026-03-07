@@ -17,6 +17,15 @@ import TopHelperBadge from "@/components/profile/TopHelperBadge";
 import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
 import WhatsAppShareButton from "@/components/profile/WhatsAppShareButton";
 
+const WORK_AUTH_LABELS: Record<string, string> = {
+  sa_citizen: "South African Citizen",
+  permanent_resident: "Permanent Resident",
+  work_permit: "Valid Work Permit",
+  asylum_permit: "Asylum Permit",
+  refugee_permit: "Refugee Permit",
+  prefer_not_to_say: "Prefer not to specify",
+};
+
 interface HelperProfile {
   user_id: string;
   age: number | null;
@@ -43,6 +52,7 @@ interface HelperProfile {
   preferred_hours: string | null;
   average_rating: number;
   total_reviews: number;
+  work_authorization_status: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
