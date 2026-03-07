@@ -118,6 +118,7 @@ const HelperProfilePage = () => {
         work_type: (helperData as any).work_type ?? [],
         preferred_hours: (helperData as any).preferred_hours ?? null,
         helper_references: helperData.helper_references as any,
+        work_authorization_status: (helperData as any).work_authorization_status ?? null,
         profiles: profileData ?? null,
         response_time: responseData ?? null,
       } as HelperProfile);

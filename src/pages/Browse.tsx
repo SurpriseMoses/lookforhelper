@@ -389,6 +389,11 @@ const Browse = () => {
                         </span>
                       )}
                     </div>
+                    {helper.work_authorization_status && helper.work_authorization_status !== "prefer_not_to_say" && (
+                      <div className="mt-1.5 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                        <ShieldCheck className="h-3 w-3" /> {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
+                      </div>
+                    )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {helper.skills?.map((skill) => (
                         <Badge key={skill} variant="secondary" className="text-xs">
