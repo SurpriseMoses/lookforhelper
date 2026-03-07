@@ -100,6 +100,7 @@ const Dashboard = () => {
             video_introduction_url: (h as any).video_introduction_url ?? "",
             helper_references: (h.helper_references as any[]) ?? [],
             is_published: h.is_published ?? false,
+            work_authorization_status: (h as any).work_authorization_status ?? "",
           });
         }
       }
