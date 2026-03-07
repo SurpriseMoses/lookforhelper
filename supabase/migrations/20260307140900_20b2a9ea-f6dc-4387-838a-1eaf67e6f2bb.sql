@@ -1,0 +1,1 @@
+ALTER TABLE public.helper_details ADD COLUMN work_authorization_status text DEFAULT NULL;

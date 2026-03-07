@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,6 +31,7 @@ interface HelperWithProfile {
   availability_status: string;
   available_from: string | null;
   work_type: string[] | null;
+  work_authorization_status: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -37,6 +39,15 @@ interface HelperWithProfile {
 }
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
+
+const WORK_AUTH_LABELS: Record<string, string> = {
+  sa_citizen: "SA Citizen",
+  permanent_resident: "Permanent Resident",
+  work_permit: "Work Permit",
+  asylum_permit: "Asylum Permit",
+  refugee_permit: "Refugee Permit",
+  prefer_not_to_say: "Prefer not to specify",
+};
 
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
@@ -53,6 +64,8 @@ const Browse = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
+  const [verifiedFilter, setVerifiedFilter] = useState(false);
+  const [workAuthFilter, setWorkAuthFilter] = useState("all");
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
@@ -66,7 +79,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type")
+      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -95,6 +108,9 @@ const Browse = () => {
     }
     if (workTypeFilter !== "all") {
       query = query.contains("work_type", [workTypeFilter]);
+    }
+    if (workAuthFilter !== "all") {
+      query = query.eq("work_authorization_status", workAuthFilter);
     }
 
     if (sortBy === "newest") {
@@ -148,42 +164,37 @@ const Browse = () => {
           availability_status: h.availability_status ?? "not_available",
           available_from: h.available_from ?? null,
           work_type: h.work_type ?? [],
+          work_authorization_status: (h as any).work_authorization_status ?? null,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
 
-      // Sort: featured > verified > same city > same province > available > rating
-      results.sort((a, b) => {
+      // Filter verified only if toggle is on
+      const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
+
+      filtered.sort((a, b) => {
         const aFeatured = a.is_featured ? 1 : 0;
         const bFeatured = b.is_featured ? 1 : 0;
         if (bFeatured !== aFeatured) return bFeatured - aFeatured;
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
         if (bVerified !== aVerified) return bVerified - aVerified;
-        // Same city first
         if (cityFilter) {
           const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
           const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
           if (bCity !== aCity) return bCity - aCity;
-          // Same province next
-          if (cityProvince) {
-            // We don't have province on helper_details, but we can infer from city lookup
-          }
         }
-        // Available now rank higher
         const aAvail = a.availability_status === "available_now" ? 1 : 0;
         const bAvail = b.availability_status === "available_now" ? 1 : 0;
         if (bAvail !== aAvail) return bAvail - aAvail;
-        // Then by average rating
         if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
         return 0;
       });
 
-      setHelpers(results);
+      setHelpers(filtered);
 
-      // Track search appearances for all displayed helpers
-      if (results.length > 0) {
-        const ids = results.map((r) => r.user_id);
+      if (filtered.length > 0) {
+        const ids = filtered.map((r) => r.user_id);
         supabase.rpc("track_search_appearances", { helper_user_ids: ids }).then(() => {});
       }
     } else {
@@ -270,6 +281,20 @@ const Browse = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Work Authorization</Label>
+              <Select value={workAuthFilter} onValueChange={setWorkAuthFilter}>
+                <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="sa_citizen">SA Citizen</SelectItem>
+                  <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
+                  <SelectItem value="work_permit">Work Permit</SelectItem>
+                  <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
+                  <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Sort by</Label>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -278,6 +303,12 @@ const Browse = () => {
                   <SelectItem value="experience">Most experienced</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 mt-2">
+            <div className="flex items-center gap-2">
+              <Switch checked={verifiedFilter} onCheckedChange={setVerifiedFilter} />
+              <Label className="text-sm cursor-pointer">Identity Verified only</Label>
             </div>
           </div>
           <Button onClick={fetchHelpers} className="w-full sm:w-auto gap-2">
@@ -358,6 +389,11 @@ const Browse = () => {
                         </span>
                       )}
                     </div>
+                    {helper.work_authorization_status && helper.work_authorization_status !== "prefer_not_to_say" && (
+                      <div className="mt-1.5 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                        <ShieldCheck className="h-3 w-3" /> {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
+                      </div>
+                    )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {helper.skills?.map((skill) => (
                         <Badge key={skill} variant="secondary" className="text-xs">

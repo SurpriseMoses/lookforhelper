@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -16,6 +16,15 @@ import ResponseTimeBadge from "@/components/profile/ResponseTimeBadge";
 import TopHelperBadge from "@/components/profile/TopHelperBadge";
 import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
 import WhatsAppShareButton from "@/components/profile/WhatsAppShareButton";
+
+const WORK_AUTH_LABELS: Record<string, string> = {
+  sa_citizen: "South African Citizen",
+  permanent_resident: "Permanent Resident",
+  work_permit: "Valid Work Permit",
+  asylum_permit: "Asylum Permit",
+  refugee_permit: "Refugee Permit",
+  prefer_not_to_say: "Prefer not to specify",
+};
 
 interface HelperProfile {
   user_id: string;
@@ -43,6 +52,7 @@ interface HelperProfile {
   preferred_hours: string | null;
   average_rating: number;
   total_reviews: number;
+  work_authorization_status: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -108,6 +118,7 @@ const HelperProfilePage = () => {
         work_type: (helperData as any).work_type ?? [],
         preferred_hours: (helperData as any).preferred_hours ?? null,
         helper_references: helperData.helper_references as any,
+        work_authorization_status: (helperData as any).work_authorization_status ?? null,
         profiles: profileData ?? null,
         response_time: responseData ?? null,
       } as HelperProfile);
@@ -251,6 +262,14 @@ const HelperProfilePage = () => {
                     </span>
                   )}
                 </div>
+                {/* Work Authorization Status */}
+                {helper.work_authorization_status && helper.work_authorization_status !== "prefer_not_to_say" && (
+                  <div className="mt-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                      <ShieldCheck className="h-3.5 w-3.5" /> Work Authorization: {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
+                    </span>
+                  </div>
+                )}
                 {/* Work type & preferred hours */}
                 {helper.work_type && helper.work_type.length > 0 && (
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
