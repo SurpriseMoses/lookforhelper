@@ -168,6 +168,9 @@ const Browse = () => {
         };
       }) as HelperWithProfile[];
 
+      // Filter verified only if toggle is on
+      const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
+
       // Sort: featured > verified > same city > same province > available > rating
       results.sort((a, b) => {
         const aFeatured = a.is_featured ? 1 : 0;
