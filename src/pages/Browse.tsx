@@ -171,38 +171,29 @@ const Browse = () => {
       // Filter verified only if toggle is on
       const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
 
-      // Sort: featured > verified > same city > same province > available > rating
-      results.sort((a, b) => {
+      filtered.sort((a, b) => {
         const aFeatured = a.is_featured ? 1 : 0;
         const bFeatured = b.is_featured ? 1 : 0;
         if (bFeatured !== aFeatured) return bFeatured - aFeatured;
         const aVerified = a.is_verified ? 1 : 0;
         const bVerified = b.is_verified ? 1 : 0;
         if (bVerified !== aVerified) return bVerified - aVerified;
-        // Same city first
         if (cityFilter) {
           const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
           const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
           if (bCity !== aCity) return bCity - aCity;
-          // Same province next
-          if (cityProvince) {
-            // We don't have province on helper_details, but we can infer from city lookup
-          }
         }
-        // Available now rank higher
         const aAvail = a.availability_status === "available_now" ? 1 : 0;
         const bAvail = b.availability_status === "available_now" ? 1 : 0;
         if (bAvail !== aAvail) return bAvail - aAvail;
-        // Then by average rating
         if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
         return 0;
       });
 
-      setHelpers(results);
+      setHelpers(filtered);
 
-      // Track search appearances for all displayed helpers
-      if (results.length > 0) {
-        const ids = results.map((r) => r.user_id);
+      if (filtered.length > 0) {
+        const ids = filtered.map((r) => r.user_id);
         supabase.rpc("track_search_appearances", { helper_user_ids: ids }).then(() => {});
       }
     } else {
