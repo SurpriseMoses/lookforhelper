@@ -138,6 +138,7 @@ const Dashboard = () => {
             video_introduction_url: helperDetails.video_introduction_url || null,
             helper_references: helperDetails.helper_references,
             is_published: helperDetails.is_published,
+            work_authorization_status: helperDetails.work_authorization_status || null,
           })
           .eq("user_id", user.id);
       }
