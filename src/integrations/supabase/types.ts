@@ -149,6 +149,7 @@ export type Database = {
           user_id: string
           video_introduction_url: string | null
           willing_to_work_abroad: boolean | null
+          work_authorization_status: string | null
           work_type: string[] | null
           years_experience: number | null
         }
@@ -184,6 +185,7 @@ export type Database = {
           user_id: string
           video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
+          work_authorization_status?: string | null
           work_type?: string[] | null
           years_experience?: number | null
         }
@@ -219,6 +221,7 @@ export type Database = {
           user_id?: string
           video_introduction_url?: string | null
           willing_to_work_abroad?: boolean | null
+          work_authorization_status?: string | null
           work_type?: string[] | null
           years_experience?: number | null
         }
