@@ -39,6 +39,15 @@ interface HelperWithProfile {
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 
+const WORK_AUTH_LABELS: Record<string, string> = {
+  sa_citizen: "SA Citizen",
+  permanent_resident: "Permanent Resident",
+  work_permit: "Work Permit",
+  asylum_permit: "Asylum Permit",
+  refugee_permit: "Refugee Permit",
+  prefer_not_to_say: "Prefer not to specify",
+};
+
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
   const [loading, setLoading] = useState(false);
