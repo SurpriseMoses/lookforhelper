@@ -54,6 +54,8 @@ const Browse = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
+  const [verifiedFilter, setVerifiedFilter] = useState(false);
+  const [workAuthFilter, setWorkAuthFilter] = useState("all");
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
