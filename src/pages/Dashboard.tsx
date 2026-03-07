@@ -53,6 +53,7 @@ const Dashboard = () => {
     video_introduction_url: "",
     helper_references: [] as { name: string; contact: string; relationship: string }[],
     is_published: false,
+    work_authorization_status: "",
   });
   const [saving, setSaving] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
