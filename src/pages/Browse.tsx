@@ -151,11 +151,11 @@ const Browse = () => {
       const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, full_name, avatar_url, is_verified")
+        .select("user_id, full_name, avatar_url, is_verified, last_active_at")
         .in("user_id", eligibleUserIds);
 
       const profileMap = new Map(
-        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified }])
+        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
       );
 
       const now = new Date();
