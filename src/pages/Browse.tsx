@@ -119,6 +119,8 @@ const Browse = () => {
 
     if (sortBy === "newest") {
       query = query.order("created_at", { ascending: false });
+    } else if (sortBy === "highest_rated") {
+      query = query.order("average_rating", { ascending: false });
     } else {
       query = query.order("years_experience", { ascending: false });
     }
