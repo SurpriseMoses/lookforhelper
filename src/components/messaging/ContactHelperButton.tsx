@@ -86,10 +86,12 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
             <div className="flex items-start gap-2">
               <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-amber-900 dark:text-amber-300 mb-1">Safety Reminder</p>
-                <p className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
-                  For your safety, always confirm a helper's identity and references before hiring. Look For Helper connects households with helpers but does not employ or supervise them.
-                </p>
+                <p className="text-xs font-semibold text-amber-900 dark:text-amber-300 mb-1">Before hiring a helper, we recommend:</p>
+                <ul className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed space-y-0.5">
+                  <li>• Conducting a phone or video interview</li>
+                  <li>• Meeting in person in a safe place</li>
+                  <li>• Verifying identity documents</li>
+                </ul>
               </div>
             </div>
             <label className="flex items-start gap-2 mt-3 cursor-pointer">
