@@ -363,6 +363,34 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              {/* Skill Experience - years per skill */}
+              {helperDetails.skills.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Experience per Skill (years)</Label>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {helperDetails.skills.map((skill) => (
+                      <div key={skill} className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground w-24 shrink-0">{skill}</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Years"
+                          className="h-8"
+                          value={helperDetails.skill_experience[skill] ?? ""}
+                          onChange={(e) =>
+                            setHelperDetails((h) => ({
+                              ...h,
+                              skill_experience: { ...h.skill_experience, [skill]: e.target.value },
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Specify how many years of experience you have for each skill.</p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Languages</Label>
                 <div className="flex flex-wrap gap-2">
