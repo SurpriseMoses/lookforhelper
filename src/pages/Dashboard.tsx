@@ -44,6 +44,7 @@ const Dashboard = () => {
     willing_to_work_abroad: false,
     years_experience: "",
     skills: [] as string[],
+    skill_experience: {} as Record<string, string>,
     languages: [] as string[],
     salary_expectation: "",
     salary_min: "",
