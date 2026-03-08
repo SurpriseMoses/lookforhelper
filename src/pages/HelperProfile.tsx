@@ -303,13 +303,27 @@ const HelperProfilePage = () => {
                   )}
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {helper.skills?.map((skill) => (
-                    <Badge key={skill} className="bg-accent/15 text-accent-foreground">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
+                {/* Structured Experience */}
+                {helper.skill_experience && Object.keys(helper.skill_experience).length > 0 ? (
+                  <div className="mt-4">
+                    <h3 className="text-sm font-medium text-foreground mb-2">Experience</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(helper.skill_experience).map(([skill, years]) => (
+                        <Badge key={skill} className="bg-accent/15 text-accent-foreground">
+                          {skill} – {years} {years === 1 ? "year" : "years"}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {helper.skills?.map((skill) => (
+                      <Badge key={skill} className="bg-accent/15 text-accent-foreground">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
