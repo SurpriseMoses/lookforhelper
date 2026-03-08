@@ -35,6 +35,7 @@ interface HelperProfile {
   willing_to_work_abroad: boolean | null;
   years_experience: number | null;
   skills: string[] | null;
+  skill_experience: Record<string, number> | null;
   languages: string[] | null;
   salary_expectation: string | null;
   salary_min: number | null;
@@ -119,6 +120,7 @@ const HelperProfilePage = () => {
         preferred_hours: (helperData as any).preferred_hours ?? null,
         helper_references: helperData.helper_references as any,
         work_authorization_status: (helperData as any).work_authorization_status ?? null,
+        skill_experience: (helperData as any).skill_experience ?? null,
         profiles: profileData ?? null,
         response_time: responseData ?? null,
       } as HelperProfile);
@@ -301,13 +303,27 @@ const HelperProfilePage = () => {
                   )}
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {helper.skills?.map((skill) => (
-                    <Badge key={skill} className="bg-accent/15 text-accent-foreground">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
+                {/* Structured Experience */}
+                {helper.skill_experience && Object.keys(helper.skill_experience).length > 0 ? (
+                  <div className="mt-4">
+                    <h3 className="text-sm font-medium text-foreground mb-2">Experience</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(helper.skill_experience).map(([skill, years]) => (
+                        <Badge key={skill} className="bg-accent/15 text-accent-foreground">
+                          {skill} – {years} {years === 1 ? "year" : "years"}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {helper.skills?.map((skill) => (
+                      <Badge key={skill} className="bg-accent/15 text-accent-foreground">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

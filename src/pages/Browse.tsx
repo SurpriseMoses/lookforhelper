@@ -12,6 +12,8 @@ import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import SaveHelperButton from "@/components/browse/SaveHelperButton";
+import ActivityIndicator from "@/components/profile/ActivityIndicator";
 
 interface HelperWithProfile {
   user_id: string;
@@ -21,6 +23,7 @@ interface HelperWithProfile {
   country: string | null;
   years_experience: number | null;
   skills: string[] | null;
+  skill_experience: Record<string, number> | null;
   languages: string[] | null;
   about_me: string | null;
   is_verified: boolean;
@@ -32,6 +35,7 @@ interface HelperWithProfile {
   available_from: string | null;
   work_type: string[] | null;
   work_authorization_status: string | null;
+  last_active_at: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -79,7 +83,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
+      .select("user_id, age, gender, city, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -115,6 +119,8 @@ const Browse = () => {
 
     if (sortBy === "newest") {
       query = query.order("created_at", { ascending: false });
+    } else if (sortBy === "highest_rated") {
+      query = query.order("average_rating", { ascending: false });
     } else {
       query = query.order("years_experience", { ascending: false });
     }
@@ -145,11 +151,11 @@ const Browse = () => {
       const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("user_id, full_name, avatar_url, is_verified")
+        .select("user_id, full_name, avatar_url, is_verified, last_active_at")
         .in("user_id", eligibleUserIds);
 
       const profileMap = new Map(
-        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified }])
+        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
       );
 
       const now = new Date();
@@ -165,6 +171,8 @@ const Browse = () => {
           available_from: h.available_from ?? null,
           work_type: h.work_type ?? [],
           work_authorization_status: (h as any).work_authorization_status ?? null,
+          skill_experience: h.skill_experience ?? null,
+          last_active_at: profileMap.get(h.user_id)?.last_active_at ?? null,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
@@ -299,7 +307,8 @@ const Browse = () => {
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="newest">Most relevant</SelectItem>
+                  <SelectItem value="highest_rated">Highest rated</SelectItem>
                   <SelectItem value="experience">Most experienced</SelectItem>
                 </SelectContent>
               </Select>
@@ -338,6 +347,7 @@ const Browse = () => {
                         <Star className="h-3 w-3" /> Featured
                       </span>
                     )}
+                    <SaveHelperButton helperUserId={helper.user_id} />
                     {helper.profiles?.avatar_url ? (
                       <img
                         src={helper.profiles.avatar_url}
@@ -360,16 +370,19 @@ const Browse = () => {
                         </span>
                       )}
                     </h3>
-                    {helper.availability_status === "available_now" && (
-                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                        <Circle className="h-2 w-2 fill-emerald-500 text-emerald-500" /> Available Now
-                      </span>
-                    )}
-                    {helper.availability_status === "available_soon" && (
-                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700">
-                        <Circle className="h-2 w-2 fill-amber-500 text-amber-500" /> Available soon
-                      </span>
-                    )}
+                    <div className="mt-1 flex items-center gap-2 flex-wrap">
+                      {helper.availability_status === "available_now" && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                          <Circle className="h-2 w-2 fill-emerald-500 text-emerald-500" /> Available Now
+                        </span>
+                      )}
+                      {helper.availability_status === "available_soon" && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700">
+                          <Circle className="h-2 w-2 fill-amber-500 text-amber-500" /> Available soon
+                        </span>
+                      )}
+                      <ActivityIndicator lastActiveAt={helper.last_active_at} />
+                    </div>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.total_reviews > 0 && (
                         <span className="flex items-center gap-1">
@@ -394,13 +407,24 @@ const Browse = () => {
                         <ShieldCheck className="h-3 w-3" /> {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
                       </div>
                     )}
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {helper.skills?.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
+                    {/* Structured skill experience */}
+                    {helper.skill_experience && Object.keys(helper.skill_experience).length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {Object.entries(helper.skill_experience).map(([skill, years]) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill} – {years} {years === 1 ? "yr" : "yrs"}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {helper.skills?.map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </Link>

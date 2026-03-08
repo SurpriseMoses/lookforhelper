@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
@@ -44,6 +44,7 @@ const Dashboard = () => {
     willing_to_work_abroad: false,
     years_experience: "",
     skills: [] as string[],
+    skill_experience: {} as Record<string, string>,
     languages: [] as string[],
     salary_expectation: "",
     salary_min: "",
@@ -83,6 +84,11 @@ const Dashboard = () => {
           .eq("user_id", user.id)
           .maybeSingle();
         if (h) {
+          const rawExp = (h as any).skill_experience ?? {};
+          const strExp: Record<string, string> = {};
+          for (const [k, v] of Object.entries(rawExp)) {
+            strExp[k] = String(v ?? "");
+          }
           setHelperDetails({
             age: h.age?.toString() ?? "",
             gender: h.gender ?? "",
@@ -91,6 +97,7 @@ const Dashboard = () => {
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
             skills: h.skills ?? [],
+            skill_experience: strExp,
             languages: h.languages ?? [],
             salary_expectation: h.salary_expectation ?? "",
             salary_min: (h as any).salary_min?.toString() ?? "",
@@ -119,6 +126,12 @@ const Dashboard = () => {
         .eq("user_id", user.id);
 
       if (role === "helper") {
+        // Convert skill_experience string values to numbers
+        const numericSkillExp: Record<string, number> = {};
+        for (const [k, v] of Object.entries(helperDetails.skill_experience)) {
+          const num = parseInt(v);
+          if (!isNaN(num) && num > 0) numericSkillExp[k] = num;
+        }
         await supabase
           .from("helper_details")
           .update({
@@ -129,6 +142,7 @@ const Dashboard = () => {
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
             skills: helperDetails.skills,
+            skill_experience: numericSkillExp,
             languages: helperDetails.languages,
             salary_expectation: helperDetails.salary_expectation,
             salary_min: helperDetails.salary_min ? parseInt(helperDetails.salary_min) : null,
@@ -139,7 +153,7 @@ const Dashboard = () => {
             helper_references: helperDetails.helper_references,
             is_published: helperDetails.is_published,
             work_authorization_status: helperDetails.work_authorization_status || null,
-          })
+          } as any)
           .eq("user_id", user.id);
       }
 
@@ -242,6 +256,17 @@ const Dashboard = () => {
         {role === "seeker" && (
           <>
             <SeekerSubscriptionCard />
+            <Card className="mb-6">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Saved Helpers</p>
+                  <p className="text-xs text-muted-foreground">View helpers you've bookmarked</p>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/saved-helpers">View Saved</Link>
+                </Button>
+              </CardContent>
+            </Card>
             <SeekerHiresSection />
           </>
         )}
@@ -348,6 +373,34 @@ const Dashboard = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Skill Experience - years per skill */}
+              {helperDetails.skills.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Experience per Skill (years)</Label>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {helperDetails.skills.map((skill) => (
+                      <div key={skill} className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground w-24 shrink-0">{skill}</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Years"
+                          className="h-8"
+                          value={helperDetails.skill_experience[skill] ?? ""}
+                          onChange={(e) =>
+                            setHelperDetails((h) => ({
+                              ...h,
+                              skill_experience: { ...h.skill_experience, [skill]: e.target.value },
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Specify how many years of experience you have for each skill.</p>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Languages</Label>

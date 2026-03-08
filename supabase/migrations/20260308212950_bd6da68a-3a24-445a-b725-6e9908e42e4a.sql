@@ -1,0 +1,1 @@
+ALTER TABLE public.helper_details ADD COLUMN IF NOT EXISTS skill_experience jsonb DEFAULT '{}'::jsonb;

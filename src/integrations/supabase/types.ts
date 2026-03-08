@@ -143,6 +143,7 @@ export type Database = {
           salary_max: number | null
           salary_min: number | null
           salary_negotiable: boolean | null
+          skill_experience: Json | null
           skills: string[] | null
           total_reviews: number | null
           updated_at: string
@@ -180,6 +181,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           salary_negotiable?: boolean | null
+          skill_experience?: Json | null
           skills?: string[] | null
           total_reviews?: number | null
           updated_at?: string
@@ -217,6 +219,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           salary_negotiable?: boolean | null
+          skill_experience?: Json | null
           skills?: string[] | null
           total_reviews?: number | null
           updated_at?: string
