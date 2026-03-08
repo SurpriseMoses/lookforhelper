@@ -443,6 +443,7 @@ const Browse = () => {
               </Link>
             ))}
           </div>
+          </>
         )}
       </div>
     </div>
