@@ -23,6 +23,7 @@ interface HelperWithProfile {
   country: string | null;
   years_experience: number | null;
   skills: string[] | null;
+  skill_experience: Record<string, number> | null;
   languages: string[] | null;
   about_me: string | null;
   is_verified: boolean;
@@ -34,6 +35,7 @@ interface HelperWithProfile {
   available_from: string | null;
   work_type: string[] | null;
   work_authorization_status: string | null;
+  last_active_at: string | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
