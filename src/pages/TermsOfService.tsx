@@ -19,7 +19,14 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">2. User Responsibilities</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">2. User Responsibility</h2>
+          <p className="text-muted-foreground mb-2">
+            Look For Helper operates as a marketplace that connects households and independent helpers. Look For Helper does not employ helpers and does not guarantee identity, references, or work authorization. Users are responsible for conducting their own checks and making informed hiring decisions.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">3. User Conduct</h2>
           <p className="text-muted-foreground mb-2">Users agree to:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Provide accurate information</li>
@@ -31,7 +38,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">3. Payments</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">4. Payments</h2>
 
           <h3 className="font-medium text-foreground mt-4 mb-1">Seeker Payments</h3>
           <p className="text-muted-foreground ml-2">Seekers may pay a fee (e.g., R25) to unlock contact or chat access with helpers. Access is valid for a limited period.</p>
@@ -49,24 +56,24 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">4. Verification & Trust Badges</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">5. Verification & Trust Badges</h2>
           <p className="text-muted-foreground mb-2">Trust badges (such as Verified Identity or Background Checked) indicate that certain checks have been completed.</p>
           <p className="text-muted-foreground">These badges do not guarantee performance, reliability, or suitability.</p>
           <p className="text-muted-foreground mt-1">Seekers are responsible for their own hiring decisions.</p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">5. Background Checks</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">6. Background Checks</h2>
           <p className="text-muted-foreground">Where available, background checks are conducted through third-party sources. Results are provided for informational purposes only and may not be exhaustive.</p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">6. Reviews & Ratings</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">7. Reviews & Ratings</h2>
           <p className="text-muted-foreground">Users may leave honest reviews based on actual experiences. We reserve the right to remove inappropriate or fraudulent content.</p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">7. Limitation of Liability</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">8. Limitation of Liability</h2>
           <p className="text-muted-foreground mb-2">Look for Helper is not responsible for:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>The conduct of users</li>
@@ -78,7 +85,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">8. Account Suspension</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">9. Account Suspension</h2>
           <p className="text-muted-foreground mb-2">We may suspend or remove accounts that:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Violate these terms</li>
@@ -88,12 +95,12 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">9. Changes to the Platform</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">10. Changes to the Platform</h2>
           <p className="text-muted-foreground">We may update features, pricing, or policies at any time. Continued use of the platform means you accept the updated terms.</p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">10. Contact</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">11. Contact</h2>
           <p className="text-muted-foreground">For support or legal inquiries:</p>
           <p className="text-muted-foreground mt-1">Email: <a href="mailto:help.lookforhelper@gmail.com?subject=Support%20Request%20-%20Look%20for%20Helper" className="text-primary underline">help.lookforhelper@gmail.com</a></p>
         </section>

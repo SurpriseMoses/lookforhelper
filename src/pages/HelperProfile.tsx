@@ -426,6 +426,19 @@ const HelperProfilePage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Safety Notice */}
+        <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4">
+          <div className="flex items-start gap-2">
+            <ShieldCheck className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-1">Safety Notice</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Look For Helper verifies certain profile information where possible, such as identity documents. However, Look For Helper does not guarantee the accuracy, reliability, or legal work status of any helper. Seekers are responsible for independently confirming identity, references, and work authorization before hiring.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showReport && userId && (
