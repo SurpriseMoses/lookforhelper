@@ -85,7 +85,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">8. Account Suspension</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">9. Account Suspension</h2>
           <p className="text-muted-foreground mb-2">We may suspend or remove accounts that:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Violate these terms</li>
