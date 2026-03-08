@@ -148,6 +148,7 @@ export type Database = {
           updated_at: string
           user_id: string
           video_introduction_url: string | null
+          video_views: number
           willing_to_work_abroad: boolean | null
           work_authorization_status: string | null
           work_type: string[] | null
@@ -184,6 +185,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           video_introduction_url?: string | null
+          video_views?: number
           willing_to_work_abroad?: boolean | null
           work_authorization_status?: string | null
           work_type?: string[] | null
@@ -220,6 +222,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           video_introduction_url?: string | null
+          video_views?: number
           willing_to_work_abroad?: boolean | null
           work_authorization_status?: string | null
           work_type?: string[] | null
@@ -907,6 +910,7 @@ export type Database = {
         Args: { helper_user_ids: string[] }
         Returns: undefined
       }
+      track_video_view: { Args: { helper_user_id: string }; Returns: undefined }
       update_last_active: { Args: never; Returns: undefined }
     }
     Enums: {
