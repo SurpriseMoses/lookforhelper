@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -357,11 +357,22 @@ const HelperProfilePage = () => {
             {/* Video Introduction */}
             {helper.video_introduction_url && (
               <div className="mt-6">
-                <h2 className="font-display text-lg font-semibold text-foreground">Video Introduction</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-lg font-semibold text-foreground">Video Introduction</h2>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Eye className="h-3.5 w-3.5" />
+                    {(helper as any).video_views ?? 0} views
+                  </span>
+                </div>
                 <video
                   src={helper.video_introduction_url}
                   controls
                   className="mt-2 w-full max-w-lg rounded-lg"
+                  onPlay={() => {
+                    if (userId) {
+                      supabase.rpc("track_video_view", { helper_user_id: userId });
+                    }
+                  }}
                 />
               </div>
             )}
