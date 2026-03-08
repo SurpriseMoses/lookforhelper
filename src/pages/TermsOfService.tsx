@@ -19,7 +19,14 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">2. User Responsibilities</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">2. User Responsibility</h2>
+          <p className="text-muted-foreground mb-2">
+            Look For Helper operates as a marketplace that connects households and independent helpers. Look For Helper does not employ helpers and does not guarantee identity, references, or work authorization. Users are responsible for conducting their own checks and making informed hiring decisions.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">3. User Conduct</h2>
           <p className="text-muted-foreground mb-2">Users agree to:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Provide accurate information</li>
