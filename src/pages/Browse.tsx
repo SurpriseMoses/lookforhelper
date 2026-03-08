@@ -347,6 +347,7 @@ const Browse = () => {
                         <Star className="h-3 w-3" /> Featured
                       </span>
                     )}
+                    <SaveHelperButton helperUserId={helper.user_id} />
                     {helper.profiles?.avatar_url ? (
                       <img
                         src={helper.profiles.avatar_url}
@@ -369,16 +370,19 @@ const Browse = () => {
                         </span>
                       )}
                     </h3>
-                    {helper.availability_status === "available_now" && (
-                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                        <Circle className="h-2 w-2 fill-emerald-500 text-emerald-500" /> Available Now
-                      </span>
-                    )}
-                    {helper.availability_status === "available_soon" && (
-                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700">
-                        <Circle className="h-2 w-2 fill-amber-500 text-amber-500" /> Available soon
-                      </span>
-                    )}
+                    <div className="mt-1 flex items-center gap-2 flex-wrap">
+                      {helper.availability_status === "available_now" && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                          <Circle className="h-2 w-2 fill-emerald-500 text-emerald-500" /> Available Now
+                        </span>
+                      )}
+                      {helper.availability_status === "available_soon" && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700">
+                          <Circle className="h-2 w-2 fill-amber-500 text-amber-500" /> Available soon
+                        </span>
+                      )}
+                      <ActivityIndicator lastActiveAt={helper.last_active_at} />
+                    </div>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.total_reviews > 0 && (
                         <span className="flex items-center gap-1">
@@ -403,13 +407,24 @@ const Browse = () => {
                         <ShieldCheck className="h-3 w-3" /> {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
                       </div>
                     )}
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {helper.skills?.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
+                    {/* Structured skill experience */}
+                    {helper.skill_experience && Object.keys(helper.skill_experience).length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {Object.entries(helper.skill_experience).map(([skill, years]) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill} – {years} {years === 1 ? "yr" : "yrs"}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {helper.skills?.map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </Link>
