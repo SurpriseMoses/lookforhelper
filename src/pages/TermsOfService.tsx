@@ -56,7 +56,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">4. Verification & Trust Badges</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">5. Verification & Trust Badges</h2>
           <p className="text-muted-foreground mb-2">Trust badges (such as Verified Identity or Background Checked) indicate that certain checks have been completed.</p>
           <p className="text-muted-foreground">These badges do not guarantee performance, reliability, or suitability.</p>
           <p className="text-muted-foreground mt-1">Seekers are responsible for their own hiring decisions.</p>
