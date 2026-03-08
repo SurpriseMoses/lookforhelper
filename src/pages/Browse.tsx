@@ -346,6 +346,10 @@ const Browse = () => {
             </div>
           </div>
         ) : (
+          <>
+          <p className="text-sm font-medium text-muted-foreground mb-4">
+            {helpers.length} helper{helpers.length !== 1 ? 's' : ''} found{cityFilter ? ` in ${cityFilter}` : ''}
+          </p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {helpers.map((helper) => (
               <Link key={helper.user_id} to={`/helper/${helper.user_id}`} onClick={(e) => handleHelperClick(e, helper.user_id)}>
@@ -439,6 +443,7 @@ const Browse = () => {
               </Link>
             ))}
           </div>
+          </>
         )}
       </div>
     </div>
