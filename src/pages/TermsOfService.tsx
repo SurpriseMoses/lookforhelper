@@ -73,7 +73,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">7. Limitation of Liability</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">8. Limitation of Liability</h2>
           <p className="text-muted-foreground mb-2">Look for Helper is not responsible for:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>The conduct of users</li>
