@@ -84,6 +84,11 @@ const Dashboard = () => {
           .eq("user_id", user.id)
           .maybeSingle();
         if (h) {
+          const rawExp = (h as any).skill_experience ?? {};
+          const strExp: Record<string, string> = {};
+          for (const [k, v] of Object.entries(rawExp)) {
+            strExp[k] = String(v ?? "");
+          }
           setHelperDetails({
             age: h.age?.toString() ?? "",
             gender: h.gender ?? "",
@@ -92,6 +97,7 @@ const Dashboard = () => {
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
             skills: h.skills ?? [],
+            skill_experience: strExp,
             languages: h.languages ?? [],
             salary_expectation: h.salary_expectation ?? "",
             salary_min: (h as any).salary_min?.toString() ?? "",
