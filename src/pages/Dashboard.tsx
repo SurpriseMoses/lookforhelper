@@ -126,6 +126,12 @@ const Dashboard = () => {
         .eq("user_id", user.id);
 
       if (role === "helper") {
+        // Convert skill_experience string values to numbers
+        const numericSkillExp: Record<string, number> = {};
+        for (const [k, v] of Object.entries(helperDetails.skill_experience)) {
+          const num = parseInt(v);
+          if (!isNaN(num) && num > 0) numericSkillExp[k] = num;
+        }
         await supabase
           .from("helper_details")
           .update({
@@ -136,6 +142,7 @@ const Dashboard = () => {
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
             skills: helperDetails.skills,
+            skill_experience: numericSkillExp,
             languages: helperDetails.languages,
             salary_expectation: helperDetails.salary_expectation,
             salary_min: helperDetails.salary_min ? parseInt(helperDetails.salary_min) : null,
@@ -146,7 +153,7 @@ const Dashboard = () => {
             helper_references: helperDetails.helper_references,
             is_published: helperDetails.is_published,
             work_authorization_status: helperDetails.work_authorization_status || null,
-          })
+          } as any)
           .eq("user_id", user.id);
       }
 
