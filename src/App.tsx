@@ -55,6 +55,7 @@ const App = () => (
                 <Route path="/cancellation-policy" element={<CancellationPolicy />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/saved-helpers" element={<SavedHelpers />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -256,6 +256,17 @@ const Dashboard = () => {
         {role === "seeker" && (
           <>
             <SeekerSubscriptionCard />
+            <Card className="mb-6">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Saved Helpers</p>
+                  <p className="text-xs text-muted-foreground">View helpers you've bookmarked</p>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/saved-helpers">View Saved</Link>
+                </Button>
+              </CardContent>
+            </Card>
             <SeekerHiresSection />
           </>
         )}
