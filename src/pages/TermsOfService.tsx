@@ -68,7 +68,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">6. Reviews & Ratings</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">7. Reviews & Ratings</h2>
           <p className="text-muted-foreground">Users may leave honest reviews based on actual experiences. We reserve the right to remove inappropriate or fraudulent content.</p>
         </section>
 
