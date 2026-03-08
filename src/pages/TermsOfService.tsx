@@ -95,7 +95,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">9. Changes to the Platform</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">10. Changes to the Platform</h2>
           <p className="text-muted-foreground">We may update features, pricing, or policies at any time. Continued use of the platform means you accept the updated terms.</p>
         </section>
 
