@@ -307,7 +307,8 @@ const Browse = () => {
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="newest">Most relevant</SelectItem>
+                  <SelectItem value="highest_rated">Highest rated</SelectItem>
                   <SelectItem value="experience">Most experienced</SelectItem>
                 </SelectContent>
               </Select>
