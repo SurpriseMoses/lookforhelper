@@ -12,6 +12,8 @@ import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
+import SaveHelperButton from "@/components/browse/SaveHelperButton";
+import ActivityIndicator from "@/components/profile/ActivityIndicator";
 
 interface HelperWithProfile {
   user_id: string;
