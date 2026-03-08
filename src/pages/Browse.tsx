@@ -333,8 +333,17 @@ const Browse = () => {
         ) : loading ? (
           <div className="py-20 text-center text-muted-foreground">Loading helpers...</div>
         ) : helpers.length === 0 ? (
-          <div className="py-20 text-center text-muted-foreground">
-            No helpers found matching your criteria. Try adjusting your filters.
+          <div className="py-20 flex flex-col items-center justify-center text-center">
+            <div className="bg-muted/50 rounded-2xl p-8 max-w-md">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No helpers found in this area yet</h3>
+              <p className="text-muted-foreground mb-4">Try:</p>
+              <ul className="text-muted-foreground text-sm space-y-1 text-left inline-block">
+                <li>• Expanding your search</li>
+                <li>• Removing some filters</li>
+                <li>• Checking nearby cities</li>
+              </ul>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
