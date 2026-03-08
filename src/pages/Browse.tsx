@@ -331,7 +331,10 @@ const Browse = () => {
             Use the filters above and click "Search Helpers" to find helpers.
           </div>
         ) : loading ? (
-          <div className="py-20 text-center text-muted-foreground">Loading helpers...</div>
+          <div className="py-20 flex flex-col items-center justify-center text-center gap-3">
+            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-muted-foreground">Searching for helpers near you...</p>
+          </div>
         ) : helpers.length === 0 ? (
           <div className="py-20 flex flex-col items-center justify-center text-center">
             <div className="bg-muted/50 rounded-2xl p-8 max-w-md">
