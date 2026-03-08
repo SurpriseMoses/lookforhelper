@@ -35,6 +35,7 @@ interface HelperProfile {
   willing_to_work_abroad: boolean | null;
   years_experience: number | null;
   skills: string[] | null;
+  skill_experience: Record<string, number> | null;
   languages: string[] | null;
   salary_expectation: string | null;
   salary_min: number | null;
