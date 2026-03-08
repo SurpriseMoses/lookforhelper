@@ -38,7 +38,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">3. Payments</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">4. Payments</h2>
 
           <h3 className="font-medium text-foreground mt-4 mb-1">Seeker Payments</h3>
           <p className="text-muted-foreground ml-2">Seekers may pay a fee (e.g., R25) to unlock contact or chat access with helpers. Access is valid for a limited period.</p>
