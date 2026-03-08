@@ -63,7 +63,7 @@ const TermsOfService = () => {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-3">5. Background Checks</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">6. Background Checks</h2>
           <p className="text-muted-foreground">Where available, background checks are conducted through third-party sources. Results are provided for informational purposes only and may not be exhaustive.</p>
         </section>
 
