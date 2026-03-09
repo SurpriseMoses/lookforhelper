@@ -437,6 +437,7 @@ const Browse = () => {
                         </span>
                       )}
                       <ActivityIndicator lastActiveAt={helper.last_active_at} />
+                      <ResponseTimeBadge avgResponseMinutes={helper.avg_response_minutes} compact />
                     </div>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.total_reviews > 0 && (
