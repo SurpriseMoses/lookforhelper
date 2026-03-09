@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck } from "lucide-react";
@@ -14,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import SaveHelperButton from "@/components/browse/SaveHelperButton";
 import ActivityIndicator from "@/components/profile/ActivityIndicator";
+import ResponseTimeBadge from "@/components/browse/ResponseTimeBadge";
 
 interface HelperWithProfile {
   user_id: string;
@@ -36,6 +38,7 @@ interface HelperWithProfile {
   work_type: string[] | null;
   work_authorization_status: string | null;
   last_active_at: string | null;
+  avg_response_minutes: number | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -70,6 +73,7 @@ const Browse = () => {
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
+  const [keywordSearch, setKeywordSearch] = useState("");
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
@@ -149,17 +153,29 @@ const Browse = () => {
       }
 
       const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url, is_verified, last_active_at")
-        .in("user_id", eligibleUserIds);
+      
+      // Fetch profiles and response metrics in parallel
+      const [profilesResult, metricsResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("user_id, full_name, avatar_url, is_verified, last_active_at")
+          .in("user_id", eligibleUserIds),
+        supabase
+          .from("response_metrics")
+          .select("user_id, avg_response_minutes")
+          .in("user_id", eligibleUserIds),
+      ]);
 
       const profileMap = new Map(
-        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
+        (profilesResult.data ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
+      );
+      
+      const metricsMap = new Map(
+        (metricsResult.data ?? []).map((m: any) => [m.user_id, m.avg_response_minutes])
       );
 
       const now = new Date();
-      const results = eligibleHelpers.map((h: any) => {
+      let results = eligibleHelpers.map((h: any) => {
         const isFeaturedActive = h.is_featured && h.featured_until && new Date(h.featured_until) > now;
         return {
           ...h,
@@ -173,9 +189,21 @@ const Browse = () => {
           work_authorization_status: (h as any).work_authorization_status ?? null,
           skill_experience: h.skill_experience ?? null,
           last_active_at: profileMap.get(h.user_id)?.last_active_at ?? null,
+          avg_response_minutes: metricsMap.get(h.user_id) ?? null,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
+
+      // Apply keyword search filter (client-side)
+      if (keywordSearch.trim()) {
+        const keyword = keywordSearch.trim().toLowerCase();
+        results = results.filter((h) => {
+          const nameMatch = h.profiles?.full_name?.toLowerCase().includes(keyword);
+          const aboutMatch = h.about_me?.toLowerCase().includes(keyword);
+          const skillsMatch = h.skills?.some((s) => s.toLowerCase().includes(keyword));
+          return nameMatch || aboutMatch || skillsMatch;
+        });
+      }
 
       // Filter verified only if toggle is on
       const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
@@ -224,6 +252,17 @@ const Browse = () => {
 
         {/* Filters */}
         <div className="mb-8 space-y-4 rounded-xl border bg-card p-4">
+          {/* Keyword search */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Search by keyword</Label>
+            <Input
+              value={keywordSearch}
+              onChange={(e) => setKeywordSearch(e.target.value)}
+              placeholder="e.g. experienced nanny, cooking, childcare..."
+              className="max-w-md"
+            />
+          </div>
+          
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
@@ -398,6 +437,7 @@ const Browse = () => {
                         </span>
                       )}
                       <ActivityIndicator lastActiveAt={helper.last_active_at} />
+                      <ResponseTimeBadge avgResponseMinutes={helper.avg_response_minutes} compact />
                     </div>
                     <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                       {helper.total_reviews > 0 && (

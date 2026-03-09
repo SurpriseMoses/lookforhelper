@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import ResetPassword from "./pages/ResetPassword";
 import SavedHelpers from "./pages/SavedHelpers";
 import BottomNav from "./components/mobile/BottomNav";
+import OnboardingTour from "./components/onboarding/OnboardingTour";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
               </Routes>
             </div>
             <BottomNav />
+            <OnboardingTour />
           </SeekerSubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
