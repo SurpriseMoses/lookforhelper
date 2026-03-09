@@ -86,6 +86,56 @@ export type Database = {
         }
         Relationships: []
       }
+      disputes: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          details: string | null
+          hire_id: string | null
+          id: string
+          other_party_id: string
+          reason: string
+          reporter_id: string
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          details?: string | null
+          hire_id?: string | null
+          id?: string
+          other_party_id: string
+          reason: string
+          reporter_id: string
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          details?: string | null
+          hire_id?: string | null
+          id?: string
+          other_party_id?: string
+          reason?: string
+          reporter_id?: string
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_hire_id_fkey"
+            columns: ["hire_id"]
+            isOneToOne: false
+            referencedRelation: "hires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       featured_payments: {
         Row: {
           amount: number
@@ -230,6 +280,33 @@ export type Database = {
           work_authorization_status?: string | null
           work_type?: string[] | null
           years_experience?: number | null
+        }
+        Relationships: []
+      }
+      helper_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          photo_url: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          photo_url: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          photo_url?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -746,6 +823,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saved_searches: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          last_notified_at: string | null
+          name: string
+          notify_new_matches: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_notified_at?: string | null
+          name?: string
+          notify_new_matches?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_notified_at?: string | null
+          name?: string
+          notify_new_matches?: boolean
+          user_id?: string
+        }
+        Relationships: []
       }
       seeker_subscriptions: {
         Row: {
