@@ -395,6 +395,16 @@ const HireDetails = () => {
       )}
 
       <SeekerPaywallDialog open={showPaywall} onClose={() => setShowPaywall(false)} />
+
+      {showDispute && hire && helperProfile && (
+        <DisputeDialog
+          open={showDispute}
+          onClose={() => setShowDispute(false)}
+          otherPartyId={hire.helper_id}
+          otherPartyName={helperProfile.full_name}
+          hireId={hire.id}
+        />
+      )}
     </div>
   );
 };
