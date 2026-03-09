@@ -259,6 +259,7 @@ const Dashboard = () => {
         {role === "seeker" && (
           <>
             <SeekerSubscriptionCard />
+            <SavedSearchesCard />
             <Card className="mb-6">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
