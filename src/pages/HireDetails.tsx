@@ -373,13 +373,22 @@ const HireDetails = () => {
           )}
 
           {(hire.status === "confirmed" || hire.status === "ended") && (
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setShowReview(true)}
-            >
-              <Star className="h-4 w-4" /> Leave Review
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => setShowReview(true)}
+              >
+                <Star className="h-4 w-4" /> Leave Review
+              </Button>
+              <Button
+                variant="ghost"
+                className="gap-2 text-muted-foreground"
+                onClick={() => setShowDispute(true)}
+              >
+                <Shield className="h-4 w-4" /> Raise Dispute
+              </Button>
+            </>
           )}
         </div>
       </div>
