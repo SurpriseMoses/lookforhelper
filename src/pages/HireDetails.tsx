@@ -44,6 +44,7 @@ const HireDetails = () => {
   const [ending, setEnding] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
