@@ -153,17 +153,29 @@ const Browse = () => {
       }
 
       const eligibleUserIds = eligibleHelpers.map((h: any) => h.user_id);
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url, is_verified, last_active_at")
-        .in("user_id", eligibleUserIds);
+      
+      // Fetch profiles and response metrics in parallel
+      const [profilesResult, metricsResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("user_id, full_name, avatar_url, is_verified, last_active_at")
+          .in("user_id", eligibleUserIds),
+        supabase
+          .from("response_metrics")
+          .select("user_id, avg_response_minutes")
+          .in("user_id", eligibleUserIds),
+      ]);
 
       const profileMap = new Map(
-        (profilesData ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
+        (profilesResult.data ?? []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url, is_verified: p.is_verified, last_active_at: p.last_active_at }])
+      );
+      
+      const metricsMap = new Map(
+        (metricsResult.data ?? []).map((m: any) => [m.user_id, m.avg_response_minutes])
       );
 
       const now = new Date();
-      const results = eligibleHelpers.map((h: any) => {
+      let results = eligibleHelpers.map((h: any) => {
         const isFeaturedActive = h.is_featured && h.featured_until && new Date(h.featured_until) > now;
         return {
           ...h,
@@ -177,9 +189,21 @@ const Browse = () => {
           work_authorization_status: (h as any).work_authorization_status ?? null,
           skill_experience: h.skill_experience ?? null,
           last_active_at: profileMap.get(h.user_id)?.last_active_at ?? null,
+          avg_response_minutes: metricsMap.get(h.user_id) ?? null,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
+
+      // Apply keyword search filter (client-side)
+      if (keywordSearch.trim()) {
+        const keyword = keywordSearch.trim().toLowerCase();
+        results = results.filter((h) => {
+          const nameMatch = h.profiles?.full_name?.toLowerCase().includes(keyword);
+          const aboutMatch = h.about_me?.toLowerCase().includes(keyword);
+          const skillsMatch = h.skills?.some((s) => s.toLowerCase().includes(keyword));
+          return nameMatch || aboutMatch || skillsMatch;
+        });
+      }
 
       // Filter verified only if toggle is on
       const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
