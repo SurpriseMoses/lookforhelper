@@ -73,6 +73,7 @@ const Browse = () => {
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
+  const [keywordSearch, setKeywordSearch] = useState("");
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
