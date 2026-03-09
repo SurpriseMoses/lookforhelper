@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,7 @@ import CityAutocomplete from "@/components/search/CityAutocomplete";
 import SaveHelperButton from "@/components/browse/SaveHelperButton";
 import ActivityIndicator from "@/components/profile/ActivityIndicator";
 import ResponseTimeBadge from "@/components/browse/ResponseTimeBadge";
+import SaveSearchDialog from "@/components/search/SaveSearchDialog";
 
 interface HelperWithProfile {
   user_id: string;
@@ -74,6 +75,9 @@ const Browse = () => {
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
   const [keywordSearch, setKeywordSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const ITEMS_PER_PAGE = 12;
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
@@ -359,9 +363,20 @@ const Browse = () => {
               <Label className="text-sm cursor-pointer">Identity Verified only</Label>
             </div>
           </div>
-          <Button onClick={fetchHelpers} className="w-full sm:w-auto gap-2">
-            <Search className="h-4 w-4" /> Search Helpers
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
+              <Search className="h-4 w-4" /> Search Helpers
+            </Button>
+            {user && (
+              <Button
+                variant="outline"
+                onClick={() => setShowSaveSearch(true)}
+                className="gap-2"
+              >
+                <Bell className="h-4 w-4" /> Save Search
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Results */}
@@ -391,9 +406,10 @@ const Browse = () => {
           <>
           <p className="text-sm font-medium text-muted-foreground mb-4">
             {helpers.length} helper{helpers.length !== 1 ? 's' : ''} found{cityFilter ? ` in ${cityFilter}` : ''}
+            {helpers.length > ITEMS_PER_PAGE && ` — Page ${currentPage} of ${Math.ceil(helpers.length / ITEMS_PER_PAGE)}`}
           </p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {helpers.map((helper) => (
+            {helpers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((helper) => (
               <Link key={helper.user_id} to={`/helper/${helper.user_id}`} onClick={(e) => handleHelperClick(e, helper.user_id)}>
                 <Card className={`overflow-hidden transition-shadow hover:shadow-lg cursor-pointer ${helper.is_featured ? "ring-2 ring-amber-400/50" : ""}`}>
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
@@ -463,7 +479,6 @@ const Browse = () => {
                         <ShieldCheck className="h-3 w-3" /> {WORK_AUTH_LABELS[helper.work_authorization_status] ?? helper.work_authorization_status}
                       </div>
                     )}
-                    {/* Structured skill experience */}
                     {helper.skill_experience && Object.keys(helper.skill_experience).length > 0 ? (
                       <div className="mt-3 flex flex-wrap gap-1.5">
                         {Object.entries(helper.skill_experience).map(([skill, years]) => (
@@ -486,9 +501,51 @@ const Browse = () => {
               </Link>
             ))}
           </div>
+
+          {/* Pagination */}
+          {helpers.length > ITEMS_PER_PAGE && (
+            <div className="mt-8 flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => { setCurrentPage((p) => p - 1); window.scrollTo(0, 0); }}
+              >
+                Previous
+              </Button>
+              {Array.from({ length: Math.ceil(helpers.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).slice(
+                Math.max(0, currentPage - 3),
+                currentPage + 2
+              ).map((page) => (
+                <Button
+                  key={page}
+                  variant={page === currentPage ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => { setCurrentPage(page); window.scrollTo(0, 0); }}
+                  className="w-9"
+                >
+                  {page}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage >= Math.ceil(helpers.length / ITEMS_PER_PAGE)}
+                onClick={() => { setCurrentPage((p) => p + 1); window.scrollTo(0, 0); }}
+              >
+                Next
+              </Button>
+            </div>
+          )}
           </>
         )}
       </div>
+
+      <SaveSearchDialog
+        open={showSaveSearch}
+        onClose={() => setShowSaveSearch(false)}
+        filters={{ skillFilter, genderFilter, cityFilter, availabilityFilter, workTypeFilter, verifiedFilter, workAuthFilter, keywordSearch }}
+      />
     </div>
   );
 };

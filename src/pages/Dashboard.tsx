@@ -24,6 +24,9 @@ import HelperListingCard from "@/components/dashboard/HelperListingCard";
 import SeekerHiresSection from "@/components/dashboard/SeekerHiresSection";
 import HelperPerformanceCard from "@/components/dashboard/HelperPerformanceCard";
 import DeleteAccountCard from "@/components/dashboard/DeleteAccountCard";
+import DataExportCard from "@/components/dashboard/DataExportCard";
+import SavedSearchesCard from "@/components/dashboard/SavedSearchesCard";
+import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
@@ -256,6 +259,7 @@ const Dashboard = () => {
         {role === "seeker" && (
           <>
             <SeekerSubscriptionCard />
+            <SavedSearchesCard />
             <Card className="mb-6">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
@@ -274,12 +278,13 @@ const Dashboard = () => {
         {/* Helper-specific fields */}
         {role === "helper" && (
           <>
-          <HelperListingCard />
+           <HelperListingCard />
           <AvailabilityCard />
            <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
           <HelperPerformanceCard />
+          <HelperPhotoGallery />
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg">Helper Details</CardTitle>
@@ -590,7 +595,8 @@ const Dashboard = () => {
           {saving ? "Saving..." : "Save Profile"}
         </Button>
 
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
+          <DataExportCard />
           <DeleteAccountCard />
         </div>
       </div>

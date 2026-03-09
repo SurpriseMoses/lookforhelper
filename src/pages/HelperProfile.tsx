@@ -16,6 +16,7 @@ import ResponseTimeBadge from "@/components/profile/ResponseTimeBadge";
 import TopHelperBadge from "@/components/profile/TopHelperBadge";
 import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
 import WhatsAppShareButton from "@/components/profile/WhatsAppShareButton";
+import ProfilePhotoGallery from "@/components/profile/ProfilePhotoGallery";
 
 const WORK_AUTH_LABELS: Record<string, string> = {
   sa_citizen: "South African Citizen",
@@ -407,6 +408,9 @@ const HelperProfilePage = () => {
                 </div>
               </div>
             )}
+
+            {/* Photo Gallery */}
+            <ProfilePhotoGallery helperUserId={helper.user_id} />
 
             {/* Reviews */}
             <HelperReviewsList helperUserId={helper.user_id} refreshKey={reviewRefreshKey} />

@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import DisputeDialog from "@/components/disputes/DisputeDialog";
 import {
   ArrowLeft,
   Briefcase,
@@ -43,6 +44,7 @@ const HireDetails = () => {
   const [ending, setEnding] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -371,13 +373,22 @@ const HireDetails = () => {
           )}
 
           {(hire.status === "confirmed" || hire.status === "ended") && (
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setShowReview(true)}
-            >
-              <Star className="h-4 w-4" /> Leave Review
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => setShowReview(true)}
+              >
+                <Star className="h-4 w-4" /> Leave Review
+              </Button>
+              <Button
+                variant="ghost"
+                className="gap-2 text-muted-foreground"
+                onClick={() => setShowDispute(true)}
+              >
+                <Shield className="h-4 w-4" /> Raise Dispute
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -393,6 +404,16 @@ const HireDetails = () => {
       )}
 
       <SeekerPaywallDialog open={showPaywall} onClose={() => setShowPaywall(false)} />
+
+      {showDispute && hire && helperProfile && (
+        <DisputeDialog
+          open={showDispute}
+          onClose={() => setShowDispute(false)}
+          otherPartyId={hire.helper_id}
+          otherPartyName={helperProfile.full_name}
+          hireId={hire.id}
+        />
+      )}
     </div>
   );
 };
