@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,7 @@ import CityAutocomplete from "@/components/search/CityAutocomplete";
 import SaveHelperButton from "@/components/browse/SaveHelperButton";
 import ActivityIndicator from "@/components/profile/ActivityIndicator";
 import ResponseTimeBadge from "@/components/browse/ResponseTimeBadge";
+import SaveSearchDialog from "@/components/search/SaveSearchDialog";
 
 interface HelperWithProfile {
   user_id: string;
