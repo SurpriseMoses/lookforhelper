@@ -38,6 +38,7 @@ interface HelperWithProfile {
   work_type: string[] | null;
   work_authorization_status: string | null;
   last_active_at: string | null;
+  avg_response_minutes: number | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
