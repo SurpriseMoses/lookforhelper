@@ -75,6 +75,9 @@ const Browse = () => {
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
   const [keywordSearch, setKeywordSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const ITEMS_PER_PAGE = 12;
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
