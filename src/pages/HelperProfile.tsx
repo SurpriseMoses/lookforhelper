@@ -409,6 +409,9 @@ const HelperProfilePage = () => {
               </div>
             )}
 
+            {/* Photo Gallery */}
+            <ProfilePhotoGallery helperUserId={helper.user_id} />
+
             {/* Reviews */}
             <HelperReviewsList helperUserId={helper.user_id} refreshKey={reviewRefreshKey} />
 

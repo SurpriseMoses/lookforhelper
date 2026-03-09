@@ -595,7 +595,8 @@ const Dashboard = () => {
           {saving ? "Saving..." : "Save Profile"}
         </Button>
 
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
+          <DataExportCard />
           <DeleteAccountCard />
         </div>
       </div>
