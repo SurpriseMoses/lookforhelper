@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import DisputeDialog from "@/components/disputes/DisputeDialog";
 import {
   ArrowLeft,
   Briefcase,
