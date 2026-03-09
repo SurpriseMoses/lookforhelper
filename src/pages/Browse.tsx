@@ -252,6 +252,17 @@ const Browse = () => {
 
         {/* Filters */}
         <div className="mb-8 space-y-4 rounded-xl border bg-card p-4">
+          {/* Keyword search */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Search by keyword</Label>
+            <Input
+              value={keywordSearch}
+              onChange={(e) => setKeywordSearch(e.target.value)}
+              placeholder="e.g. experienced nanny, cooking, childcare..."
+              className="max-w-md"
+            />
+          </div>
+          
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
