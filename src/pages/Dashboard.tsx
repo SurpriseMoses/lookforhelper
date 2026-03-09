@@ -24,6 +24,9 @@ import HelperListingCard from "@/components/dashboard/HelperListingCard";
 import SeekerHiresSection from "@/components/dashboard/SeekerHiresSection";
 import HelperPerformanceCard from "@/components/dashboard/HelperPerformanceCard";
 import DeleteAccountCard from "@/components/dashboard/DeleteAccountCard";
+import DataExportCard from "@/components/dashboard/DataExportCard";
+import SavedSearchesCard from "@/components/dashboard/SavedSearchesCard";
+import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
