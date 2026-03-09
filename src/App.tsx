@@ -62,6 +62,7 @@ const App = () => (
               </Routes>
             </div>
             <BottomNav />
+            <OnboardingTour />
           </SeekerSubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
