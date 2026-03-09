@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck } from "lucide-react";
@@ -14,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import SaveHelperButton from "@/components/browse/SaveHelperButton";
 import ActivityIndicator from "@/components/profile/ActivityIndicator";
+import ResponseTimeBadge from "@/components/browse/ResponseTimeBadge";
 
 interface HelperWithProfile {
   user_id: string;
