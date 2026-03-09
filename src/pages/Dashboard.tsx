@@ -278,12 +278,13 @@ const Dashboard = () => {
         {/* Helper-specific fields */}
         {role === "helper" && (
           <>
-          <HelperListingCard />
+           <HelperListingCard />
           <AvailabilityCard />
            <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
           <HelperPerformanceCard />
+          <HelperPhotoGallery />
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg">Helper Details</CardTitle>
