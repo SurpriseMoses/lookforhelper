@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell, Navigation, Loader2 } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,6 +41,9 @@ interface HelperWithProfile {
   work_authorization_status: string | null;
   last_active_at: string | null;
   avg_response_minutes: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  distance_km: number | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -58,6 +61,15 @@ const WORK_AUTH_LABELS: Record<string, string> = {
   prefer_not_to_say: "Prefer not to specify",
 };
 
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+};
+
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -70,6 +82,8 @@ const Browse = () => {
   const [genderFilter, setGenderFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("");
   const [cityProvince, setCityProvince] = useState("");
+  const [cityLat, setCityLat] = useState<number | null>(null);
+  const [cityLng, setCityLng] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
@@ -78,6 +92,12 @@ const Browse = () => {
   const [keywordSearch, setKeywordSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const [nearMeMode, setNearMeMode] = useState(false);
+  const [seekerLat, setSeekerLat] = useState<number | null>(null);
+  const [seekerLng, setSeekerLng] = useState<number | null>(null);
+  const [radiusKm, setRadiusKm] = useState("50");
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
