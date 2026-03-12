@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import CityAutocomplete from "@/components/search/CityAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ const CompleteProfile = () => {
   const [selectedRole, setSelectedRole] = useState<"seeker" | "helper">("seeker");
   const [fullName, setFullName] = useState("");
   const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
   const [country, setCountry] = useState("South Africa");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -67,7 +69,7 @@ const CompleteProfile = () => {
         // Create helper_details row (trigger only fires on role insert, not update)
         await supabase
           .from("helper_details")
-          .upsert({ user_id: user.id, city, country }, { onConflict: "user_id" });
+          .upsert({ user_id: user.id, city, province, country }, { onConflict: "user_id" });
       }
 
       // 4. Create seeker subscription if seeker (trigger fires on role insert)
@@ -171,24 +173,29 @@ const CompleteProfile = () => {
               {selectedRole === "helper" && (
                 <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
                   <p className="text-sm font-medium text-foreground">Location</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
+                      <CityAutocomplete
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        onCitySelect={(c, p) => {
+                          setCity(c);
+                          setProvince(p);
+                          setCountry("South Africa");
+                        }}
+                        onClear={() => { setCity(""); setProvince(""); }}
                         placeholder="e.g. Cape Town"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input
-                        id="country"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        placeholder="e.g. South Africa"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label>Province</Label>
+                        <Input value={province} disabled className="bg-muted" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Country</Label>
+                        <Input value={country} disabled className="bg-muted" />
+                      </div>
                     </div>
                   </div>
                 </div>

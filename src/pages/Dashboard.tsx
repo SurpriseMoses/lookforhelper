@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
+import CityAutocomplete from "@/components/search/CityAutocomplete";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,10 +40,12 @@ const Dashboard = () => {
   useLastActive();
 
   const [profile, setProfile] = useState({ full_name: "", avatar_url: "" });
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [helperDetails, setHelperDetails] = useState({
     age: "",
     gender: "",
     city: "",
+    province: "",
     country: "South Africa",
     willing_to_work_abroad: false,
     years_experience: "",
@@ -75,10 +78,13 @@ const Dashboard = () => {
     const load = async () => {
       const { data: p } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, phone_number")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (p) setProfile({ full_name: p.full_name, avatar_url: p.avatar_url ?? "" });
+      if (p) {
+        setProfile({ full_name: p.full_name, avatar_url: (p as any).avatar_url ?? "" });
+        setPhoneNumber((p as any).phone_number ?? "");
+      }
 
       if (role === "helper") {
         const { data: h } = await supabase
@@ -96,6 +102,7 @@ const Dashboard = () => {
             age: h.age?.toString() ?? "",
             gender: h.gender ?? "",
             city: h.city ?? "",
+            province: (h as any).province ?? "",
             country: h.country ?? "South Africa",
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
@@ -125,7 +132,7 @@ const Dashboard = () => {
     try {
       await supabase
         .from("profiles")
-        .update({ full_name: profile.full_name })
+        .update({ full_name: profile.full_name, phone_number: phoneNumber || null } as any)
         .eq("user_id", user.id);
 
       if (role === "helper") {
@@ -141,6 +148,7 @@ const Dashboard = () => {
             age: helperDetails.age ? parseInt(helperDetails.age) : null,
             gender: helperDetails.gender || null,
             city: helperDetails.city,
+            province: helperDetails.province,
             country: helperDetails.country,
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
@@ -312,11 +320,30 @@ const Dashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>City</Label>
-                  <Input value={helperDetails.city} onChange={(e) => setHelperDetails((h) => ({ ...h, city: e.target.value }))} />
+                  <CityAutocomplete
+                    value={helperDetails.city}
+                    onCitySelect={(city, province, lat, lng) => {
+                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa" }));
+                    }}
+                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "" }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Province</Label>
+                  <Input value={helperDetails.province} disabled className="bg-muted" />
                 </div>
                 <div className="space-y-2">
                   <Label>Country</Label>
-                  <Input value={helperDetails.country} onChange={(e) => setHelperDetails((h) => ({ ...h, country: e.target.value }))} />
+                  <Input value={helperDetails.country} disabled className="bg-muted" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone Number</Label>
+                  <Input
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+27 71 234 5678"
+                  />
+                  <p className="text-xs text-muted-foreground">International format (e.g. +27 for South Africa)</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Years of Experience</Label>

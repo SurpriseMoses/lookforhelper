@@ -23,6 +23,7 @@ interface HelperWithProfile {
   age: number | null;
   gender: string | null;
   city: string | null;
+  province: string | null;
   country: string | null;
   years_experience: number | null;
   skills: string[] | null;
@@ -91,7 +92,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
+      .select("user_id, age, gender, city, province, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -465,7 +466,7 @@ const Browse = () => {
                       )}
                       {helper.city && (
                         <span className="flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" /> {helper.city}
+                          <MapPin className="h-3.5 w-3.5" /> {[helper.city, helper.province].filter(Boolean).join(", ")}
                         </span>
                       )}
                       {helper.years_experience != null && (
