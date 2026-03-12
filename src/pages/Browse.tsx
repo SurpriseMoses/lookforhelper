@@ -420,9 +420,25 @@ const Browse = () => {
                   <SelectItem value="newest">Most relevant</SelectItem>
                   <SelectItem value="highest_rated">Highest rated</SelectItem>
                   <SelectItem value="experience">Most experienced</SelectItem>
+                  <SelectItem value="nearest">Nearest</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {(nearMeMode || sortBy === "nearest") && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Search radius</Label>
+                <Select value={radiusKm} onValueChange={setRadiusKm}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 km</SelectItem>
+                    <SelectItem value="20">20 km</SelectItem>
+                    <SelectItem value="50">50 km</SelectItem>
+                    <SelectItem value="100">100 km</SelectItem>
+                    <SelectItem value="9999">Any distance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )
           </div>
           <div className="flex items-center gap-6 mt-2">
             <div className="flex items-center gap-2">
