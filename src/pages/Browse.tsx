@@ -23,6 +23,7 @@ interface HelperWithProfile {
   age: number | null;
   gender: string | null;
   city: string | null;
+  province: string | null;
   country: string | null;
   years_experience: number | null;
   skills: string[] | null;
