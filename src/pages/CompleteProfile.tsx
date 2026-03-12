@@ -70,7 +70,7 @@ const CompleteProfile = () => {
         // Create helper_details row (trigger only fires on role insert, not update)
         await supabase
           .from("helper_details")
-          .upsert({ user_id: user.id, city, country }, { onConflict: "user_id" });
+          .upsert({ user_id: user.id, city, province, country }, { onConflict: "user_id" });
       }
 
       // 4. Create seeker subscription if seeker (trigger fires on role insert)
