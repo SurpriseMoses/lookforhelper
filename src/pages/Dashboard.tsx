@@ -148,6 +148,7 @@ const Dashboard = () => {
             age: helperDetails.age ? parseInt(helperDetails.age) : null,
             gender: helperDetails.gender || null,
             city: helperDetails.city,
+            province: helperDetails.province,
             country: helperDetails.country,
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
