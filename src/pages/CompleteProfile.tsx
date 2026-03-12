@@ -20,6 +20,8 @@ const CompleteProfile = () => {
   const [fullName, setFullName] = useState("");
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
+  const [cityLat, setCityLat] = useState<number | undefined>();
+  const [cityLng, setCityLng] = useState<number | undefined>();
   const [country, setCountry] = useState("South Africa");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -69,7 +71,7 @@ const CompleteProfile = () => {
         // Create helper_details row (trigger only fires on role insert, not update)
         await supabase
           .from("helper_details")
-          .upsert({ user_id: user.id, city, province, country }, { onConflict: "user_id" });
+          .upsert({ user_id: user.id, city, province, country, latitude: cityLat ?? null, longitude: cityLng ?? null } as any, { onConflict: "user_id" });
       }
 
       // 4. Create seeker subscription if seeker (trigger fires on role insert)
@@ -178,12 +180,14 @@ const CompleteProfile = () => {
                       <Label htmlFor="city">City</Label>
                       <CityAutocomplete
                         value={city}
-                        onCitySelect={(c, p) => {
+                        onCitySelect={(c, p, lat, lng) => {
                           setCity(c);
                           setProvince(p);
+                          setCityLat(lat);
+                          setCityLng(lng);
                           setCountry("South Africa");
                         }}
-                        onClear={() => { setCity(""); setProvince(""); }}
+                        onClear={() => { setCity(""); setProvince(""); setCityLat(undefined); setCityLng(undefined); }}
                         placeholder="e.g. Cape Town"
                       />
                     </div>

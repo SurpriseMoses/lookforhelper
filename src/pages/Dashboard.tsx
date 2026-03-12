@@ -49,6 +49,8 @@ const Dashboard = () => {
     country: "South Africa",
     willing_to_work_abroad: false,
     years_experience: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
     skills: [] as string[],
     skill_experience: {} as Record<string, string>,
     languages: [] as string[],
@@ -104,6 +106,8 @@ const Dashboard = () => {
             city: h.city ?? "",
             province: (h as any).province ?? "",
             country: h.country ?? "South Africa",
+            latitude: (h as any).latitude ?? null,
+            longitude: (h as any).longitude ?? null,
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
             skills: h.skills ?? [],
@@ -150,6 +154,8 @@ const Dashboard = () => {
             city: helperDetails.city,
             province: helperDetails.province,
             country: helperDetails.country,
+            latitude: helperDetails.latitude,
+            longitude: helperDetails.longitude,
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
             skills: helperDetails.skills,
@@ -323,9 +329,9 @@ const Dashboard = () => {
                   <CityAutocomplete
                     value={helperDetails.city}
                     onCitySelect={(city, province, lat, lng) => {
-                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa" }));
+                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa", latitude: lat ?? null, longitude: lng ?? null }));
                     }}
-                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "" }))}
+                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "", latitude: null, longitude: null }))}
                   />
                 </div>
                 <div className="space-y-2">

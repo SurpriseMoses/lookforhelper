@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell, Navigation, Loader2 } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,6 +41,9 @@ interface HelperWithProfile {
   work_authorization_status: string | null;
   last_active_at: string | null;
   avg_response_minutes: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  distance_km: number | null;
   profiles: {
     full_name: string;
     avatar_url: string | null;
@@ -58,6 +61,15 @@ const WORK_AUTH_LABELS: Record<string, string> = {
   prefer_not_to_say: "Prefer not to specify",
 };
 
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+};
+
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -70,6 +82,8 @@ const Browse = () => {
   const [genderFilter, setGenderFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("");
   const [cityProvince, setCityProvince] = useState("");
+  const [cityLat, setCityLat] = useState<number | null>(null);
+  const [cityLng, setCityLng] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("newest");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
@@ -78,7 +92,41 @@ const Browse = () => {
   const [keywordSearch, setKeywordSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const [nearMeMode, setNearMeMode] = useState(false);
+  const [seekerLat, setSeekerLat] = useState<number | null>(null);
+  const [seekerLng, setSeekerLng] = useState<number | null>(null);
+  const [radiusKm, setRadiusKm] = useState("50");
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation not supported by your browser");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setSeekerLat(pos.coords.latitude);
+        setSeekerLng(pos.coords.longitude);
+        setNearMeMode(true);
+        setSortBy("nearest");
+        setGeoLoading(false);
+        // Auto-trigger search after location detected
+        setTimeout(() => {
+          setCurrentPage(1);
+          document.getElementById("search-helpers-btn")?.click();
+        }, 100);
+      },
+      () => {
+        setGeoError("Location permission denied. Use city search instead.");
+        setGeoLoading(false);
+      },
+      { timeout: 10000 }
+    );
+  };
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
@@ -92,7 +140,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, province, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
+      .select("user_id, age, gender, city, province, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status, latitude, longitude")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
@@ -126,13 +174,8 @@ const Browse = () => {
       query = query.eq("work_authorization_status", workAuthFilter);
     }
 
-    if (sortBy === "newest") {
-      query = query.order("created_at", { ascending: false });
-    } else if (sortBy === "highest_rated") {
-      query = query.order("average_rating", { ascending: false });
-    } else {
-      query = query.order("years_experience", { ascending: false });
-    }
+    // Default DB ordering; client-side sort handles the final order
+    query = query.order("created_at", { ascending: false });
 
     const { data } = await query;
     const helperRows = data ?? [];
@@ -179,9 +222,19 @@ const Browse = () => {
         (metricsResult.data ?? []).map((m: any) => [m.user_id, m.avg_response_minutes])
       );
 
+      // Determine reference point for distance (seeker location or selected city)
+      const refLat = nearMeMode && seekerLat != null ? seekerLat : cityLat;
+      const refLng = nearMeMode && seekerLng != null ? seekerLng : cityLng;
+
       const now = new Date();
       let results = eligibleHelpers.map((h: any) => {
         const isFeaturedActive = h.is_featured && h.featured_until && new Date(h.featured_until) > now;
+        const hLat = h.latitude as number | null;
+        const hLng = h.longitude as number | null;
+        let distance_km: number | null = null;
+        if (refLat != null && refLng != null && hLat != null && hLng != null) {
+          distance_km = Math.round(haversineDistance(refLat, refLng, hLat, hLng) * 10) / 10;
+        }
         return {
           ...h,
           is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
@@ -195,9 +248,16 @@ const Browse = () => {
           skill_experience: h.skill_experience ?? null,
           last_active_at: profileMap.get(h.user_id)?.last_active_at ?? null,
           avg_response_minutes: metricsMap.get(h.user_id) ?? null,
+          distance_km,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
+
+      // Filter by radius if nearMe mode active
+      if (nearMeMode && seekerLat != null && seekerLng != null) {
+        const maxRadius = parseInt(radiusKm) || 50;
+        results = results.filter((h) => h.distance_km != null && h.distance_km <= maxRadius);
+      }
 
       // Apply keyword search filter (client-side)
       if (keywordSearch.trim()) {
@@ -213,24 +273,31 @@ const Browse = () => {
       // Filter verified only if toggle is on
       const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
 
-      filtered.sort((a, b) => {
-        const aFeatured = a.is_featured ? 1 : 0;
-        const bFeatured = b.is_featured ? 1 : 0;
-        if (bFeatured !== aFeatured) return bFeatured - aFeatured;
-        const aVerified = a.is_verified ? 1 : 0;
-        const bVerified = b.is_verified ? 1 : 0;
-        if (bVerified !== aVerified) return bVerified - aVerified;
-        if (cityFilter) {
-          const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
-          const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
-          if (bCity !== aCity) return bCity - aCity;
-        }
-        const aAvail = a.availability_status === "available_now" ? 1 : 0;
-        const bAvail = b.availability_status === "available_now" ? 1 : 0;
-        if (bAvail !== aAvail) return bAvail - aAvail;
-        if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
-        return 0;
-      });
+      // Sort
+      if (sortBy === "nearest" && refLat != null) {
+        filtered.sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+      } else {
+        filtered.sort((a, b) => {
+          const aFeatured = a.is_featured ? 1 : 0;
+          const bFeatured = b.is_featured ? 1 : 0;
+          if (bFeatured !== aFeatured) return bFeatured - aFeatured;
+          const aVerified = a.is_verified ? 1 : 0;
+          const bVerified = b.is_verified ? 1 : 0;
+          if (bVerified !== aVerified) return bVerified - aVerified;
+          if (cityFilter) {
+            const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+            const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+            if (bCity !== aCity) return bCity - aCity;
+          }
+          if (sortBy === "highest_rated" && b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
+          if (sortBy === "experience") return (b.years_experience ?? 0) - (a.years_experience ?? 0);
+          const aAvail = a.availability_status === "available_now" ? 1 : 0;
+          const bAvail = b.availability_status === "available_now" ? 1 : 0;
+          if (bAvail !== aAvail) return bAvail - aAvail;
+          if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
+          return 0;
+        });
+      }
 
       setHelpers(filtered);
 
@@ -273,13 +340,18 @@ const Browse = () => {
               <Label className="text-xs text-muted-foreground">Search by city</Label>
               <CityAutocomplete
                 value={cityFilter}
-                onCitySelect={(city, province) => {
+                onCitySelect={(city, province, lat, lng) => {
                   setCityFilter(city);
                   setCityProvince(province);
+                  setCityLat(lat ?? null);
+                  setCityLng(lng ?? null);
+                  setNearMeMode(false);
                 }}
                 onClear={() => {
                   setCityFilter("");
                   setCityProvince("");
+                  setCityLat(null);
+                  setCityLng(null);
                 }}
                 placeholder="e.g. Johannesburg"
               />
@@ -354,9 +426,25 @@ const Browse = () => {
                   <SelectItem value="newest">Most relevant</SelectItem>
                   <SelectItem value="highest_rated">Highest rated</SelectItem>
                   <SelectItem value="experience">Most experienced</SelectItem>
+                  <SelectItem value="nearest">Nearest</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {(nearMeMode || sortBy === "nearest") && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Search radius</Label>
+                <Select value={radiusKm} onValueChange={setRadiusKm}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 km</SelectItem>
+                    <SelectItem value="20">20 km</SelectItem>
+                    <SelectItem value="50">50 km</SelectItem>
+                    <SelectItem value="100">100 km</SelectItem>
+                    <SelectItem value="9999">Any distance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-6 mt-2">
             <div className="flex items-center gap-2">
@@ -364,9 +452,25 @@ const Browse = () => {
               <Label className="text-sm cursor-pointer">Identity Verified only</Label>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button id="search-helpers-btn" onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
               <Search className="h-4 w-4" /> Search Helpers
+            </Button>
+            <Button
+              variant={nearMeMode ? "default" : "outline"}
+              onClick={() => {
+                if (!seekerLat) {
+                  handleDetectLocation();
+                } else {
+                  setNearMeMode(!nearMeMode);
+                  setSortBy("nearest");
+                }
+              }}
+              disabled={geoLoading}
+              className="gap-2"
+            >
+              {geoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
+              {nearMeMode ? "Near Me (on)" : "Helpers Near Me"}
             </Button>
             {user && (
               <Button
@@ -377,6 +481,7 @@ const Browse = () => {
                 <Bell className="h-4 w-4" /> Save Search
               </Button>
             )}
+          {geoError && <p className="text-xs text-destructive">{geoError}</p>}
           </div>
         </div>
 
@@ -467,6 +572,11 @@ const Browse = () => {
                       {helper.city && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" /> {[helper.city, helper.province].filter(Boolean).join(", ")}
+                        </span>
+                      )}
+                      {helper.distance_km != null && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-primary">
+                          <Navigation className="h-3 w-3" /> {helper.distance_km < 1 ? "< 1" : helper.distance_km.toFixed(0)} km
                         </span>
                       )}
                       {helper.years_experience != null && (
