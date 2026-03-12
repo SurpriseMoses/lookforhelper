@@ -19,6 +19,8 @@ const CompleteProfile = () => {
   const [selectedRole, setSelectedRole] = useState<"seeker" | "helper">("seeker");
   const [fullName, setFullName] = useState("");
   const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [country, setCountry] = useState("South Africa");
   const [country, setCountry] = useState("South Africa");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
