@@ -20,6 +20,8 @@ const CompleteProfile = () => {
   const [fullName, setFullName] = useState("");
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
+  const [cityLat, setCityLat] = useState<number | undefined>();
+  const [cityLng, setCityLng] = useState<number | undefined>();
   const [country, setCountry] = useState("South Africa");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
