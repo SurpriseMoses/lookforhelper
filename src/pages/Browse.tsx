@@ -334,13 +334,18 @@ const Browse = () => {
               <Label className="text-xs text-muted-foreground">Search by city</Label>
               <CityAutocomplete
                 value={cityFilter}
-                onCitySelect={(city, province) => {
+                onCitySelect={(city, province, lat, lng) => {
                   setCityFilter(city);
                   setCityProvince(province);
+                  setCityLat(lat ?? null);
+                  setCityLng(lng ?? null);
+                  setNearMeMode(false);
                 }}
                 onClear={() => {
                   setCityFilter("");
                   setCityProvince("");
+                  setCityLat(null);
+                  setCityLng(null);
                 }}
                 placeholder="e.g. Johannesburg"
               />
