@@ -21,7 +21,6 @@ const CompleteProfile = () => {
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [country, setCountry] = useState("South Africa");
-  const [country, setCountry] = useState("South Africa");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
