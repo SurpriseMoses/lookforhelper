@@ -180,12 +180,14 @@ const CompleteProfile = () => {
                       <Label htmlFor="city">City</Label>
                       <CityAutocomplete
                         value={city}
-                        onCitySelect={(c, p) => {
+                        onCitySelect={(c, p, lat, lng) => {
                           setCity(c);
                           setProvince(p);
+                          setCityLat(lat);
+                          setCityLng(lng);
                           setCountry("South Africa");
                         }}
-                        onClear={() => { setCity(""); setProvince(""); }}
+                        onClear={() => { setCity(""); setProvince(""); setCityLat(undefined); setCityLng(undefined); }}
                         placeholder="e.g. Cape Town"
                       />
                     </div>
