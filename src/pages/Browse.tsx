@@ -168,13 +168,8 @@ const Browse = () => {
       query = query.eq("work_authorization_status", workAuthFilter);
     }
 
-    if (sortBy === "newest") {
-      query = query.order("created_at", { ascending: false });
-    } else if (sortBy === "highest_rated") {
-      query = query.order("average_rating", { ascending: false });
-    } else {
-      query = query.order("years_experience", { ascending: false });
-    }
+    // Default DB ordering; client-side sort handles the final order
+    query = query.order("created_at", { ascending: false });
 
     const { data } = await query;
     const helperRows = data ?? [];
