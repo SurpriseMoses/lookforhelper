@@ -49,6 +49,8 @@ const Dashboard = () => {
     country: "South Africa",
     willing_to_work_abroad: false,
     years_experience: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
     skills: [] as string[],
     skill_experience: {} as Record<string, string>,
     languages: [] as string[],
