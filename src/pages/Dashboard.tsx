@@ -132,7 +132,7 @@ const Dashboard = () => {
     try {
       await supabase
         .from("profiles")
-        .update({ full_name: profile.full_name })
+        .update({ full_name: profile.full_name, phone_number: phoneNumber || null } as any)
         .eq("user_id", user.id);
 
       if (role === "helper") {
