@@ -323,9 +323,9 @@ const Dashboard = () => {
                   <CityAutocomplete
                     value={helperDetails.city}
                     onCitySelect={(city, province, lat, lng) => {
-                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa" }));
+                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa", latitude: lat ?? null, longitude: lng ?? null }));
                     }}
-                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "" }))}
+                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "", latitude: null, longitude: null }))}
                   />
                 </div>
                 <div className="space-y-2">
