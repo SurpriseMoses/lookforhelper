@@ -40,10 +40,12 @@ const Dashboard = () => {
   useLastActive();
 
   const [profile, setProfile] = useState({ full_name: "", avatar_url: "" });
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [helperDetails, setHelperDetails] = useState({
     age: "",
     gender: "",
     city: "",
+    province: "",
     country: "South Africa",
     willing_to_work_abroad: false,
     years_experience: "",
