@@ -453,7 +453,7 @@ const Browse = () => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
+            <Button id="search-helpers-btn" onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
               <Search className="h-4 w-4" /> Search Helpers
             </Button>
             <Button
