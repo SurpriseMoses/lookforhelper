@@ -154,6 +154,8 @@ const Dashboard = () => {
             city: helperDetails.city,
             province: helperDetails.province,
             country: helperDetails.country,
+            latitude: helperDetails.latitude,
+            longitude: helperDetails.longitude,
             willing_to_work_abroad: helperDetails.willing_to_work_abroad,
             years_experience: helperDetails.years_experience ? parseInt(helperDetails.years_experience) : null,
             skills: helperDetails.skills,
