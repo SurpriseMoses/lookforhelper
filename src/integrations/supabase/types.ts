@@ -86,6 +86,39 @@ export type Database = {
         }
         Relationships: []
       }
+      countries: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          currency: string
+          default_language: string
+          id: string
+          is_active: boolean
+          phone_prefix: string
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          currency?: string
+          default_language?: string
+          id?: string
+          is_active?: boolean
+          phone_prefix?: string
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          currency?: string
+          default_language?: string
+          id?: string
+          is_active?: boolean
+          phone_prefix?: string
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           admin_notes: string | null
@@ -140,7 +173,10 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          currency: string | null
           id: string
+          payment_country: string | null
+          payment_provider: string | null
           payment_reference: string | null
           plan: string
           status: string
@@ -149,7 +185,10 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string
+          currency?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           plan: string
           status?: string
@@ -158,7 +197,10 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          currency?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           plan?: string
           status?: string
@@ -189,6 +231,7 @@ export type Database = {
           is_published: boolean | null
           languages: string[] | null
           preferred_hours: string | null
+          province: string | null
           salary_expectation: string | null
           salary_max: number | null
           salary_min: number | null
@@ -227,6 +270,7 @@ export type Database = {
           is_published?: boolean | null
           languages?: string[] | null
           preferred_hours?: string | null
+          province?: string | null
           salary_expectation?: string | null
           salary_max?: number | null
           salary_min?: number | null
@@ -265,6 +309,7 @@ export type Database = {
           is_published?: boolean | null
           languages?: string[] | null
           preferred_hours?: string | null
+          province?: string | null
           salary_expectation?: string | null
           salary_max?: number | null
           salary_min?: number | null
@@ -645,6 +690,7 @@ export type Database = {
           is_suspended: boolean
           is_verified: boolean
           last_active_at: string | null
+          phone_number: string | null
           referral_code: string | null
           referred_by: string | null
           suspended_at: string | null
@@ -661,6 +707,7 @@ export type Database = {
           is_suspended?: boolean
           is_verified?: boolean
           last_active_at?: string | null
+          phone_number?: string | null
           referral_code?: string | null
           referred_by?: string | null
           suspended_at?: string | null
@@ -677,6 +724,7 @@ export type Database = {
           is_suspended?: boolean
           is_verified?: boolean
           last_active_at?: string | null
+          phone_number?: string | null
           referral_code?: string | null
           referred_by?: string | null
           suspended_at?: string | null
@@ -858,9 +906,12 @@ export type Database = {
         Row: {
           amount: number | null
           created_at: string
+          currency: string | null
           current_period_end: string | null
           current_period_start: string | null
           id: string
+          payment_country: string | null
+          payment_provider: string | null
           payment_reference: string | null
           status: string
           stripe_customer_id: string | null
@@ -871,9 +922,12 @@ export type Database = {
         Insert: {
           amount?: number | null
           created_at?: string
+          currency?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           status?: string
           stripe_customer_id?: string | null
@@ -884,9 +938,12 @@ export type Database = {
         Update: {
           amount?: number | null
           created_at?: string
+          currency?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           status?: string
           stripe_customer_id?: string | null
@@ -921,7 +978,10 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          currency: string | null
           id: string
+          payment_country: string | null
+          payment_provider: string | null
           payment_reference: string | null
           status: string
           user_id: string
@@ -929,7 +989,10 @@ export type Database = {
         Insert: {
           amount?: number
           created_at?: string
+          currency?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           status?: string
           user_id: string
@@ -937,7 +1000,10 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          currency?: string | null
           id?: string
+          payment_country?: string | null
+          payment_provider?: string | null
           payment_reference?: string | null
           status?: string
           user_id?: string
