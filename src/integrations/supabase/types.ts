@@ -230,6 +230,8 @@ export type Database = {
           is_featured: boolean
           is_published: boolean | null
           languages: string[] | null
+          latitude: number | null
+          longitude: number | null
           preferred_hours: string | null
           province: string | null
           salary_expectation: string | null
@@ -269,6 +271,8 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           preferred_hours?: string | null
           province?: string | null
           salary_expectation?: string | null
@@ -308,6 +312,8 @@ export type Database = {
           is_featured?: boolean
           is_published?: boolean | null
           languages?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           preferred_hours?: string | null
           province?: string | null
           salary_expectation?: string | null
@@ -1065,6 +1071,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      haversine_distance: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
       }
       search_cities: {
         Args: { result_limit?: number; search_term: string }
