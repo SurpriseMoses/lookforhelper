@@ -475,7 +475,7 @@ const Browse = () => {
                 <Bell className="h-4 w-4" /> Save Search
               </Button>
             )}
-            )}
+          {geoError && <p className="text-xs text-destructive">{geoError}</p>}
           </div>
         </div>
 
