@@ -446,9 +446,25 @@ const Browse = () => {
               <Label className="text-sm cursor-pointer">Identity Verified only</Label>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button onClick={() => { setCurrentPage(1); fetchHelpers(); }} className="w-full sm:w-auto gap-2">
               <Search className="h-4 w-4" /> Search Helpers
+            </Button>
+            <Button
+              variant={nearMeMode ? "default" : "outline"}
+              onClick={() => {
+                if (!seekerLat) {
+                  handleDetectLocation();
+                } else {
+                  setNearMeMode(!nearMeMode);
+                  setSortBy("nearest");
+                }
+              }}
+              disabled={geoLoading}
+              className="gap-2"
+            >
+              {geoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
+              {nearMeMode ? "Near Me (on)" : "Helpers Near Me"}
             </Button>
             {user && (
               <Button
@@ -458,6 +474,7 @@ const Browse = () => {
               >
                 <Bell className="h-4 w-4" /> Save Search
               </Button>
+            )}
             )}
           </div>
         </div>
