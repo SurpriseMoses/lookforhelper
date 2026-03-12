@@ -100,6 +100,28 @@ const Browse = () => {
   const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
 
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation not supported by your browser");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setSeekerLat(pos.coords.latitude);
+        setSeekerLng(pos.coords.longitude);
+        setNearMeMode(true);
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Location permission denied. Use city search instead.");
+        setGeoLoading(false);
+      },
+      { timeout: 10000 }
+    );
+  };
+
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
     if (!user) {
       e.preventDefault();
