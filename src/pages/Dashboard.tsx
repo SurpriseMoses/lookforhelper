@@ -106,6 +106,8 @@ const Dashboard = () => {
             city: h.city ?? "",
             province: (h as any).province ?? "",
             country: h.country ?? "South Africa",
+            latitude: (h as any).latitude ?? null,
+            longitude: (h as any).longitude ?? null,
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
             skills: h.skills ?? [],
