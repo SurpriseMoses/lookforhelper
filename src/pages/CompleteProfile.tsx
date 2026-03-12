@@ -174,24 +174,29 @@ const CompleteProfile = () => {
               {selectedRole === "helper" && (
                 <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
                   <p className="text-sm font-medium text-foreground">Location</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
+                      <CityAutocomplete
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        onCitySelect={(c, p) => {
+                          setCity(c);
+                          setProvince(p);
+                          setCountry("South Africa");
+                        }}
+                        onClear={() => { setCity(""); setProvince(""); }}
                         placeholder="e.g. Cape Town"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input
-                        id="country"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        placeholder="e.g. South Africa"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label>Province</Label>
+                        <Input value={province} disabled className="bg-muted" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Country</Label>
+                        <Input value={country} disabled className="bg-muted" />
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -289,7 +289,7 @@ const HelperProfilePage = () => {
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground md:justify-start">
                   {helper.city && (
                     <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" /> {helper.city}, {helper.country}
+                      <MapPin className="h-4 w-4" /> {[helper.city, (helper as any).province, helper.country].filter(Boolean).join(", ")}
                     </span>
                   )}
                   {helper.years_experience != null && (

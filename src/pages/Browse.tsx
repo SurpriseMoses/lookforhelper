@@ -466,7 +466,7 @@ const Browse = () => {
                       )}
                       {helper.city && (
                         <span className="flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" /> {helper.city}
+                          <MapPin className="h-3.5 w-3.5" /> {[helper.city, helper.province].filter(Boolean).join(", ")}
                         </span>
                       )}
                       {helper.years_experience != null && (
