@@ -92,7 +92,7 @@ const Browse = () => {
     setLoading(true);
     let query = supabase
       .from("helper_details")
-      .select("user_id, age, gender, city, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
+      .select("user_id, age, gender, city, province, country, years_experience, skills, skill_experience, languages, about_me, is_featured, featured_until, average_rating, total_reviews, availability_status, available_from, work_type, work_authorization_status")
       .eq("is_published", true);
 
     if (skillFilter !== "all") {
