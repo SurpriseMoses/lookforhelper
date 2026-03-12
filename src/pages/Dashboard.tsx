@@ -102,6 +102,7 @@ const Dashboard = () => {
             age: h.age?.toString() ?? "",
             gender: h.gender ?? "",
             city: h.city ?? "",
+            province: (h as any).province ?? "",
             country: h.country ?? "South Africa",
             willing_to_work_abroad: h.willing_to_work_abroad ?? false,
             years_experience: h.years_experience?.toString() ?? "",
