@@ -320,11 +320,30 @@ const Dashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>City</Label>
-                  <Input value={helperDetails.city} onChange={(e) => setHelperDetails((h) => ({ ...h, city: e.target.value }))} />
+                  <CityAutocomplete
+                    value={helperDetails.city}
+                    onCitySelect={(city, province, lat, lng) => {
+                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa" }));
+                    }}
+                    onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "" }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Province</Label>
+                  <Input value={helperDetails.province} disabled className="bg-muted" />
                 </div>
                 <div className="space-y-2">
                   <Label>Country</Label>
-                  <Input value={helperDetails.country} onChange={(e) => setHelperDetails((h) => ({ ...h, country: e.target.value }))} />
+                  <Input value={helperDetails.country} disabled className="bg-muted" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone Number</Label>
+                  <Input
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+27 71 234 5678"
+                  />
+                  <p className="text-xs text-muted-foreground">International format (e.g. +27 for South Africa)</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Years of Experience</Label>
