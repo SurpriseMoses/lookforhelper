@@ -78,10 +78,13 @@ const Dashboard = () => {
     const load = async () => {
       const { data: p } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, phone_number")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (p) setProfile({ full_name: p.full_name, avatar_url: p.avatar_url ?? "" });
+      if (p) {
+        setProfile({ full_name: p.full_name, avatar_url: (p as any).avatar_url ?? "" });
+        setPhoneNumber((p as any).phone_number ?? "");
+      }
 
       if (role === "helper") {
         const { data: h } = await supabase
