@@ -112,7 +112,13 @@ const Browse = () => {
         setSeekerLat(pos.coords.latitude);
         setSeekerLng(pos.coords.longitude);
         setNearMeMode(true);
+        setSortBy("nearest");
         setGeoLoading(false);
+        // Auto-trigger search after location detected
+        setTimeout(() => {
+          setCurrentPage(1);
+          document.getElementById("search-helpers-btn")?.click();
+        }, 100);
       },
       () => {
         setGeoError("Location permission denied. Use city search instead.");
