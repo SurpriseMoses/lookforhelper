@@ -221,9 +221,19 @@ const Browse = () => {
         (metricsResult.data ?? []).map((m: any) => [m.user_id, m.avg_response_minutes])
       );
 
+      // Determine reference point for distance (seeker location or selected city)
+      const refLat = nearMeMode && seekerLat != null ? seekerLat : cityLat;
+      const refLng = nearMeMode && seekerLng != null ? seekerLng : cityLng;
+
       const now = new Date();
       let results = eligibleHelpers.map((h: any) => {
         const isFeaturedActive = h.is_featured && h.featured_until && new Date(h.featured_until) > now;
+        const hLat = h.latitude as number | null;
+        const hLng = h.longitude as number | null;
+        let distance_km: number | null = null;
+        if (refLat != null && refLng != null && hLat != null && hLng != null) {
+          distance_km = Math.round(haversineDistance(refLat, refLng, hLat, hLng) * 10) / 10;
+        }
         return {
           ...h,
           is_verified: profileMap.get(h.user_id)?.is_verified ?? false,
@@ -237,9 +247,16 @@ const Browse = () => {
           skill_experience: h.skill_experience ?? null,
           last_active_at: profileMap.get(h.user_id)?.last_active_at ?? null,
           avg_response_minutes: metricsMap.get(h.user_id) ?? null,
+          distance_km,
           profiles: profileMap.get(h.user_id) ? { full_name: profileMap.get(h.user_id)!.full_name, avatar_url: profileMap.get(h.user_id)!.avatar_url } : null,
         };
       }) as HelperWithProfile[];
+
+      // Filter by radius if nearMe mode active
+      if (nearMeMode && seekerLat != null && seekerLng != null) {
+        const maxRadius = parseInt(radiusKm) || 50;
+        results = results.filter((h) => h.distance_km != null && h.distance_km <= maxRadius);
+      }
 
       // Apply keyword search filter (client-side)
       if (keywordSearch.trim()) {
@@ -255,24 +272,31 @@ const Browse = () => {
       // Filter verified only if toggle is on
       const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
 
-      filtered.sort((a, b) => {
-        const aFeatured = a.is_featured ? 1 : 0;
-        const bFeatured = b.is_featured ? 1 : 0;
-        if (bFeatured !== aFeatured) return bFeatured - aFeatured;
-        const aVerified = a.is_verified ? 1 : 0;
-        const bVerified = b.is_verified ? 1 : 0;
-        if (bVerified !== aVerified) return bVerified - aVerified;
-        if (cityFilter) {
-          const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
-          const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
-          if (bCity !== aCity) return bCity - aCity;
-        }
-        const aAvail = a.availability_status === "available_now" ? 1 : 0;
-        const bAvail = b.availability_status === "available_now" ? 1 : 0;
-        if (bAvail !== aAvail) return bAvail - aAvail;
-        if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
-        return 0;
-      });
+      // Sort
+      if (sortBy === "nearest" && refLat != null) {
+        filtered.sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+      } else {
+        filtered.sort((a, b) => {
+          const aFeatured = a.is_featured ? 1 : 0;
+          const bFeatured = b.is_featured ? 1 : 0;
+          if (bFeatured !== aFeatured) return bFeatured - aFeatured;
+          const aVerified = a.is_verified ? 1 : 0;
+          const bVerified = b.is_verified ? 1 : 0;
+          if (bVerified !== aVerified) return bVerified - aVerified;
+          if (cityFilter) {
+            const aCity = a.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+            const bCity = b.city?.toLowerCase() === cityFilter.toLowerCase() ? 1 : 0;
+            if (bCity !== aCity) return bCity - aCity;
+          }
+          if (sortBy === "highest_rated" && b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
+          if (sortBy === "experience") return (b.years_experience ?? 0) - (a.years_experience ?? 0);
+          const aAvail = a.availability_status === "available_now" ? 1 : 0;
+          const bAvail = b.availability_status === "available_now" ? 1 : 0;
+          if (bAvail !== aAvail) return bAvail - aAvail;
+          if (b.average_rating !== a.average_rating) return b.average_rating - a.average_rating;
+          return 0;
+        });
+      }
 
       setHelpers(filtered);
 
