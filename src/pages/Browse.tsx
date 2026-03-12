@@ -568,6 +568,11 @@ const Browse = () => {
                           <MapPin className="h-3.5 w-3.5" /> {[helper.city, helper.province].filter(Boolean).join(", ")}
                         </span>
                       )}
+                      {helper.distance_km != null && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-primary">
+                          <Navigation className="h-3 w-3" /> {helper.distance_km < 1 ? "< 1" : helper.distance_km.toFixed(0)} km
+                        </span>
+                      )}
                       {helper.years_experience != null && (
                         <span className="flex items-center gap-1">
                           <Clock className="h-3.5 w-3.5" /> {helper.years_experience} yrs
