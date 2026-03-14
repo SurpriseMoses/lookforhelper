@@ -606,9 +606,18 @@ const AdminDashboard = () => {
                           size="sm"
                           variant="outline"
                           onClick={async () => {
-                            const { data } = await supabase.storage
+                            const { data, error } = await supabase.storage
                               .from("identity-documents")
                               .createSignedUrl(vr.document_url, 300);
+                            if (error) {
+                              console.error("Signed URL error:", error);
+                              toast({
+                                title: "Error viewing document",
+                                description: error.message || "Could not generate a signed URL.",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
                             if (data?.signedUrl) {
                               window.open(data.signedUrl, "_blank");
                             }
