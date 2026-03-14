@@ -27,9 +27,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-    setRole(data?.role ?? null);
+      .eq("user_id", userId);
+    
+    if (!data || data.length === 0) {
+      setRole(null);
+      return;
+    }
+    
+    // Prioritize admin role, then helper, then seeker
+    const roles = data.map((r: any) => r.role);
+    if (roles.includes("admin")) {
+      setRole("admin");
+    } else if (roles.includes("helper")) {
+      setRole("helper");
+    } else {
+      setRole(roles[0] ?? null);
+    }
   };
 
   const processReferralCode = async (userId: string) => {
