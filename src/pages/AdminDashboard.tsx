@@ -336,6 +336,39 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleViewDocument = async (documentPath: string) => {
+    const popup = window.open("", "_blank", "noopener,noreferrer");
+
+    const { data, error } = await supabase.storage
+      .from("identity-documents")
+      .createSignedUrl(documentPath, 300);
+
+    const signedUrl = (data as { signedUrl?: string; signedURL?: string } | null)?.signedUrl
+      ?? (data as { signedUrl?: string; signedURL?: string } | null)?.signedURL;
+
+    if (error || !signedUrl) {
+      popup?.close();
+      console.error("Signed URL error:", error);
+      toast({
+        title: "Error viewing document",
+        description: error?.message || "Could not generate a signed URL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const absoluteUrl = signedUrl.startsWith("http")
+      ? signedUrl
+      : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1${signedUrl}`;
+
+    if (popup) {
+      popup.location.href = absoluteUrl;
+      return;
+    }
+
+    window.location.assign(absoluteUrl);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -605,23 +638,7 @@ const AdminDashboard = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={async () => {
-                            const { data, error } = await supabase.storage
-                              .from("identity-documents")
-                              .createSignedUrl(vr.document_url, 300);
-                            if (error) {
-                              console.error("Signed URL error:", error);
-                              toast({
-                                title: "Error viewing document",
-                                description: error.message || "Could not generate a signed URL.",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            if (data?.signedUrl) {
-                              window.open(data.signedUrl, "_blank");
-                            }
-                          }}
+                          onClick={() => handleViewDocument(vr.document_url)}
                           className="gap-1"
                         >
                           <Eye className="h-4 w-4" /> View Document
