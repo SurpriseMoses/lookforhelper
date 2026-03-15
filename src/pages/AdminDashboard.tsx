@@ -663,8 +663,9 @@ const AdminDashboard = () => {
                           variant="outline"
                           onClick={() => handleViewDocument(vr.document_url)}
                           className="gap-1"
+                          disabled={docPreviewLoading}
                         >
-                          <Eye className="h-4 w-4" /> View Document
+                          <Eye className="h-4 w-4" /> {docPreviewLoading ? "Loading..." : "View Document"}
                         </Button>
                       </div>
 
