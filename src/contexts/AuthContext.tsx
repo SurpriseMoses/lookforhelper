@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,27 +22,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<AppRole | null>(null);
+  const roleRequestIdRef = useRef(0);
 
-  const fetchRole = async (userId: string) => {
-    const { data } = await supabase
+  const resolveRole = (roles: string[], fallbackRole?: AppRole | null) => {
+    if (roles.includes("admin")) return "admin";
+    if (roles.includes("helper")) return "helper";
+    if (roles.includes("seeker")) return "seeker";
+    return fallbackRole ?? null;
+  };
+
+  const fetchRole = async (userId: string, fallbackRole?: AppRole | null, retries = 1): Promise<void> => {
+    const requestId = ++roleRequestIdRef.current;
+
+    const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    
-    if (!data || data.length === 0) {
-      setRole(null);
+
+    if (requestId !== roleRequestIdRef.current) return;
+
+    if (error) {
+      if (retries > 0) {
+        setTimeout(() => {
+          void fetchRole(userId, fallbackRole, retries - 1);
+        }, 200);
+        return;
+      }
+      console.error("Failed to fetch user roles:", error.message);
+      setRole(fallbackRole ?? null);
       return;
     }
-    
-    // Prioritize admin role, then helper, then seeker
-    const roles = data.map((r: any) => r.role);
-    if (roles.includes("admin")) {
-      setRole("admin");
-    } else if (roles.includes("helper")) {
-      setRole("helper");
-    } else {
-      setRole(roles[0] ?? null);
-    }
+
+    const roles = (data ?? []).map((r) => r.role as string);
+    setRole(resolveRole(roles, fallbackRole));
   };
 
   const processReferralCode = async (userId: string) => {
@@ -51,7 +63,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("pending_referral_code");
 
     try {
-      // Find referrer by code
       const { data: referrerProfile } = await supabase
         .from("profiles")
         .select("user_id")
@@ -60,13 +71,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (!referrerProfile || referrerProfile.user_id === userId) return;
 
-      // Update referred_by on the new user's profile
       await supabase
         .from("profiles")
         .update({ referred_by: code })
         .eq("user_id", userId);
 
-      // Create referral record
       await supabase
         .from("referrals")
         .insert({
@@ -80,33 +89,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
-          // Use setTimeout to avoid potential deadlocks with Supabase auth
-          setTimeout(() => {
-            fetchRole(session.user.id);
-          }, 0);
-          // Process pending referral code after first sign-in
-          if (event === 'SIGNED_IN') {
-            setTimeout(() => processReferralCode(session.user.id), 500);
-          }
-        } else if (!session) {
-          setRole(null);
-        }
-        setLoading(false);
-      }
-    );
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchRole(session.user.id);
+      if (!nextSession) {
+        roleRequestIdRef.current += 1;
+        setRole(null);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        setLoading(true);
+        const fallbackRole = (nextSession.user.user_metadata?.role as AppRole | undefined) ?? null;
+
+        setTimeout(() => {
+          void fetchRole(nextSession.user.id, fallbackRole).finally(() => {
+            if (roleRequestIdRef.current > 0) {
+              setLoading(false);
+            }
+          });
+        }, 0);
+
+        if (event === "SIGNED_IN") {
+          setTimeout(() => void processReferralCode(nextSession.user.id), 500);
+        }
+      }
+    });
+
+    void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
+
+      if (!initialSession?.user) {
+        setRole(null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      const fallbackRole = (initialSession.user.user_metadata?.role as AppRole | undefined) ?? null;
+      void fetchRole(initialSession.user.id, fallbackRole).finally(() => {
+        setLoading(false);
+      });
     });
 
     return () => subscription.unsubscribe();
@@ -133,7 +159,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
-  // Profile is complete if the user signed up via email (role in metadata) or has explicitly set role
+
   const profileComplete = !user || !!user.user_metadata?.role;
 
   return (
