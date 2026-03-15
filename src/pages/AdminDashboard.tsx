@@ -337,7 +337,13 @@ const AdminDashboard = () => {
     }
   };
 
+  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
+  const [docPreviewName, setDocPreviewName] = useState("");
+  const [docPreviewLoading, setDocPreviewLoading] = useState(false);
+
   const handleViewDocument = async (documentPath: string) => {
+    setDocPreviewLoading(true);
+    setDocPreviewName(documentPath.split("/").pop() || "document");
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
@@ -350,22 +356,12 @@ const AdminDashboard = () => {
           description: error?.message || "Could not download the document.",
           variant: "destructive",
         });
+        setDocPreviewLoading(false);
         return;
       }
 
       const blobUrl = URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      // Set filename for download fallback
-      const filename = documentPath.split("/").pop() || "document";
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      // Revoke after a delay to allow the browser to process
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      setDocPreviewUrl(blobUrl);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -373,7 +369,27 @@ const AdminDashboard = () => {
         description: err?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setDocPreviewLoading(false);
     }
+  };
+
+  const handleCloseDocPreview = () => {
+    if (docPreviewUrl) {
+      URL.revokeObjectURL(docPreviewUrl);
+    }
+    setDocPreviewUrl(null);
+    setDocPreviewName("");
+  };
+
+  const handleDownloadDoc = () => {
+    if (!docPreviewUrl) return;
+    const link = document.createElement("a");
+    link.href = docPreviewUrl;
+    link.download = docPreviewName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (authLoading) {
