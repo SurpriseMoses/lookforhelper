@@ -839,6 +839,29 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Document Preview Dialog */}
+      <Dialog open={!!docPreviewUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
+            <DialogTitle className="flex items-center justify-between pr-8">
+              <span className="truncate">{docPreviewName}</span>
+              <Button size="sm" variant="outline" onClick={handleDownloadDoc} className="gap-1 ml-2 flex-shrink-0">
+                <Download className="h-4 w-4" /> Download
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 px-6 pb-6">
+            {docPreviewUrl && (
+              <iframe
+                src={docPreviewUrl}
+                className="w-full h-full rounded-md border"
+                title="Document Preview"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
