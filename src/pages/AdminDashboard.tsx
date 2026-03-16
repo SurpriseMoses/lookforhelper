@@ -857,7 +857,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Document Preview Dialog */}
-      <Dialog open={!!docPreviewUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+      <Dialog open={!!docPreviewDataUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
         <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center justify-between pr-8">
@@ -868,13 +868,19 @@ const AdminDashboard = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
-            {docPreviewUrl && (
+            {docPreviewDataUrl && docPreviewType.startsWith("image/") ? (
+              <img
+                src={docPreviewDataUrl}
+                alt="Document Preview"
+                className="w-full h-full object-contain rounded-md border"
+              />
+            ) : docPreviewDataUrl ? (
               <iframe
-                src={docPreviewUrl}
+                src={docPreviewDataUrl}
                 className="w-full h-full rounded-md border"
                 title="Document Preview"
               />
-            )}
+            ) : null}
           </div>
         </DialogContent>
       </Dialog>
