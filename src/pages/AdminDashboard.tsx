@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 
 interface VerificationReq {
   id: string;
@@ -342,9 +343,12 @@ const AdminDashboard = () => {
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<string>("");
+  const [docPreviewPdfError, setDocPreviewPdfError] = useState<string | null>(null);
+  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
+    setDocPreviewPdfError(null);
     const fileName = documentPath.split("/").pop() || "document";
     setDocPreviewName(fileName);
     try {
@@ -366,16 +370,18 @@ const AdminDashboard = () => {
       const mimeType = data.type || "application/octet-stream";
       setDocPreviewType(mimeType);
 
-      // Store blob URL for download
       const blobUrl = URL.createObjectURL(data);
       setDocPreviewBlobUrl(blobUrl);
 
-      // Convert to data URL for preview (works in sandboxed iframes)
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDocPreviewDataUrl(reader.result as string);
-      };
-      reader.readAsDataURL(data);
+      if (mimeType.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setDocPreviewDataUrl(reader.result as string);
+        };
+        reader.readAsDataURL(data);
+      } else {
+        setDocPreviewDataUrl(null);
+      }
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -388,6 +394,40 @@ const AdminDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const renderPdfPreview = async () => {
+      if (!docPreviewBlobUrl || !docPreviewType.includes("pdf") || !pdfCanvasRef.current) return;
+
+      try {
+        GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+        const pdf = await getDocument(docPreviewBlobUrl).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.2 });
+        const canvas = pdfCanvasRef.current;
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          setDocPreviewPdfError("Canvas rendering is not available in this browser.");
+          return;
+        }
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({
+          canvas,
+          canvasContext: context,
+          viewport,
+        }).promise;
+        setDocPreviewPdfError(null);
+      } catch (error: any) {
+        console.error("PDF render error:", error);
+        setDocPreviewPdfError("Could not render this PDF preview.");
+      }
+    };
+
+    renderPdfPreview();
+  }, [docPreviewBlobUrl, docPreviewType]);
+
   const handleCloseDocPreview = () => {
     if (docPreviewBlobUrl) {
       URL.revokeObjectURL(docPreviewBlobUrl);
@@ -396,6 +436,7 @@ const AdminDashboard = () => {
     setDocPreviewBlobUrl(null);
     setDocPreviewName("");
     setDocPreviewType("");
+    setDocPreviewPdfError(null);
   };
 
   const handleDownloadDoc = () => {
@@ -857,7 +898,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Document Preview Dialog */}
-      <Dialog open={!!docPreviewDataUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+      <Dialog open={!!docPreviewBlobUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
         <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center justify-between pr-8">
@@ -866,21 +907,30 @@ const AdminDashboard = () => {
                 <Download className="h-4 w-4" /> Download
               </Button>
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Preview and download uploaded identity verification documents.
+            </DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
-            {docPreviewDataUrl && docPreviewType.startsWith("image/") ? (
+            {docPreviewType.startsWith("image/") && docPreviewDataUrl ? (
               <img
                 src={docPreviewDataUrl}
                 alt="Document Preview"
                 className="w-full h-full object-contain rounded-md border"
               />
-            ) : docPreviewDataUrl ? (
-              <iframe
-                src={docPreviewDataUrl}
-                className="w-full h-full rounded-md border"
-                title="Document Preview"
-              />
-            ) : null}
+            ) : docPreviewType.includes("pdf") ? (
+              <div className="flex h-full items-center justify-center overflow-auto rounded-md border bg-muted/30 p-4">
+                {docPreviewPdfError ? (
+                  <p className="text-sm text-muted-foreground">{docPreviewPdfError}</p>
+                ) : (
+                  <canvas ref={pdfCanvasRef} className="max-w-full h-auto rounded-md bg-background shadow-sm" />
+                )}
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
+                Preview unavailable for this file type. Please use download.
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
