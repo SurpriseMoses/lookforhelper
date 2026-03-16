@@ -343,9 +343,12 @@ const AdminDashboard = () => {
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<string>("");
+  const [docPreviewPdfError, setDocPreviewPdfError] = useState<string | null>(null);
+  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
+    setDocPreviewPdfError(null);
     const fileName = documentPath.split("/").pop() || "document";
     setDocPreviewName(fileName);
     try {
@@ -367,16 +370,18 @@ const AdminDashboard = () => {
       const mimeType = data.type || "application/octet-stream";
       setDocPreviewType(mimeType);
 
-      // Store blob URL for download
       const blobUrl = URL.createObjectURL(data);
       setDocPreviewBlobUrl(blobUrl);
 
-      // Convert to data URL for preview (works in sandboxed iframes)
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDocPreviewDataUrl(reader.result as string);
-      };
-      reader.readAsDataURL(data);
+      if (mimeType.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setDocPreviewDataUrl(reader.result as string);
+        };
+        reader.readAsDataURL(data);
+      } else {
+        setDocPreviewDataUrl(null);
+      }
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -389,6 +394,36 @@ const AdminDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const renderPdfPreview = async () => {
+      if (!docPreviewBlobUrl || !docPreviewType.includes("pdf") || !pdfCanvasRef.current) return;
+
+      try {
+        GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+        const pdf = await getDocument(docPreviewBlobUrl).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.2 });
+        const canvas = pdfCanvasRef.current;
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          setDocPreviewPdfError("Canvas rendering is not available in this browser.");
+          return;
+        }
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: context, viewport }).promise;
+        setDocPreviewPdfError(null);
+      } catch (error: any) {
+        console.error("PDF render error:", error);
+        setDocPreviewPdfError("Could not render this PDF preview.");
+      }
+    };
+
+    renderPdfPreview();
+  }, [docPreviewBlobUrl, docPreviewType]);
+
   const handleCloseDocPreview = () => {
     if (docPreviewBlobUrl) {
       URL.revokeObjectURL(docPreviewBlobUrl);
@@ -397,6 +432,7 @@ const AdminDashboard = () => {
     setDocPreviewBlobUrl(null);
     setDocPreviewName("");
     setDocPreviewType("");
+    setDocPreviewPdfError(null);
   };
 
   const handleDownloadDoc = () => {
