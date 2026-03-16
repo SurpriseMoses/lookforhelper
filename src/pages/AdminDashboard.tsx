@@ -337,13 +337,16 @@ const AdminDashboard = () => {
     }
   };
 
-  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
+  const [docPreviewDataUrl, setDocPreviewDataUrl] = useState<string | null>(null);
+  const [docPreviewBlobUrl, setDocPreviewBlobUrl] = useState<string | null>(null);
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
+  const [docPreviewType, setDocPreviewType] = useState<string>("");
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
-    setDocPreviewName(documentPath.split("/").pop() || "document");
+    const fileName = documentPath.split("/").pop() || "document";
+    setDocPreviewName(fileName);
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
@@ -360,8 +363,19 @@ const AdminDashboard = () => {
         return;
       }
 
+      const mimeType = data.type || "application/octet-stream";
+      setDocPreviewType(mimeType);
+
+      // Store blob URL for download
       const blobUrl = URL.createObjectURL(data);
-      setDocPreviewUrl(blobUrl);
+      setDocPreviewBlobUrl(blobUrl);
+
+      // Convert to data URL for preview (works in sandboxed iframes)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDocPreviewDataUrl(reader.result as string);
+      };
+      reader.readAsDataURL(data);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -375,17 +389,19 @@ const AdminDashboard = () => {
   };
 
   const handleCloseDocPreview = () => {
-    if (docPreviewUrl) {
-      URL.revokeObjectURL(docPreviewUrl);
+    if (docPreviewBlobUrl) {
+      URL.revokeObjectURL(docPreviewBlobUrl);
     }
-    setDocPreviewUrl(null);
+    setDocPreviewDataUrl(null);
+    setDocPreviewBlobUrl(null);
     setDocPreviewName("");
+    setDocPreviewType("");
   };
 
   const handleDownloadDoc = () => {
-    if (!docPreviewUrl) return;
+    if (!docPreviewBlobUrl) return;
     const link = document.createElement("a");
-    link.href = docPreviewUrl;
+    link.href = docPreviewBlobUrl;
     link.download = docPreviewName;
     document.body.appendChild(link);
     link.click();
