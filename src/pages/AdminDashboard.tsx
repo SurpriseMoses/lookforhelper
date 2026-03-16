@@ -413,7 +413,11 @@ const AdminDashboard = () => {
 
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        await page.render({ canvasContext: context, viewport }).promise;
+        await page.render({
+          canvas,
+          canvasContext: context,
+          viewport,
+        }).promise;
         setDocPreviewPdfError(null);
       } catch (error: any) {
         console.error("PDF render error:", error);
