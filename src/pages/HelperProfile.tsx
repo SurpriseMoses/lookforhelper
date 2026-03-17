@@ -73,6 +73,7 @@ const HelperProfilePage = () => {
   const [showReview, setShowReview] = useState(false);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [hireCount, setHireCount] = useState(0);
+  const [verifiedDocType, setVerifiedDocType] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
