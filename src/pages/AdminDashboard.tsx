@@ -23,6 +23,11 @@ interface VerificationReq {
   rejection_reason: string | null;
   created_at: string;
   helper_name: string;
+  document_type: string | null;
+  selfie_url: string | null;
+  country_of_origin: string | null;
+  document_number: string | null;
+  expiry_date: string | null;
 }
 
 interface Report {
