@@ -160,23 +160,18 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
       if (selfieErr) throw selfieErr;
 
       // Insert verification request
-      const insertData: Record<string, any> = {
-        user_id: user.id,
-        document_url: docPath,
-        selfie_url: selfiePath,
-        document_type: documentType,
-        status: "pending",
-      };
-
-      if (isForeigner) {
-        insertData.country_of_origin = countryOfOrigin || null;
-        insertData.document_number = documentNumber || null;
-        insertData.expiry_date = expiryDate || null;
-      }
-
       const { error: insertErr } = await supabase
         .from("verification_requests")
-        .insert(insertData);
+        .insert({
+          user_id: user.id,
+          document_url: docPath,
+          selfie_url: selfiePath,
+          document_type: documentType,
+          status: "pending",
+          country_of_origin: isForeigner ? (countryOfOrigin || null) : null,
+          document_number: isForeigner ? (documentNumber || null) : null,
+          expiry_date: isForeigner ? (expiryDate || null) : null,
+        } as any);
       if (insertErr) throw insertErr;
 
       toast({
