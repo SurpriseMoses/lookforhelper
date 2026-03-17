@@ -209,7 +209,12 @@ const HelperProfilePage = () => {
                   {helper.profiles?.full_name}
                   {helper.profiles?.is_verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
-                      <CheckCircle className="h-3.5 w-3.5" /> Verified Identity
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      {verifiedDocType === "passport" ? "Passport Verified" :
+                       verifiedDocType === "work_permit" ? "Permit Verified" :
+                       verifiedDocType === "asylum_permit" ? "Permit Verified" :
+                       verifiedDocType === "sa_id" ? "SA Verified" :
+                       "Verified Identity"}
                     </span>
                   )}
                   {helper.is_featured && (
