@@ -1021,6 +1021,19 @@ const AdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Selfie Preview Dialog */}
+      <Dialog open={!!selfiePreviewUrl} onOpenChange={(open) => { if (!open) setSelfiePreviewUrl(null); }}>
+        <DialogContent className="max-w-lg w-[95vw]">
+          <DialogHeader>
+            <DialogTitle>Selfie Preview</DialogTitle>
+            <DialogDescription className="sr-only">Preview of the verification selfie.</DialogDescription>
+          </DialogHeader>
+          {selfiePreviewUrl && (
+            <img src={selfiePreviewUrl} alt="Selfie" className="w-full rounded-lg border" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
