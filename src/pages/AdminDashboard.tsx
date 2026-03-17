@@ -323,16 +323,16 @@ const AdminDashboard = () => {
     loadVerificationRequests();
   };
 
-  const handleRejectVerification = async (reqId: string) => {
-    const reason = rejectionReasons[reqId];
-    if (!reason) {
+  const handleRejectVerification = async (reqId: string, reason?: string) => {
+    const rejectReason = reason || rejectionReasons[reqId];
+    if (!rejectReason) {
       toast({ title: "Please provide a rejection reason", variant: "destructive" });
       return;
     }
 
     const { error } = await supabase
       .from("verification_requests")
-      .update({ status: "rejected", rejection_reason: reason, reviewed_by: user?.id })
+      .update({ status: "rejected", rejection_reason: rejectReason, reviewed_by: user?.id } as any)
       .eq("id", reqId);
 
     if (error) {
@@ -340,6 +340,29 @@ const AdminDashboard = () => {
     } else {
       toast({ title: "Verification rejected" });
       loadVerificationRequests();
+    }
+  };
+
+  const handleRequestNewUpload = async (reqId: string) => {
+    await handleRejectVerification(reqId, "Please upload clearer or valid documents.");
+  };
+
+  const handleViewSelfie = async (selfiePath: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("verification-selfies")
+        .download(selfiePath);
+      if (error || !data) {
+        toast({ title: "Error", description: error?.message || "Could not load selfie", variant: "destructive" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelfiePreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(data);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
