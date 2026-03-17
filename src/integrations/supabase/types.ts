@@ -1018,34 +1018,49 @@ export type Database = {
       }
       verification_requests: {
         Row: {
+          country_of_origin: string | null
           created_at: string
+          document_number: string | null
+          document_type: string | null
           document_url: string
+          expiry_date: string | null
           id: string
           payment_id: string | null
           rejection_reason: string | null
           reviewed_by: string | null
+          selfie_url: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          country_of_origin?: string | null
           created_at?: string
+          document_number?: string | null
+          document_type?: string | null
           document_url: string
+          expiry_date?: string | null
           id?: string
           payment_id?: string | null
           rejection_reason?: string | null
           reviewed_by?: string | null
+          selfie_url?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          country_of_origin?: string | null
           created_at?: string
+          document_number?: string | null
+          document_type?: string | null
           document_url?: string
+          expiry_date?: string | null
           id?: string
           payment_id?: string | null
           rejection_reason?: string | null
           reviewed_by?: string | null
+          selfie_url?: string | null
           status?: string
           updated_at?: string
           user_id?: string
