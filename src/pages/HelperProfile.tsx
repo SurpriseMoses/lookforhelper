@@ -73,6 +73,7 @@ const HelperProfilePage = () => {
   const [showReview, setShowReview] = useState(false);
   const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   const [hireCount, setHireCount] = useState(0);
+  const [verifiedDocType, setVerifiedDocType] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -133,6 +134,18 @@ const HelperProfilePage = () => {
         .eq("helper_id", userId)
         .eq("status", "confirmed");
       setHireCount(count ?? 0);
+
+      // Fetch verification document type if verified
+      if (profileData?.is_verified) {
+        const { data: verReq } = await supabase
+          .from("verification_requests")
+          .select("document_type")
+          .eq("user_id", userId)
+          .eq("status", "approved")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        setVerifiedDocType((verReq as any)?.[0]?.document_type ?? null);
+      }
 
       setLoading(false);
     };
@@ -196,7 +209,12 @@ const HelperProfilePage = () => {
                   {helper.profiles?.full_name}
                   {helper.profiles?.is_verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
-                      <CheckCircle className="h-3.5 w-3.5" /> Verified Identity
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      {verifiedDocType === "passport" ? "Passport Verified" :
+                       verifiedDocType === "work_permit" ? "Permit Verified" :
+                       verifiedDocType === "asylum_permit" ? "Permit Verified" :
+                       verifiedDocType === "sa_id" ? "SA Verified" :
+                       "Verified Identity"}
                     </span>
                   )}
                   {helper.is_featured && (

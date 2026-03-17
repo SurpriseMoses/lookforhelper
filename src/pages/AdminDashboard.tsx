@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
@@ -23,6 +23,11 @@ interface VerificationReq {
   rejection_reason: string | null;
   created_at: string;
   helper_name: string;
+  document_type: string | null;
+  selfie_url: string | null;
+  country_of_origin: string | null;
+  document_number: string | null;
+  expiry_date: string | null;
 }
 
 interface Report {
@@ -72,6 +77,7 @@ const AdminDashboard = () => {
   const [referralStats, setReferralStats] = useState({ total: 0, pending: 0, completed: 0, rewarded: 0 });
   const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
   const [hireStats, setHireStats] = useState({ total: 0, confirmed: 0, pending: 0 });
+  const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (role === "admin") {
@@ -318,16 +324,16 @@ const AdminDashboard = () => {
     loadVerificationRequests();
   };
 
-  const handleRejectVerification = async (reqId: string) => {
-    const reason = rejectionReasons[reqId];
-    if (!reason) {
+  const handleRejectVerification = async (reqId: string, reason?: string) => {
+    const rejectReason = reason || rejectionReasons[reqId];
+    if (!rejectReason) {
       toast({ title: "Please provide a rejection reason", variant: "destructive" });
       return;
     }
 
     const { error } = await supabase
       .from("verification_requests")
-      .update({ status: "rejected", rejection_reason: reason, reviewed_by: user?.id })
+      .update({ status: "rejected", rejection_reason: rejectReason, reviewed_by: user?.id } as any)
       .eq("id", reqId);
 
     if (error) {
@@ -335,6 +341,29 @@ const AdminDashboard = () => {
     } else {
       toast({ title: "Verification rejected" });
       loadVerificationRequests();
+    }
+  };
+
+  const handleRequestNewUpload = async (reqId: string) => {
+    await handleRejectVerification(reqId, "Please upload clearer or valid documents.");
+  };
+
+  const handleViewSelfie = async (selfiePath: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("verification-selfies")
+        .download(selfiePath);
+      if (error || !data) {
+        toast({ title: "Error", description: error?.message || "Could not load selfie", variant: "destructive" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelfiePreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(data);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -694,62 +723,120 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {verificationRequests.map((vr) => (
-                  <Card key={vr.id}>
-                    <CardContent className="p-5 space-y-3">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{vr.helper_name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Submitted {format(new Date(vr.created_at), "MMM d, yyyy HH:mm")}
-                          </p>
+                {verificationRequests.map((vr) => {
+                  const docTypeLabel: Record<string, string> = {
+                    sa_id: "SA ID",
+                    passport: "Passport",
+                    work_permit: "Work Permit",
+                    asylum_permit: "Asylum Permit",
+                    other: "Other ID",
+                  };
+                  const isExpired = vr.expiry_date && new Date(vr.expiry_date) < new Date();
+
+                  return (
+                    <Card key={vr.id}>
+                      <CardContent className="p-5 space-y-4">
+                        {/* Header */}
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{vr.helper_name}</p>
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                              <Badge variant="outline" className="text-xs">
+                                {docTypeLabel[vr.document_type ?? "sa_id"] ?? "Unknown"}
+                              </Badge>
+                              {vr.country_of_origin && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Globe className="h-3 w-3" /> {vr.country_of_origin}
+                                </span>
+                              )}
+                              {isExpired && (
+                                <Badge variant="destructive" className="text-xs gap-1">
+                                  <AlertTriangle className="h-3 w-3" /> Expired Doc
+                                </Badge>
+                              )}
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(vr.created_at), "MMM d, yyyy HH:mm")}
+                              </span>
+                            </div>
+                            {vr.document_number && (
+                              <p className="text-xs text-muted-foreground mt-1">Doc #: {vr.document_number}</p>
+                            )}
+                            {vr.expiry_date && (
+                              <p className={`text-xs mt-0.5 ${isExpired ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+                                Expires: {format(new Date(vr.expiry_date), "MMM d, yyyy")}
+                              </p>
+                            )}
+                          </div>
+                          <Badge className={STATUS_COLORS[vr.status] ?? ""}>
+                            {vr.status.charAt(0).toUpperCase() + vr.status.slice(1)}
+                          </Badge>
                         </div>
-                        <Badge className={STATUS_COLORS[vr.status] ?? ""}>
-                          {vr.status.charAt(0).toUpperCase() + vr.status.slice(1)}
-                        </Badge>
-                      </div>
 
-                      {/* Document viewer */}
-                      <div className="rounded-lg border p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Identity Document</span>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleViewDocument(vr.document_url)}
-                          className="gap-1"
-                          disabled={docPreviewLoading}
-                        >
-                          <Eye className="h-4 w-4" /> {docPreviewLoading ? "Loading..." : "View Document"}
-                        </Button>
-                      </div>
-
-                      {vr.rejection_reason && (
-                        <p className="text-sm text-muted-foreground">Rejection reason: {vr.rejection_reason}</p>
-                      )}
-
-                      {vr.status === "pending" && (
-                        <div className="border-t pt-3 space-y-3">
-                          <Input
-                            placeholder="Rejection reason (required to reject)..."
-                            value={rejectionReasons[vr.id] ?? ""}
-                            onChange={(e) => setRejectionReasons((prev) => ({ ...prev, [vr.id]: e.target.value }))}
-                          />
-                          <div className="flex gap-2">
-                            <Button size="sm" onClick={() => handleApproveVerification(vr.id, vr.user_id)} className="gap-1">
-                              <CheckCircle className="h-4 w-4" /> Approve
-                            </Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleRejectVerification(vr.id)} className="gap-1">
-                              <XCircle className="h-4 w-4" /> Reject
+                        {/* Side-by-side: Document & Selfie */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="rounded-lg border p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium text-foreground">Document</span>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleViewDocument(vr.document_url)}
+                              className="gap-1"
+                              disabled={docPreviewLoading}
+                            >
+                              <Eye className="h-4 w-4" /> View Document
                             </Button>
                           </div>
+                          <div className="rounded-lg border p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Camera className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium text-foreground">Selfie</span>
+                            </div>
+                            {vr.selfie_url ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewSelfie(vr.selfie_url!)}
+                                className="gap-1"
+                              >
+                                <Eye className="h-4 w-4" /> View Selfie
+                              </Button>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">No selfie submitted</p>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+
+                        {vr.rejection_reason && (
+                          <p className="text-sm text-muted-foreground">Rejection reason: {vr.rejection_reason}</p>
+                        )}
+
+                        {vr.status === "pending" && (
+                          <div className="border-t pt-3 space-y-3">
+                            <Input
+                              placeholder="Rejection reason (required to reject)..."
+                              value={rejectionReasons[vr.id] ?? ""}
+                              onChange={(e) => setRejectionReasons((prev) => ({ ...prev, [vr.id]: e.target.value }))}
+                            />
+                            <div className="flex gap-2 flex-wrap">
+                              <Button size="sm" onClick={() => handleApproveVerification(vr.id, vr.user_id)} className="gap-1">
+                                <CheckCircle className="h-4 w-4" /> Approve
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleRejectVerification(vr.id)} className="gap-1">
+                                <XCircle className="h-4 w-4" /> Reject
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleRequestNewUpload(vr.id)} className="gap-1">
+                                <RefreshCw className="h-4 w-4" /> Request New Upload
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
@@ -932,6 +1019,19 @@ const AdminDashboard = () => {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Selfie Preview Dialog */}
+      <Dialog open={!!selfiePreviewUrl} onOpenChange={(open) => { if (!open) setSelfiePreviewUrl(null); }}>
+        <DialogContent className="max-w-lg w-[95vw]">
+          <DialogHeader>
+            <DialogTitle>Selfie Preview</DialogTitle>
+            <DialogDescription className="sr-only">Preview of the verification selfie.</DialogDescription>
+          </DialogHeader>
+          {selfiePreviewUrl && (
+            <img src={selfiePreviewUrl} alt="Selfie" className="w-full rounded-lg border" />
+          )}
         </DialogContent>
       </Dialog>
     </div>
