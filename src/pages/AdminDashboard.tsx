@@ -838,10 +838,6 @@ const AdminDashboard = () => {
                   );
                 })}
               </div>
-            )}
-                ))}
-              </div>
-            )}
           </TabsContent>
 
           {/* Featured Tab */}
