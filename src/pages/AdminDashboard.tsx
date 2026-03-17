@@ -77,6 +77,7 @@ const AdminDashboard = () => {
   const [referralStats, setReferralStats] = useState({ total: 0, pending: 0, completed: 0, rewarded: 0 });
   const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
   const [hireStats, setHireStats] = useState({ total: 0, confirmed: 0, pending: 0 });
+  const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (role === "admin") {
