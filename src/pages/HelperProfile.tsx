@@ -135,6 +135,18 @@ const HelperProfilePage = () => {
         .eq("status", "confirmed");
       setHireCount(count ?? 0);
 
+      // Fetch verification document type if verified
+      if (profileData?.is_verified) {
+        const { data: verReq } = await supabase
+          .from("verification_requests")
+          .select("document_type")
+          .eq("user_id", userId)
+          .eq("status", "approved")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        setVerifiedDocType((verReq as any)?.[0]?.document_type ?? null);
+      }
+
       setLoading(false);
     };
 
