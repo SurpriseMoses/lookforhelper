@@ -92,10 +92,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
         video: { facingMode: "user", width: 640, height: 480 },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
+      pendingStreamRef.current = stream;
       setCameraActive(true);
     } catch {
       toast({
@@ -105,6 +102,16 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
       });
     }
   };
+
+  // Callback ref to attach stream when video element mounts
+  const videoRefCallback = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node && pendingStreamRef.current) {
+      node.srcObject = pendingStreamRef.current;
+      node.play().catch(() => {});
+      pendingStreamRef.current = null;
+    }
+  }, []);
 
   const captureSelfie = () => {
     if (!videoRef.current || !canvasRef.current) return;
