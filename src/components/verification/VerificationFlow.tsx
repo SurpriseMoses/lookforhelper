@@ -61,6 +61,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pendingStreamRef = useRef<MediaStream | null>(null);
 
   const isForeigner = documentType !== "sa_id" && documentType !== "";
   const totalSteps = isForeigner ? 5 : 4;
