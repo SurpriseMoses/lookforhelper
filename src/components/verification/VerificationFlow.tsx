@@ -61,6 +61,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pendingStreamRef = useRef<MediaStream | null>(null);
 
   const isForeigner = documentType !== "sa_id" && documentType !== "";
   const totalSteps = isForeigner ? 5 : 4;
@@ -91,10 +92,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
         video: { facingMode: "user", width: 640, height: 480 },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
+      pendingStreamRef.current = stream;
       setCameraActive(true);
     } catch {
       toast({
@@ -104,6 +102,16 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
       });
     }
   };
+
+  // Callback ref to attach stream when video element mounts
+  const videoRefCallback = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node && pendingStreamRef.current) {
+      node.srcObject = pendingStreamRef.current;
+      node.play().catch(() => {});
+      pendingStreamRef.current = null;
+    }
+  }, []);
 
   const captureSelfie = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -288,7 +296,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
             ) : cameraActive ? (
               <div className="space-y-3 text-center">
                 <div className="mx-auto w-64 h-48 overflow-hidden rounded-lg border bg-black">
-                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
+                  <video ref={videoRefCallback} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
                 </div>
                 <Button onClick={captureSelfie}>
                   <Camera className="h-4 w-4 mr-1" /> Capture Selfie
