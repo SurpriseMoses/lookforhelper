@@ -296,7 +296,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
             ) : cameraActive ? (
               <div className="space-y-3 text-center">
                 <div className="mx-auto w-64 h-48 overflow-hidden rounded-lg border bg-black">
-                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
+                  <video ref={videoRefCallback} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
                 </div>
                 <Button onClick={captureSelfie}>
                   <Camera className="h-4 w-4 mr-1" /> Capture Selfie
