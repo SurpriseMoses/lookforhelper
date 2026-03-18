@@ -373,11 +373,14 @@ const AdminDashboard = () => {
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<string>("");
   const [docPreviewPdfError, setDocPreviewPdfError] = useState<string | null>(null);
+  const [docPreviewPdfBytes, setDocPreviewPdfBytes] = useState<Uint8Array | null>(null);
   const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
     setDocPreviewPdfError(null);
+    setDocPreviewDataUrl(null);
+    setDocPreviewPdfBytes(null);
     const fileName = documentPath.split("/").pop() || "document";
     setDocPreviewName(fileName);
     try {
@@ -392,14 +395,14 @@ const AdminDashboard = () => {
           description: error?.message || "Could not download the document.",
           variant: "destructive",
         });
-        setDocPreviewLoading(false);
         return;
       }
 
       const mimeType = data.type || "application/octet-stream";
-      setDocPreviewType(mimeType);
-
       const blobUrl = URL.createObjectURL(data);
+      const arrayBuffer = await data.arrayBuffer();
+
+      setDocPreviewType(mimeType);
       setDocPreviewBlobUrl(blobUrl);
 
       if (mimeType.startsWith("image/")) {
@@ -408,9 +411,15 @@ const AdminDashboard = () => {
           setDocPreviewDataUrl(reader.result as string);
         };
         reader.readAsDataURL(data);
-      } else {
-        setDocPreviewDataUrl(null);
+        return;
       }
+
+      if (mimeType.includes("pdf")) {
+        setDocPreviewPdfBytes(new Uint8Array(arrayBuffer));
+        return;
+      }
+
+      setDocPreviewDataUrl(null);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -425,11 +434,11 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const renderPdfPreview = async () => {
-      if (!docPreviewBlobUrl || !docPreviewType.includes("pdf") || !pdfCanvasRef.current) return;
+      if (!docPreviewPdfBytes || !docPreviewType.includes("pdf") || !pdfCanvasRef.current) return;
 
       try {
         GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
-        const pdf = await getDocument(docPreviewBlobUrl).promise;
+        const pdf = await getDocument({ data: docPreviewPdfBytes }).promise;
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1.2 });
         const canvas = pdfCanvasRef.current;
@@ -442,6 +451,7 @@ const AdminDashboard = () => {
 
         canvas.width = viewport.width;
         canvas.height = viewport.height;
+        context.clearRect(0, 0, canvas.width, canvas.height);
         await page.render({
           canvas,
           canvasContext: context,
@@ -450,12 +460,12 @@ const AdminDashboard = () => {
         setDocPreviewPdfError(null);
       } catch (error: any) {
         console.error("PDF render error:", error);
-        setDocPreviewPdfError("Could not render this PDF preview.");
+        setDocPreviewPdfError("Could not render this PDF preview. Please use download.");
       }
     };
 
-    renderPdfPreview();
-  }, [docPreviewBlobUrl, docPreviewType]);
+    void renderPdfPreview();
+  }, [docPreviewPdfBytes, docPreviewType]);
 
   const handleCloseDocPreview = () => {
     if (docPreviewBlobUrl) {
@@ -466,6 +476,7 @@ const AdminDashboard = () => {
     setDocPreviewName("");
     setDocPreviewType("");
     setDocPreviewPdfError(null);
+    setDocPreviewPdfBytes(null);
   };
 
   const handleDownloadDoc = () => {
