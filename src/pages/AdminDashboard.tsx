@@ -382,6 +382,7 @@ const AdminDashboard = () => {
     setDocPreviewDataUrl(null);
     setDocPreviewPdfBytes(null);
     const fileName = documentPath.split("/").pop() || "document";
+    const normalizedName = fileName.toLowerCase();
     setDocPreviewName(fileName);
     try {
       const { data, error } = await supabase.storage
@@ -398,23 +399,48 @@ const AdminDashboard = () => {
         return;
       }
 
-      const mimeType = data.type || "application/octet-stream";
-      const blobUrl = URL.createObjectURL(data);
-      const arrayBuffer = await data.arrayBuffer();
+      const detectedType = (() => {
+        const blobType = (data.type || "").toLowerCase();
+        if (blobType.startsWith("image/") || blobType.includes("pdf")) {
+          return blobType;
+        }
+        if (normalizedName.endsWith(".pdf")) {
+          return "application/pdf";
+        }
+        if (/(\.jpg|\.jpeg)$/.test(normalizedName)) {
+          return "image/jpeg";
+        }
+        if (normalizedName.endsWith(".png")) {
+          return "image/png";
+        }
+        if (normalizedName.endsWith(".webp")) {
+          return "image/webp";
+        }
+        if (normalizedName.endsWith(".gif")) {
+          return "image/gif";
+        }
+        return blobType || "application/octet-stream";
+      })();
 
-      setDocPreviewType(mimeType);
+      const previewBlob = detectedType === data.type || !detectedType
+        ? data
+        : new Blob([data], { type: detectedType });
+      const blobUrl = URL.createObjectURL(previewBlob);
+      const arrayBuffer = await previewBlob.arrayBuffer();
+
+      setDocPreviewType(detectedType);
       setDocPreviewBlobUrl(blobUrl);
 
-      if (mimeType.startsWith("image/")) {
+      if (detectedType.startsWith("image/")) {
         const reader = new FileReader();
         reader.onloadend = () => {
           setDocPreviewDataUrl(reader.result as string);
         };
-        reader.readAsDataURL(data);
+        reader.readAsDataURL(previewBlob);
         return;
       }
 
-      if (mimeType.includes("pdf")) {
+      if (detectedType.includes("pdf")) {
         setDocPreviewPdfBytes(new Uint8Array(arrayBuffer));
         return;
       }
