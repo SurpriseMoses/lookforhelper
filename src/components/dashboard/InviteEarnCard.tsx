@@ -39,10 +39,12 @@ const InviteEarnCard = () => {
     load();
   }, [user]);
 
+  const referralLink = `${window.location.origin}/?ref=${referralCode}`;
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(referralCode);
+    navigator.clipboard.writeText(referralLink);
     setCopied(true);
-    toast({ title: "Copied!" });
+    toast({ title: "Referral link copied!" });
     setTimeout(() => setCopied(false), 2000);
   };
 
