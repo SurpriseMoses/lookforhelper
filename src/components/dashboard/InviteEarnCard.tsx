@@ -60,16 +60,17 @@ const InviteEarnCard = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="rounded-lg border bg-muted/50 p-4 space-y-3">
-          <p className="text-sm font-medium text-foreground">Your referral code</p>
+          <p className="text-sm font-medium text-foreground">Your referral link</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 rounded-md border bg-background px-3 py-2 text-sm font-mono font-bold tracking-widest text-foreground">
-              {referralCode}
+            <code className="flex-1 rounded-md border bg-background px-3 py-2 text-xs font-mono text-foreground truncate">
+              {referralLink}
             </code>
             <Button size="sm" variant="outline" onClick={handleCopy} className="gap-1.5 shrink-0">
               {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {copied ? "Copied" : "Copy"}
             </Button>
           </div>
+          <p className="text-xs text-muted-foreground">Code: <span className="font-mono font-bold tracking-widest">{referralCode}</span></p>
         </div>
 
         <div className="rounded-lg border p-4 space-y-2">
