@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+
 
 interface VerificationReq {
   id: string;
@@ -367,85 +367,43 @@ const AdminDashboard = () => {
     }
   };
 
-  const [docPreviewDataUrl, setDocPreviewDataUrl] = useState<string | null>(null);
-  const [docPreviewBlobUrl, setDocPreviewBlobUrl] = useState<string | null>(null);
+  const [docPreviewSignedUrl, setDocPreviewSignedUrl] = useState<string | null>(null);
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
-  const [docPreviewType, setDocPreviewType] = useState<string>("");
-  const [docPreviewPdfError, setDocPreviewPdfError] = useState<string | null>(null);
-  const [docPreviewPdfBytes, setDocPreviewPdfBytes] = useState<Uint8Array | null>(null);
-  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [docPreviewType, setDocPreviewType] = useState<"image" | "pdf" | "unknown">("unknown");
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
-    setDocPreviewPdfError(null);
-    setDocPreviewDataUrl(null);
-    setDocPreviewPdfBytes(null);
+    setDocPreviewSignedUrl(null);
     const fileName = documentPath.split("/").pop() || "document";
     const normalizedName = fileName.toLowerCase();
     setDocPreviewName(fileName);
+
+    if (normalizedName.endsWith(".pdf")) {
+      setDocPreviewType("pdf");
+    } else if (/(\.jpg|\.jpeg|\.png|\.webp|\.gif)$/.test(normalizedName)) {
+      setDocPreviewType("image");
+    } else {
+      setDocPreviewType("image");
+    }
+
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
-        .download(documentPath);
+        .createSignedUrl(documentPath, 300);
 
-      if (error || !data) {
-        console.error("Download error:", error);
+      if (error || !data?.signedUrl) {
+        console.error("Signed URL error:", error);
         toast({
           title: "Error viewing document",
-          description: error?.message || "Could not download the document.",
+          description: error?.message || "Could not generate preview URL.",
           variant: "destructive",
         });
+        setDocPreviewLoading(false);
         return;
       }
 
-      const detectedType = (() => {
-        const blobType = (data.type || "").toLowerCase();
-        if (blobType.startsWith("image/") || blobType.includes("pdf")) {
-          return blobType;
-        }
-        if (normalizedName.endsWith(".pdf")) {
-          return "application/pdf";
-        }
-        if (/(\.jpg|\.jpeg)$/.test(normalizedName)) {
-          return "image/jpeg";
-        }
-        if (normalizedName.endsWith(".png")) {
-          return "image/png";
-        }
-        if (normalizedName.endsWith(".webp")) {
-          return "image/webp";
-        }
-        if (normalizedName.endsWith(".gif")) {
-          return "image/gif";
-        }
-        return blobType || "application/octet-stream";
-      })();
-
-      const previewBlob = detectedType === data.type || !detectedType
-        ? data
-        : new Blob([data], { type: detectedType });
-      const blobUrl = URL.createObjectURL(previewBlob);
-      const arrayBuffer = await previewBlob.arrayBuffer();
-
-      setDocPreviewType(detectedType);
-      setDocPreviewBlobUrl(blobUrl);
-
-      if (detectedType.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setDocPreviewDataUrl(reader.result as string);
-        };
-        reader.readAsDataURL(previewBlob);
-        return;
-      }
-
-      if (detectedType.includes("pdf")) {
-        setDocPreviewPdfBytes(new Uint8Array(arrayBuffer));
-        return;
-      }
-
-      setDocPreviewDataUrl(null);
+      setDocPreviewSignedUrl(data.signedUrl);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -458,61 +416,15 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    const renderPdfPreview = async () => {
-      if (!docPreviewPdfBytes || !docPreviewType.includes("pdf") || !pdfCanvasRef.current) return;
-
-      try {
-        GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
-        const pdf = await getDocument({ data: docPreviewPdfBytes }).promise;
-        const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.2 });
-        const canvas = pdfCanvasRef.current;
-        const context = canvas.getContext("2d");
-
-        if (!context) {
-          setDocPreviewPdfError("Canvas rendering is not available in this browser.");
-          return;
-        }
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        await page.render({
-          canvas,
-          canvasContext: context,
-          viewport,
-        }).promise;
-        setDocPreviewPdfError(null);
-      } catch (error: any) {
-        console.error("PDF render error:", error);
-        setDocPreviewPdfError("Could not render this PDF preview. Please use download.");
-      }
-    };
-
-    void renderPdfPreview();
-  }, [docPreviewPdfBytes, docPreviewType]);
-
   const handleCloseDocPreview = () => {
-    if (docPreviewBlobUrl) {
-      URL.revokeObjectURL(docPreviewBlobUrl);
-    }
-    setDocPreviewDataUrl(null);
-    setDocPreviewBlobUrl(null);
+    setDocPreviewSignedUrl(null);
     setDocPreviewName("");
-    setDocPreviewType("");
-    setDocPreviewPdfError(null);
-    setDocPreviewPdfBytes(null);
+    setDocPreviewType("unknown");
   };
 
   const handleDownloadDoc = () => {
-    if (!docPreviewBlobUrl) return;
-    const link = document.createElement("a");
-    link.href = docPreviewBlobUrl;
-    link.download = docPreviewName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!docPreviewSignedUrl) return;
+    window.open(docPreviewSignedUrl, "_blank");
   };
 
   if (authLoading) {
@@ -1022,7 +934,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Document Preview Dialog */}
-      <Dialog open={!!docPreviewBlobUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+      <Dialog open={!!docPreviewSignedUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
         <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center justify-between pr-8">
@@ -1036,20 +948,18 @@ const AdminDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
-            {docPreviewType.startsWith("image/") && docPreviewDataUrl ? (
+            {docPreviewType === "image" && docPreviewSignedUrl ? (
               <img
-                src={docPreviewDataUrl}
+                src={docPreviewSignedUrl}
                 alt="Document Preview"
                 className="w-full h-full object-contain rounded-md border"
               />
-            ) : docPreviewType.includes("pdf") ? (
-              <div className="flex h-full items-center justify-center overflow-auto rounded-md border bg-muted/30 p-4">
-                {docPreviewPdfError ? (
-                  <p className="text-sm text-muted-foreground">{docPreviewPdfError}</p>
-                ) : (
-                  <canvas ref={pdfCanvasRef} className="max-w-full h-auto rounded-md bg-background shadow-sm" />
-                )}
-              </div>
+            ) : docPreviewType === "pdf" && docPreviewSignedUrl ? (
+              <iframe
+                src={docPreviewSignedUrl}
+                title="PDF Preview"
+                className="w-full h-full rounded-md border"
+              />
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
