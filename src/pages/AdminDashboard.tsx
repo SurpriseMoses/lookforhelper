@@ -352,16 +352,12 @@ const AdminDashboard = () => {
     try {
       const { data, error } = await supabase.storage
         .from("verification-selfies")
-        .download(selfiePath);
-      if (error || !data) {
+        .createSignedUrl(selfiePath, 300);
+      if (error || !data?.signedUrl) {
         toast({ title: "Error", description: error?.message || "Could not load selfie", variant: "destructive" });
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelfiePreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(data);
+      setSelfiePreviewUrl(data.signedUrl);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
