@@ -934,7 +934,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Document Preview Dialog */}
-      <Dialog open={!!docPreviewBlobUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+      <Dialog open={!!docPreviewSignedUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
         <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center justify-between pr-8">
@@ -948,20 +948,18 @@ const AdminDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
-            {docPreviewType.startsWith("image/") && docPreviewDataUrl ? (
+            {docPreviewType === "image" && docPreviewSignedUrl ? (
               <img
-                src={docPreviewDataUrl}
+                src={docPreviewSignedUrl}
                 alt="Document Preview"
                 className="w-full h-full object-contain rounded-md border"
               />
-            ) : docPreviewType.includes("pdf") ? (
-              <div className="flex h-full items-center justify-center overflow-auto rounded-md border bg-muted/30 p-4">
-                {docPreviewPdfError ? (
-                  <p className="text-sm text-muted-foreground">{docPreviewPdfError}</p>
-                ) : (
-                  <canvas ref={pdfCanvasRef} className="max-w-full h-auto rounded-md bg-background shadow-sm" />
-                )}
-              </div>
+            ) : docPreviewType === "pdf" && docPreviewSignedUrl ? (
+              <iframe
+                src={docPreviewSignedUrl}
+                title="PDF Preview"
+                className="w-full h-full rounded-md border"
+              />
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
