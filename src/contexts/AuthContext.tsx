@@ -34,27 +34,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchRole = async (userId: string, fallbackRole?: AppRole | null, retries = 1): Promise<void> => {
     const requestId = ++roleRequestIdRef.current;
 
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    const [adminResult, helperResult, seekerResult] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: userId, _role: "helper" }),
+      supabase.rpc("has_role", { _user_id: userId, _role: "seeker" }),
+    ]);
 
     if (requestId !== roleRequestIdRef.current) return;
 
-    if (error) {
+    const rpcError = adminResult.error ?? helperResult.error ?? seekerResult.error;
+
+    if (rpcError) {
       if (retries > 0) {
         setTimeout(() => {
           void fetchRole(userId, fallbackRole, retries - 1);
         }, 200);
         return;
       }
-      console.error("Failed to fetch user roles:", error.message);
-      setRole(fallbackRole ?? null);
+
+      console.error("Failed to fetch user roles:", rpcError.message);
+      setRole((currentRole) => currentRole ?? fallbackRole ?? null);
       return;
     }
 
-    const roles = (data ?? []).map((r) => r.role as string);
-    setRole(resolveRole(roles, fallbackRole));
+    const roles = [
+      adminResult.data ? "admin" : null,
+      helperResult.data ? "helper" : null,
+      seekerResult.data ? "seeker" : null,
+    ].filter(Boolean) as string[];
+
+    setRole((currentRole) => resolveRole(roles, currentRole ?? fallbackRole));
   };
 
   const processReferralCode = async (userId: string) => {
