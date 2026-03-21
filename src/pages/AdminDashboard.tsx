@@ -481,7 +481,7 @@ const AdminDashboard = () => {
         canvas.style.height = `${viewport.height}px`;
 
         context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        await page.render({ canvasContext: context, viewport }).promise;
+        await page.render({ canvas, canvasContext: context, viewport }).promise;
       } catch (error: any) {
         if (!cancelled) {
           console.error("PDF preview render error:", error);
