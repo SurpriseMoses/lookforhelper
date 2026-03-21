@@ -123,20 +123,35 @@ const AdminDashboard = () => {
         setAdminCheckLoading(true);
       }
 
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
+      const { data: hasAdminRole, error } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
 
       if (cancelled) return;
 
       if (error) {
         console.error("Admin role fallback check failed:", error.message);
+
+        const { data: fallbackRoleRow, error: fallbackError } = await supabase
+          .from("user_roles")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (fallbackError) {
+          console.error("Admin role table fallback check failed:", fallbackError.message);
+        }
+
+        setHasAdminAccess(Boolean(fallbackRoleRow));
+        setAdminCheckLoading(false);
+        return;
       }
 
-      setHasAdminAccess(Boolean(data));
+      setHasAdminAccess(Boolean(hasAdminRole));
       setAdminCheckLoading(false);
     };
 
