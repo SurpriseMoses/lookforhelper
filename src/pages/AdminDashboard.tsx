@@ -415,14 +415,26 @@ const AdminDashboard = () => {
     }
   };
 
-  const [docPreviewSignedUrl, setDocPreviewSignedUrl] = useState<string | null>(null);
+  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<"image" | "pdf" | "unknown">("unknown");
 
+  useEffect(() => {
+    return () => {
+      if (docPreviewUrl) {
+        URL.revokeObjectURL(docPreviewUrl);
+      }
+    };
+  }, [docPreviewUrl]);
+
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
-    setDocPreviewSignedUrl(null);
+    if (docPreviewUrl) {
+      URL.revokeObjectURL(docPreviewUrl);
+      setDocPreviewUrl(null);
+    }
+
     const fileName = documentPath.split("/").pop() || "document";
     const normalizedName = fileName.toLowerCase();
     setDocPreviewName(fileName);
@@ -438,20 +450,20 @@ const AdminDashboard = () => {
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
-        .createSignedUrl(documentPath, 300);
+        .download(documentPath);
 
-      if (error || !data?.signedUrl) {
-        console.error("Signed URL error:", error);
+      if (error || !data) {
+        console.error("Document download error:", error);
         toast({
           title: "Error viewing document",
-          description: error?.message || "Could not generate preview URL.",
+          description: error?.message || "Could not load the document.",
           variant: "destructive",
         });
         setDocPreviewLoading(false);
         return;
       }
 
-      setDocPreviewSignedUrl(data.signedUrl);
+      setDocPreviewUrl(URL.createObjectURL(data));
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -465,14 +477,22 @@ const AdminDashboard = () => {
   };
 
   const handleCloseDocPreview = () => {
-    setDocPreviewSignedUrl(null);
+    if (docPreviewUrl) {
+      URL.revokeObjectURL(docPreviewUrl);
+    }
+    setDocPreviewUrl(null);
     setDocPreviewName("");
     setDocPreviewType("unknown");
   };
 
   const handleDownloadDoc = () => {
-    if (!docPreviewSignedUrl) return;
-    window.open(docPreviewSignedUrl, "_blank");
+    if (!docPreviewUrl) return;
+    const link = document.createElement("a");
+    link.href = docPreviewUrl;
+    link.download = docPreviewName || "document";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (authLoading || adminCheckLoading) {
@@ -982,7 +1002,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Document Preview Dialog */}
-      <Dialog open={!!docPreviewSignedUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
+      <Dialog open={!!docPreviewUrl} onOpenChange={(open) => { if (!open) handleCloseDocPreview(); }}>
         <DialogContent className="max-w-4xl w-[95vw] h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center justify-between pr-8">
@@ -996,15 +1016,15 @@ const AdminDashboard = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
-            {docPreviewType === "image" && docPreviewSignedUrl ? (
+            {docPreviewType === "image" && docPreviewUrl ? (
               <img
-                src={docPreviewSignedUrl}
+                src={docPreviewUrl}
                 alt="Document Preview"
                 className="w-full h-full object-contain rounded-md border"
               />
-            ) : docPreviewType === "pdf" && docPreviewSignedUrl ? (
+            ) : docPreviewType === "pdf" && docPreviewUrl ? (
               <iframe
-                src={docPreviewSignedUrl}
+                src={docPreviewUrl}
                 title="PDF Preview"
                 className="w-full h-full rounded-md border"
               />
