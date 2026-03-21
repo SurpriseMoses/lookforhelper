@@ -934,7 +934,7 @@ const AdminDashboard = () => {
                           <p className="text-sm text-muted-foreground">Rejection reason: {vr.rejection_reason}</p>
                         )}
 
-                        {vr.status === "pending" && (
+                        {(vr.status === "pending" || vr.status === "approved") && (
                           <div className="border-t pt-3 space-y-3">
                             <Input
                               placeholder="Rejection reason (required to reject)..."
