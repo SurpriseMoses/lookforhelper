@@ -54,6 +54,18 @@ interface UserProfile {
   role: string;
 }
 
+const getDocumentMimeType = (fileName: string) => {
+  const normalizedName = fileName.toLowerCase();
+
+  if (normalizedName.endsWith(".pdf")) return "application/pdf";
+  if (normalizedName.endsWith(".png")) return "image/png";
+  if (normalizedName.endsWith(".webp")) return "image/webp";
+  if (normalizedName.endsWith(".gif")) return "image/gif";
+  if (normalizedName.endsWith(".jpg") || normalizedName.endsWith(".jpeg")) return "image/jpeg";
+
+  return "application/octet-stream";
+};
+
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",
   reviewing: "bg-blue-100 text-blue-800 border-blue-200",
@@ -463,7 +475,10 @@ const AdminDashboard = () => {
         return;
       }
 
-      setDocPreviewUrl(URL.createObjectURL(data));
+      const mimeType = getDocumentMimeType(fileName);
+      const typedBlob = data.type === mimeType ? data : new Blob([data], { type: mimeType });
+
+      setDocPreviewUrl(URL.createObjectURL(typedBlob));
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -1023,11 +1038,13 @@ const AdminDashboard = () => {
                 className="w-full h-full object-contain rounded-md border"
               />
             ) : docPreviewType === "pdf" && docPreviewUrl ? (
-              <iframe
-                src={docPreviewUrl}
-                title="PDF Preview"
-                className="w-full h-full rounded-md border"
-              />
+              <object
+                data={docPreviewUrl}
+                type="application/pdf"
+                className="h-full w-full rounded-md border"
+              >
+                <embed src={docPreviewUrl} type="application/pdf" className="h-full w-full rounded-md border" />
+              </object>
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
