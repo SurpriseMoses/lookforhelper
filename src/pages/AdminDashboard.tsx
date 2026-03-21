@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+
+GlobalWorkerOptions.workerSrc = pdfWorker;
 
 
 interface VerificationReq {
@@ -431,6 +435,9 @@ const AdminDashboard = () => {
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<"image" | "pdf" | "unknown">("unknown");
+  const [docPreviewError, setDocPreviewError] = useState<string | null>(null);
+  const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
+  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     return () => {
@@ -440,8 +447,64 @@ const AdminDashboard = () => {
     };
   }, [docPreviewUrl]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const renderPdfPreview = async () => {
+      if (docPreviewType !== "pdf" || !docPreviewUrl || !pdfCanvasRef.current) return;
+
+      setPdfPreviewLoading(true);
+      setDocPreviewError(null);
+
+      try {
+        const pdf = await getDocument(docPreviewUrl).promise;
+        const page = await pdf.getPage(1);
+
+        if (cancelled || !pdfCanvasRef.current) return;
+
+        const canvas = pdfCanvasRef.current;
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          throw new Error("Could not initialize preview canvas.");
+        }
+
+        const containerWidth = canvas.parentElement?.clientWidth ?? 900;
+        const initialViewport = page.getViewport({ scale: 1 });
+        const scale = Math.max(containerWidth / initialViewport.width, 1);
+        const viewport = page.getViewport({ scale });
+        const pixelRatio = window.devicePixelRatio || 1;
+
+        canvas.width = viewport.width * pixelRatio;
+        canvas.height = viewport.height * pixelRatio;
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        await page.render({ canvasContext: context, viewport }).promise;
+      } catch (error: any) {
+        if (!cancelled) {
+          console.error("PDF preview render error:", error);
+          setDocPreviewError(error?.message || "Could not render PDF preview.");
+        }
+      } finally {
+        if (!cancelled) {
+          setPdfPreviewLoading(false);
+        }
+      }
+    };
+
+    void renderPdfPreview();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [docPreviewType, docPreviewUrl]);
+
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
+    setDocPreviewError(null);
+    setPdfPreviewLoading(false);
     if (docPreviewUrl) {
       URL.revokeObjectURL(docPreviewUrl);
       setDocPreviewUrl(null);
@@ -498,6 +561,8 @@ const AdminDashboard = () => {
     setDocPreviewUrl(null);
     setDocPreviewName("");
     setDocPreviewType("unknown");
+    setDocPreviewError(null);
+    setPdfPreviewLoading(false);
   };
 
   const handleDownloadDoc = () => {
@@ -1038,13 +1103,18 @@ const AdminDashboard = () => {
                 className="w-full h-full object-contain rounded-md border"
               />
             ) : docPreviewType === "pdf" && docPreviewUrl ? (
-              <object
-                data={docPreviewUrl}
-                type="application/pdf"
-                className="h-full w-full rounded-md border"
-              >
-                <embed src={docPreviewUrl} type="application/pdf" className="h-full w-full rounded-md border" />
-              </object>
+              <div className="flex h-full flex-col items-center overflow-auto rounded-md border bg-muted/20 p-4">
+                {pdfPreviewLoading && (
+                  <div className="mb-4 text-sm text-muted-foreground">Rendering PDF preview…</div>
+                )}
+                {docPreviewError ? (
+                  <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+                    Preview unavailable. Please download the document.
+                  </div>
+                ) : (
+                  <canvas ref={pdfCanvasRef} className="max-w-full rounded-md shadow-sm" />
+                )}
+              </div>
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
