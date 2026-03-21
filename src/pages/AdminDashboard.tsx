@@ -414,6 +414,9 @@ const AdminDashboard = () => {
       return;
     }
 
+    // Find the request to get user_id
+    const req = verificationRequests.find(v => v.id === reqId);
+
     const { error } = await supabase
       .from("verification_requests")
       .update({ status: "rejected", rejection_reason: rejectReason, reviewed_by: user?.id } as any)
@@ -422,13 +425,19 @@ const AdminDashboard = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Verification rejected" });
+      // The DB trigger notify_verification_result will create a notification automatically
+      toast({ title: "Verification rejected — helper has been notified" });
       loadVerificationRequests();
     }
   };
 
-  const handleRequestNewUpload = async (reqId: string) => {
-    await handleRejectVerification(reqId, "Please upload clearer or valid documents.");
+  const handleRequestClearerPhotos = async (reqId: string, issue: "selfie" | "document" | "both") => {
+    const reasons: Record<string, string> = {
+      selfie: "Your selfie photo is not clear enough for identity matching. Please retake your selfie with good lighting and a clear view of your face, then resubmit.",
+      document: "Your uploaded document is not clear enough to verify. Please upload a clearer, higher-quality photo or scan of your document, then resubmit.",
+      both: "Both your selfie and uploaded document are not clear enough. Please retake your selfie with good lighting and upload a clearer photo/scan of your document, then resubmit.",
+    };
+    await handleRejectVerification(reqId, reasons[issue]);
   };
 
   const handleViewSelfie = async (selfiePath: string) => {
@@ -939,8 +948,14 @@ const AdminDashboard = () => {
                               <Button size="sm" variant="destructive" onClick={() => handleRejectVerification(vr.id)} className="gap-1">
                                 <XCircle className="h-4 w-4" /> Reject
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => handleRequestNewUpload(vr.id)} className="gap-1">
-                                <RefreshCw className="h-4 w-4" /> Request New Upload
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "selfie")} className="gap-1">
+                                <Camera className="h-4 w-4" /> Unclear Selfie
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "document")} className="gap-1">
+                                <FileText className="h-4 w-4" /> Unclear Document
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "both")} className="gap-1">
+                                <RefreshCw className="h-4 w-4" /> Both Unclear
                               </Button>
                             </div>
                           </div>
