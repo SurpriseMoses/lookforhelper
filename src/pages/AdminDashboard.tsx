@@ -948,8 +948,14 @@ const AdminDashboard = () => {
                               <Button size="sm" variant="destructive" onClick={() => handleRejectVerification(vr.id)} className="gap-1">
                                 <XCircle className="h-4 w-4" /> Reject
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => handleRequestNewUpload(vr.id)} className="gap-1">
-                                <RefreshCw className="h-4 w-4" /> Request New Upload
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "selfie")} className="gap-1">
+                                <Camera className="h-4 w-4" /> Unclear Selfie
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "document")} className="gap-1">
+                                <FileText className="h-4 w-4" /> Unclear Document
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleRequestClearerPhotos(vr.id, "both")} className="gap-1">
+                                <RefreshCw className="h-4 w-4" /> Both Unclear
                               </Button>
                             </div>
                           </div>
