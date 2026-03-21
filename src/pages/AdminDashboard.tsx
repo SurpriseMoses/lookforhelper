@@ -67,6 +67,8 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [suspendReason, setSuspendReason] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,7 +82,57 @@ const AdminDashboard = () => {
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (role === "admin") {
+    let cancelled = false;
+
+    const verifyAdminAccess = async () => {
+      if (authLoading) return;
+
+      if (!user) {
+        if (!cancelled) {
+          setHasAdminAccess(false);
+          setAdminCheckLoading(false);
+        }
+        return;
+      }
+
+      if (role === "admin") {
+        if (!cancelled) {
+          setHasAdminAccess(true);
+          setAdminCheckLoading(false);
+        }
+        return;
+      }
+
+      if (!cancelled) {
+        setAdminCheckLoading(true);
+      }
+
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error("Admin role fallback check failed:", error.message);
+      }
+
+      setHasAdminAccess(Boolean(data));
+      setAdminCheckLoading(false);
+    };
+
+    void verifyAdminAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, role, user]);
+
+  useEffect(() => {
+    if (hasAdminAccess) {
       loadReports();
       loadUsers();
       loadVerificationRequests();
@@ -90,7 +142,7 @@ const AdminDashboard = () => {
       loadBgCheckStats();
       loadHireStats();
     }
-  }, [role]);
+  }, [hasAdminAccess]);
 
   const loadFeaturedStats = async () => {
     const { data: payments } = await supabase
@@ -423,7 +475,7 @@ const AdminDashboard = () => {
     window.open(docPreviewSignedUrl, "_blank");
   };
 
-  if (authLoading) {
+  if (authLoading || adminCheckLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -432,7 +484,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!user || role !== "admin") {
+  if (!user || !hasAdminAccess) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
