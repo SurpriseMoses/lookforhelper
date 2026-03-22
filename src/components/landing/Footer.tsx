@@ -57,7 +57,7 @@ const Footer = () => {
               <span>Facebook — <em>Coming Soon</em></span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Look For Helper. All rights reserved.
+              © 2026 Look For Helper (Pty) Ltd. Registration No: 2026/224124/07. All rights reserved.
             </p>
           </div>
 
