@@ -59,7 +59,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: 4900, // R49 in kobo
+          amount: 300, // R3 in cents (testing)
           currency: "ZAR",
           metadata: {
             user_id: user.id,
@@ -95,7 +95,7 @@ serve(async (req) => {
         .from("verification_payments")
         .insert({
           user_id: user.id,
-          amount: 49.00,
+          amount: 3.00,
           status: "pending",
           payment_reference: paystackData.data.reference,
         });
