@@ -52,7 +52,7 @@ export const SeekerSubscriptionProvider = ({ children }: { children: React.React
 
   // Verify pending Paystack payment on return (runs globally on any page)
   useEffect(() => {
-    if (!user || role !== "seeker") return;
+    if (!user || (role !== "seeker" && role !== "admin")) return;
     const ref = localStorage.getItem("seeker_sub_ref");
     if (!ref) return;
 
