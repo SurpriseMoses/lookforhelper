@@ -270,7 +270,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Seeker-specific */}
-        {role === "seeker" && (
+        {(role === "seeker" || role === "admin") && (
           <>
             <SeekerSubscriptionCard />
             <SavedSearchesCard />

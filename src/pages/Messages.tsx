@@ -280,7 +280,7 @@ const Messages = () => {
                     {activeConversation?.other_name}
                   </h2>
                   <div className="ml-auto flex gap-2">
-                    {role === "seeker" && activeHelperUserId && (
+                    {(role === "seeker" || role === "admin") && activeHelperUserId && (
                       hasActiveSubscription ? (
                         <Button
                           variant="outline"
