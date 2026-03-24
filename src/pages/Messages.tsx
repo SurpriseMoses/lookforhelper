@@ -157,7 +157,7 @@ const Messages = () => {
   const handleSend = async () => {
     if (!newMessage.trim() || !activeConvo || !user || sending) return;
     // Gate seekers without subscription
-    if (role === "seeker" && !hasActiveSubscription) {
+    if ((role === "seeker" || role === "admin") && !hasActiveSubscription) {
       setShowPaywall(true);
       return;
     }
