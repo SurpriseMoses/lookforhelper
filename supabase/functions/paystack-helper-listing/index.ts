@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PLAN_AMOUNT = 2500; // R25 in cents
+const PLAN_AMOUNT = 100; // R1 in cents (testing)
 const PLAN_DAYS = 30;
 
 serve(async (req) => {
