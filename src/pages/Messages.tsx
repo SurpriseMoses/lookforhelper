@@ -219,7 +219,7 @@ const Messages = () => {
                 <div className="p-6 text-center text-muted-foreground text-sm">
                   <MessageSquare className="mx-auto h-8 w-8 mb-2 opacity-30" />
                   No conversations yet.
-                  {role === "seeker" && (
+                  {(role === "seeker" || role === "admin") && (
                     <p className="mt-1">
                       <Link to="/browse" className="text-primary hover:underline">
                         Browse helpers
