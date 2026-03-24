@@ -27,7 +27,7 @@ export const SeekerSubscriptionProvider = ({ children }: { children: React.React
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!user || role !== "seeker") {
+    if (!user || (role !== "seeker" && role !== "admin")) {
       setHasActiveSubscription(false);
       setLoading(false);
       return;
