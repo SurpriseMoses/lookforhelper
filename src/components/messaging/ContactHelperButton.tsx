@@ -27,7 +27,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
       navigate("/auth");
       return;
     }
-    if (role !== "seeker") {
+    if (role !== "seeker" && role !== "admin") {
       toast({ title: "Only seekers can message helpers", variant: "destructive" });
       return;
     }
@@ -74,8 +74,8 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
     setLoading(false);
   };
 
-  const isLocked = role === "seeker" && !hasActiveSubscription;
-  const isSeeker = role === "seeker";
+  const isSeeker = role === "seeker" || role === "admin";
+  const isLocked = isSeeker && !hasActiveSubscription;
 
   return (
     <>
