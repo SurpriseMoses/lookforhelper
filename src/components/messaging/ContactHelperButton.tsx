@@ -74,8 +74,8 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
     setLoading(false);
   };
 
-  const isLocked = role === "seeker" && !hasActiveSubscription;
-  const isSeeker = role === "seeker";
+  const isSeeker = role === "seeker" || role === "admin";
+  const isLocked = isSeeker && !hasActiveSubscription;
 
   return (
     <>
