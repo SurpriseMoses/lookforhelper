@@ -187,7 +187,7 @@ const Interviews = () => {
           <div className="py-20 text-center text-muted-foreground">
             <Calendar className="mx-auto h-10 w-10 mb-3 opacity-30" />
             <p>No interviews yet.</p>
-            {role === "seeker" && (
+            {(role === "seeker" || role === "admin") && (
               <p className="mt-1 text-sm">
                 Start a conversation with a helper and book an interview from the chat.
               </p>

@@ -157,7 +157,7 @@ const Messages = () => {
   const handleSend = async () => {
     if (!newMessage.trim() || !activeConvo || !user || sending) return;
     // Gate seekers without subscription
-    if (role === "seeker" && !hasActiveSubscription) {
+    if ((role === "seeker" || role === "admin") && !hasActiveSubscription) {
       setShowPaywall(true);
       return;
     }
@@ -219,7 +219,7 @@ const Messages = () => {
                 <div className="p-6 text-center text-muted-foreground text-sm">
                   <MessageSquare className="mx-auto h-8 w-8 mb-2 opacity-30" />
                   No conversations yet.
-                  {role === "seeker" && (
+                  {(role === "seeker" || role === "admin") && (
                     <p className="mt-1">
                       <Link to="/browse" className="text-primary hover:underline">
                         Browse helpers
@@ -280,7 +280,7 @@ const Messages = () => {
                     {activeConversation?.other_name}
                   </h2>
                   <div className="ml-auto flex gap-2">
-                    {role === "seeker" && activeHelperUserId && (
+                    {(role === "seeker" || role === "admin") && activeHelperUserId && (
                       hasActiveSubscription ? (
                         <Button
                           variant="outline"
