@@ -140,7 +140,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "7 Days — R49"}
+                {paying ? "Processing..." : "7 Days — R2"}
               </Button>
               <Button
                 onClick={() => handleBoost("21_days")}
