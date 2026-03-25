@@ -376,6 +376,22 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleMakeAdmin = async (userId: string) => {
+    setMakingAdmin(true);
+    const { error } = await supabase
+      .from("user_roles")
+      .insert({ user_id: userId, role: "admin" as any });
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "User is now an admin" });
+      loadUsers();
+    }
+    setMakingAdmin(false);
+    setMakeAdminUserId(null);
+  };
+
   const handleToggleVerify = async (userId: string, currentlyVerified: boolean) => {
     const update = currentlyVerified
       ? { is_verified: false, verified_at: null }
