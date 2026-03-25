@@ -40,54 +40,33 @@ const FeaturedHelpers = () => {
 
         const boostedUserIds = new Set((boostedData || []).map((h) => h.user_id));
 
-        // Fetch verified helpers (not already boosted)
-        const { data: verifiedProfiles } = await supabase
-          .from("profiles")
-          .select("user_id")
-          .eq("is_verified", true);
-
-        const verifiedUserIds = new Set((verifiedProfiles || []).map((p) => p.user_id));
-        const verifiedOnlyIds = [...verifiedUserIds].filter((id) => !boostedUserIds.has(id));
-
-        let verifiedHelpers: typeof boostedData = [];
-        if (verifiedOnlyIds.length > 0) {
-          const { data } = await supabase
-            .from("helper_details")
-            .select("user_id, skills, years_experience, city, average_rating, is_featured, featured_until, availability_status")
-            .eq("is_published", true)
-            .in("user_id", verifiedOnlyIds)
-            .order("average_rating", { ascending: false })
-            .limit(10);
-          verifiedHelpers = data || [];
-        }
-
-        // Fetch listing-active helpers (active subscription, not already boosted or verified-listed)
+        // Fetch paid listing subscribers (featured_active = true, not already boosted)
         const { data: listingData } = await supabase
           .from("helper_subscriptions")
-          .select("user_id, featured_active, featured_expires_at")
+          .select("user_id, featured_active, featured_expires_at, status")
           .eq("featured_active", true);
 
         const activeListingUserIds = (listingData || [])
-          .filter((s) => s.featured_expires_at && new Date(s.featured_expires_at) > new Date())
+          .filter((s) => {
+            const hasPaidListing = s.status === "active" && s.featured_expires_at && new Date(s.featured_expires_at) > new Date();
+            return hasPaidListing && !boostedUserIds.has(s.user_id);
+          })
           .map((s) => s.user_id);
 
-        const alreadyIncluded = new Set([...boostedUserIds, ...verifiedOnlyIds.filter((id) => (verifiedHelpers || []).some((h) => h.user_id === id))]);
-        const listingOnlyIds = activeListingUserIds.filter((id) => !alreadyIncluded.has(id));
-
         let listingHelpers: typeof boostedData = [];
-        if (listingOnlyIds.length > 0) {
+        if (activeListingUserIds.length > 0) {
           const { data } = await supabase
             .from("helper_details")
             .select("user_id, skills, years_experience, city, average_rating, is_featured, featured_until, availability_status")
             .eq("is_published", true)
-            .in("user_id", listingOnlyIds)
+            .in("user_id", activeListingUserIds)
             .order("average_rating", { ascending: false })
             .limit(10);
           listingHelpers = data || [];
         }
 
-        // Combine: boosted first, then verified, then listing subscribers
-        const allHelpers = [...(boostedData || []), ...verifiedHelpers, ...listingHelpers].slice(0, 10);
+        // Combine: boosted first, then paid listing subscribers
+        const allHelpers = [...(boostedData || []), ...(listingHelpers || [])].slice(0, 10);
 
         if (allHelpers.length === 0) {
           setLoading(false);
