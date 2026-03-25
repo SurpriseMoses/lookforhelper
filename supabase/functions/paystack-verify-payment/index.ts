@@ -95,7 +95,7 @@ serve(async (req) => {
         .from("verification_payments")
         .insert({
           user_id: user.id,
-          amount: 3.00,
+          amount: 49.00,
           status: "pending",
           payment_reference: paystackData.data.reference,
         });
