@@ -97,6 +97,8 @@ const AdminDashboard = () => {
   const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
   const [hireStats, setHireStats] = useState({ total: 0, confirmed: 0, pending: 0 });
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
+  const [makeAdminUserId, setMakeAdminUserId] = useState<string | null>(null);
+  const [makingAdmin, setMakingAdmin] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
