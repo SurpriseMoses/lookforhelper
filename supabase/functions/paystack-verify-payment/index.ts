@@ -59,7 +59,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: 300, // R3 in cents (testing)
+          amount: 4900, // R49 in cents
           currency: "ZAR",
           metadata: {
             user_id: user.id,
