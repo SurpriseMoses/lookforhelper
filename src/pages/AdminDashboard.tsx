@@ -525,14 +525,9 @@ const AdminDashboard = () => {
   };
 
   const handleCloseDocPreview = () => {
-    if (docPreviewUrl) {
-      URL.revokeObjectURL(docPreviewUrl);
-    }
     setDocPreviewUrl(null);
     setDocPreviewName("");
     setDocPreviewType("unknown");
-    setDocPreviewError(null);
-    setPdfPreviewLoading(false);
   };
 
   const handleDownloadDoc = () => {
