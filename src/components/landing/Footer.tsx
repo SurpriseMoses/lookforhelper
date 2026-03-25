@@ -54,7 +54,9 @@ const Footer = () => {
                 </a>
               </span>
               <span className="hidden md:inline">·</span>
-              <span>Facebook — <em>Coming Soon</em></span>
+              <a href="https://web.facebook.com/profile.php?id=61588374671149" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Facebook</a>
+              <span className="hidden md:inline">·</span>
+              <a href="https://www.instagram.com/look_for_helper/?hl=en" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Instagram</a>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2026 Look For Helper (Pty) Ltd. Registration No: 2026/224124/07. All rights reserved.
