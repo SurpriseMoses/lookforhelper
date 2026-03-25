@@ -806,6 +806,20 @@ const AdminDashboard = () => {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-foreground truncate">{u.full_name}</p>
                         <Badge variant="outline" className="text-xs">{u.role}</Badge>
+                        {u.role === "admin" ? (
+                          <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs gap-1">
+                            <Shield className="h-3 w-3" /> Admin
+                          </Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 px-2 text-xs gap-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                            onClick={() => setMakeAdminUserId(u.user_id)}
+                          >
+                            <Shield className="h-3 w-3" /> Make Admin
+                          </Button>
+                        )}
                         {u.is_verified && (
                           <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs gap-1">
                             <CheckCircle className="h-3 w-3" /> Verified
