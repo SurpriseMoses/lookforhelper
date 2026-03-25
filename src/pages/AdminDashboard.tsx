@@ -53,17 +53,6 @@ interface UserProfile {
   role: string;
 }
 
-const getDocumentMimeType = (fileName: string) => {
-  const normalizedName = fileName.toLowerCase();
-
-  if (normalizedName.endsWith(".pdf")) return "application/pdf";
-  if (normalizedName.endsWith(".png")) return "image/png";
-  if (normalizedName.endsWith(".webp")) return "image/webp";
-  if (normalizedName.endsWith(".gif")) return "image/gif";
-  if (normalizedName.endsWith(".jpg") || normalizedName.endsWith(".jpeg")) return "image/jpeg";
-
-  return "application/octet-stream";
-};
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",
