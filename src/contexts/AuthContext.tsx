@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -138,6 +138,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       },
     });
     if (error) throw error;
+
+    // Supabase returns a user with empty identities when the email already exists
+    if (data?.user && data.user.identities && data.user.identities.length === 0) {
+      throw new Error("An account with this email already exists. Please log in instead.");
+    }
   };
 
   const signIn = async (email: string, password: string) => {
