@@ -478,78 +478,10 @@ const AdminDashboard = () => {
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<"image" | "pdf" | "unknown">("unknown");
-  const [docPreviewError, setDocPreviewError] = useState<string | null>(null);
-  const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
-  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (docPreviewUrl) {
-        URL.revokeObjectURL(docPreviewUrl);
-      }
-    };
-  }, [docPreviewUrl]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const renderPdfPreview = async () => {
-      if (docPreviewType !== "pdf" || !docPreviewUrl || !pdfCanvasRef.current) return;
-
-      setPdfPreviewLoading(true);
-      setDocPreviewError(null);
-
-      try {
-        const pdf = await getDocument(docPreviewUrl).promise;
-        const page = await pdf.getPage(1);
-
-        if (cancelled || !pdfCanvasRef.current) return;
-
-        const canvas = pdfCanvasRef.current;
-        const context = canvas.getContext("2d");
-
-        if (!context) {
-          throw new Error("Could not initialize preview canvas.");
-        }
-
-        const containerWidth = canvas.parentElement?.clientWidth ?? 900;
-        const initialViewport = page.getViewport({ scale: 1 });
-        const scale = Math.max(containerWidth / initialViewport.width, 1);
-        const viewport = page.getViewport({ scale });
-        const pixelRatio = window.devicePixelRatio || 1;
-
-        canvas.width = viewport.width * pixelRatio;
-        canvas.height = viewport.height * pixelRatio;
-        canvas.style.width = `${viewport.width}px`;
-        canvas.style.height = `${viewport.height}px`;
-
-        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        await page.render({ canvas, canvasContext: context, viewport }).promise;
-      } catch (error: any) {
-        if (!cancelled) {
-          console.error("PDF preview render error:", error);
-          setDocPreviewError(error?.message || "Could not render PDF preview.");
-        }
-      } finally {
-        if (!cancelled) {
-          setPdfPreviewLoading(false);
-        }
-      }
-    };
-
-    void renderPdfPreview();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [docPreviewType, docPreviewUrl]);
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
-    setDocPreviewError(null);
-    setPdfPreviewLoading(false);
     if (docPreviewUrl) {
-      URL.revokeObjectURL(docPreviewUrl);
       setDocPreviewUrl(null);
     }
 
@@ -559,8 +491,6 @@ const AdminDashboard = () => {
 
     if (normalizedName.endsWith(".pdf")) {
       setDocPreviewType("pdf");
-    } else if (/(\.jpg|\.jpeg|\.png|\.webp|\.gif)$/.test(normalizedName)) {
-      setDocPreviewType("image");
     } else {
       setDocPreviewType("image");
     }
@@ -568,10 +498,10 @@ const AdminDashboard = () => {
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
-        .download(documentPath);
+        .createSignedUrl(documentPath, 300);
 
-      if (error || !data) {
-        console.error("Document download error:", error);
+      if (error || !data?.signedUrl) {
+        console.error("Document signed URL error:", error);
         toast({
           title: "Error viewing document",
           description: error?.message || "Could not load the document.",
@@ -581,10 +511,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const mimeType = getDocumentMimeType(fileName);
-      const typedBlob = data.type === mimeType ? data : new Blob([data], { type: mimeType });
-
-      setDocPreviewUrl(URL.createObjectURL(typedBlob));
+      setDocPreviewUrl(data.signedUrl);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
