@@ -1088,18 +1088,11 @@ const AdminDashboard = () => {
                 className="w-full h-full object-contain rounded-md border"
               />
             ) : docPreviewType === "pdf" && docPreviewUrl ? (
-              <div className="flex h-full flex-col items-center overflow-auto rounded-md border bg-muted/20 p-4">
-                {pdfPreviewLoading && (
-                  <div className="mb-4 text-sm text-muted-foreground">Rendering PDF preview…</div>
-                )}
-                {docPreviewError ? (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-                    Preview unavailable. Please download the document.
-                  </div>
-                ) : (
-                  <canvas ref={pdfCanvasRef} className="max-w-full rounded-md shadow-sm" />
-                )}
-              </div>
+              <iframe
+                src={docPreviewUrl}
+                title="PDF Preview"
+                className="w-full h-full rounded-md border"
+              />
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
