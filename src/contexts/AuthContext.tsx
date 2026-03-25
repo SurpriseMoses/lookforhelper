@@ -24,46 +24,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<AppRole | null>(null);
   const roleRequestIdRef = useRef(0);
 
-  const resolveRole = (roles: string[], fallbackRole?: AppRole | null) => {
-    if (roles.includes("admin")) return "admin";
-    if (roles.includes("helper")) return "helper";
-    if (roles.includes("seeker")) return "seeker";
-    return fallbackRole ?? null;
-  };
-
-  const fetchRole = async (userId: string, fallbackRole?: AppRole | null, retries = 1): Promise<void> => {
+  const fetchRole = async (userId: string, fallbackRole?: AppRole | null): Promise<void> => {
     const requestId = ++roleRequestIdRef.current;
 
-    const [adminResult, helperResult, seekerResult] = await Promise.all([
-      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
-      supabase.rpc("has_role", { _user_id: userId, _role: "helper" }),
-      supabase.rpc("has_role", { _user_id: userId, _role: "seeker" }),
-    ]);
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
 
     if (requestId !== roleRequestIdRef.current) return;
 
-    const rpcError = adminResult.error ?? helperResult.error ?? seekerResult.error;
-
-    if (rpcError) {
-      if (retries > 0) {
-        setTimeout(() => {
-          void fetchRole(userId, fallbackRole, retries - 1);
-        }, 200);
-        return;
-      }
-
-      console.error("Failed to fetch user roles:", rpcError.message);
+    if (error) {
+      console.error("Failed to fetch user roles:", error.message);
       setRole((currentRole) => currentRole ?? fallbackRole ?? null);
       return;
     }
 
-    const roles = [
-      adminResult.data ? "admin" : null,
-      helperResult.data ? "helper" : null,
-      seekerResult.data ? "seeker" : null,
-    ].filter(Boolean) as string[];
-
-    setRole((currentRole) => resolveRole(roles, currentRole ?? fallbackRole));
+    const roles = (data || []).map((r) => r.role as string);
+    if (roles.includes("admin")) setRole("admin");
+    else if (roles.includes("helper")) setRole("helper");
+    else if (roles.includes("seeker")) setRole("seeker");
+    else setRole(fallbackRole ?? null);
   };
 
   const processReferralCode = async (userId: string) => {
