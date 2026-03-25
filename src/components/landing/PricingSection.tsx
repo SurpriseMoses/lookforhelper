@@ -24,7 +24,7 @@ const PricingSection = () => {
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <PriceItem label="Unlock chat & contact with helpers (30 days)" price="R25" />
-                <PriceItem label="Premium keyword search (30 days)" price="R29" />
+                <PriceItem label="Keyword search" price="Free" highlight />
               </div>
               <p className="text-xs text-muted-foreground pt-2 border-t">
                 Browsing helpers is always free.

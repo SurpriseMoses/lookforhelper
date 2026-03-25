@@ -8,9 +8,9 @@ const corsHeaders = {
 };
 
 const PLANS: Record<string, { amount: number; days: number; label: string }> = {
-  "7_days": { amount: 200, days: 7, label: "7 Days Featured" },
-  "21_days": { amount: 200, days: 21, label: "21 Days Featured" },
-  "30_days": { amount: 200, days: 30, label: "30 Days Featured" },
+  "7_days": { amount: 4900, days: 7, label: "7 Days Featured" },
+  "21_days": { amount: 9900, days: 21, label: "21 Days Featured" },
+  "30_days": { amount: 13900, days: 30, label: "30 Days Featured" },
 };
 
 serve(async (req) => {
