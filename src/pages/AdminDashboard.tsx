@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -96,6 +97,8 @@ const AdminDashboard = () => {
   const [bgCheckStats, setBgCheckStats] = useState({ requested: 0 });
   const [hireStats, setHireStats] = useState({ total: 0, confirmed: 0, pending: 0 });
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
+  const [makeAdminUserId, setMakeAdminUserId] = useState<string | null>(null);
+  const [makingAdmin, setMakingAdmin] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -371,6 +374,22 @@ const AdminDashboard = () => {
       toast({ title: currentlySuspended ? "User unsuspended" : "User suspended" });
       loadUsers();
     }
+  };
+
+  const handleMakeAdmin = async (userId: string) => {
+    setMakingAdmin(true);
+    const { error } = await supabase
+      .from("user_roles")
+      .insert({ user_id: userId, role: "admin" as any });
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "User is now an admin" });
+      loadUsers();
+    }
+    setMakingAdmin(false);
+    setMakeAdminUserId(null);
   };
 
   const handleToggleVerify = async (userId: string, currentlyVerified: boolean) => {
@@ -787,6 +806,20 @@ const AdminDashboard = () => {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-foreground truncate">{u.full_name}</p>
                         <Badge variant="outline" className="text-xs">{u.role}</Badge>
+                        {u.role === "admin" ? (
+                          <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs gap-1">
+                            <Shield className="h-3 w-3" /> Admin
+                          </Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 px-2 text-xs gap-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                            onClick={() => setMakeAdminUserId(u.user_id)}
+                          >
+                            <Shield className="h-3 w-3" /> Make Admin
+                          </Button>
+                        )}
                         {u.is_verified && (
                           <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs gap-1">
                             <CheckCircle className="h-3 w-3" /> Verified
@@ -1166,6 +1199,26 @@ const AdminDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+      {/* Make Admin Confirmation */}
+      <AlertDialog open={!!makeAdminUserId} onOpenChange={(open) => !open && setMakeAdminUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Grant Admin Access</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to grant admin access to this user? This action cannot be undone from this dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={makingAdmin}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={makingAdmin}
+              onClick={() => makeAdminUserId && handleMakeAdmin(makeAdminUserId)}
+            >
+              {makingAdmin ? "Granting..." : "Yes, Make Admin"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
