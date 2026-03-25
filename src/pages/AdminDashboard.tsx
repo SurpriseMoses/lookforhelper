@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,12 +14,6 @@ import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, F
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-
-GlobalWorkerOptions.workerSrc = pdfWorker;
-
-
 interface VerificationReq {
   id: string;
   user_id: string;
@@ -59,17 +53,6 @@ interface UserProfile {
   role: string;
 }
 
-const getDocumentMimeType = (fileName: string) => {
-  const normalizedName = fileName.toLowerCase();
-
-  if (normalizedName.endsWith(".pdf")) return "application/pdf";
-  if (normalizedName.endsWith(".png")) return "image/png";
-  if (normalizedName.endsWith(".webp")) return "image/webp";
-  if (normalizedName.endsWith(".gif")) return "image/gif";
-  if (normalizedName.endsWith(".jpg") || normalizedName.endsWith(".jpeg")) return "image/jpeg";
-
-  return "application/octet-stream";
-};
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",
@@ -478,78 +461,10 @@ const AdminDashboard = () => {
   const [docPreviewName, setDocPreviewName] = useState("");
   const [docPreviewLoading, setDocPreviewLoading] = useState(false);
   const [docPreviewType, setDocPreviewType] = useState<"image" | "pdf" | "unknown">("unknown");
-  const [docPreviewError, setDocPreviewError] = useState<string | null>(null);
-  const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
-  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (docPreviewUrl) {
-        URL.revokeObjectURL(docPreviewUrl);
-      }
-    };
-  }, [docPreviewUrl]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const renderPdfPreview = async () => {
-      if (docPreviewType !== "pdf" || !docPreviewUrl || !pdfCanvasRef.current) return;
-
-      setPdfPreviewLoading(true);
-      setDocPreviewError(null);
-
-      try {
-        const pdf = await getDocument(docPreviewUrl).promise;
-        const page = await pdf.getPage(1);
-
-        if (cancelled || !pdfCanvasRef.current) return;
-
-        const canvas = pdfCanvasRef.current;
-        const context = canvas.getContext("2d");
-
-        if (!context) {
-          throw new Error("Could not initialize preview canvas.");
-        }
-
-        const containerWidth = canvas.parentElement?.clientWidth ?? 900;
-        const initialViewport = page.getViewport({ scale: 1 });
-        const scale = Math.max(containerWidth / initialViewport.width, 1);
-        const viewport = page.getViewport({ scale });
-        const pixelRatio = window.devicePixelRatio || 1;
-
-        canvas.width = viewport.width * pixelRatio;
-        canvas.height = viewport.height * pixelRatio;
-        canvas.style.width = `${viewport.width}px`;
-        canvas.style.height = `${viewport.height}px`;
-
-        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        await page.render({ canvas, canvasContext: context, viewport }).promise;
-      } catch (error: any) {
-        if (!cancelled) {
-          console.error("PDF preview render error:", error);
-          setDocPreviewError(error?.message || "Could not render PDF preview.");
-        }
-      } finally {
-        if (!cancelled) {
-          setPdfPreviewLoading(false);
-        }
-      }
-    };
-
-    void renderPdfPreview();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [docPreviewType, docPreviewUrl]);
 
   const handleViewDocument = async (documentPath: string) => {
     setDocPreviewLoading(true);
-    setDocPreviewError(null);
-    setPdfPreviewLoading(false);
     if (docPreviewUrl) {
-      URL.revokeObjectURL(docPreviewUrl);
       setDocPreviewUrl(null);
     }
 
@@ -559,8 +474,6 @@ const AdminDashboard = () => {
 
     if (normalizedName.endsWith(".pdf")) {
       setDocPreviewType("pdf");
-    } else if (/(\.jpg|\.jpeg|\.png|\.webp|\.gif)$/.test(normalizedName)) {
-      setDocPreviewType("image");
     } else {
       setDocPreviewType("image");
     }
@@ -568,10 +481,10 @@ const AdminDashboard = () => {
     try {
       const { data, error } = await supabase.storage
         .from("identity-documents")
-        .download(documentPath);
+        .createSignedUrl(documentPath, 300);
 
-      if (error || !data) {
-        console.error("Document download error:", error);
+      if (error || !data?.signedUrl) {
+        console.error("Document signed URL error:", error);
         toast({
           title: "Error viewing document",
           description: error?.message || "Could not load the document.",
@@ -581,10 +494,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const mimeType = getDocumentMimeType(fileName);
-      const typedBlob = data.type === mimeType ? data : new Blob([data], { type: mimeType });
-
-      setDocPreviewUrl(URL.createObjectURL(typedBlob));
+      setDocPreviewUrl(data.signedUrl);
     } catch (err: any) {
       console.error("Document view error:", err);
       toast({
@@ -598,14 +508,9 @@ const AdminDashboard = () => {
   };
 
   const handleCloseDocPreview = () => {
-    if (docPreviewUrl) {
-      URL.revokeObjectURL(docPreviewUrl);
-    }
     setDocPreviewUrl(null);
     setDocPreviewName("");
     setDocPreviewType("unknown");
-    setDocPreviewError(null);
-    setPdfPreviewLoading(false);
   };
 
   const handleDownloadDoc = () => {
@@ -1166,18 +1071,11 @@ const AdminDashboard = () => {
                 className="w-full h-full object-contain rounded-md border"
               />
             ) : docPreviewType === "pdf" && docPreviewUrl ? (
-              <div className="flex h-full flex-col items-center overflow-auto rounded-md border bg-muted/20 p-4">
-                {pdfPreviewLoading && (
-                  <div className="mb-4 text-sm text-muted-foreground">Rendering PDF preview…</div>
-                )}
-                {docPreviewError ? (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-                    Preview unavailable. Please download the document.
-                  </div>
-                ) : (
-                  <canvas ref={pdfCanvasRef} className="max-w-full rounded-md shadow-sm" />
-                )}
-              </div>
+              <iframe
+                src={docPreviewUrl}
+                title="PDF Preview"
+                className="w-full h-full rounded-md border"
+              />
             ) : (
               <div className="flex h-full items-center justify-center rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
                 Preview unavailable for this file type. Please use download.
