@@ -140,7 +140,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "7 Days — R2"}
+                {paying ? "Processing..." : "7 Days — R49"}
               </Button>
               <Button
                 onClick={() => handleBoost("21_days")}
@@ -149,7 +149,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "21 Days — R2"}
+                {paying ? "Processing..." : "21 Days — R99"}
               </Button>
               <Button
                 onClick={() => handleBoost("30_days")}
@@ -158,7 +158,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "30 Days — R2"}
+                {paying ? "Processing..." : "30 Days — R139"}
               </Button>
             </div>
           </div>
