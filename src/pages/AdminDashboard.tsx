@@ -1199,6 +1199,26 @@ const AdminDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+      {/* Make Admin Confirmation */}
+      <AlertDialog open={!!makeAdminUserId} onOpenChange={(open) => !open && setMakeAdminUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Grant Admin Access</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to grant admin access to this user? This action cannot be undone from this dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={makingAdmin}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={makingAdmin}
+              onClick={() => makeAdminUserId && handleMakeAdmin(makeAdminUserId)}
+            >
+              {makingAdmin ? "Granting..." : "Yes, Make Admin"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
