@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
