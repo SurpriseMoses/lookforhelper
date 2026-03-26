@@ -38,7 +38,7 @@ interface VerificationPayment {
 }
 
 const VerificationCard = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { toast } = useToast();
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [payment, setPayment] = useState<VerificationPayment | null>(null);
