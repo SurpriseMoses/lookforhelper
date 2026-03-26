@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 
+import TrustSection from "@/components/landing/TrustSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import FeaturedHelpers from "@/components/landing/FeaturedHelpers";
 import PricingSection from "@/components/landing/PricingSection";
@@ -25,7 +26,7 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        
+        <TrustSection />
         <HowItWorks />
         <FeaturedHelpers />
         <PricingSection />

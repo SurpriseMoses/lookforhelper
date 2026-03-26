@@ -27,10 +27,7 @@ const TrustSection = () => {
     <section className="bg-secondary py-20 md:py-28">
       <div className="container">
         <div className="text-center">
-          <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-            Why South Africans Trust Us
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+          <p className="mx-auto max-w-lg text-lg font-medium text-foreground">
             We make finding and hiring household help safe, simple, and
             professional.
           </p>
