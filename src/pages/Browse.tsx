@@ -341,7 +341,7 @@ const Browse = () => {
             <Label className="text-xs text-muted-foreground">Search by keyword</Label>
             <Input
               value={keywordSearch}
-              onChange={(e) => setKeywordSearch(e.target.value)}
+              onChange={(e) => handleKeywordChange(e.target.value)}
               placeholder="e.g. experienced nanny, cooking, childcare..."
               className="max-w-md"
             />
