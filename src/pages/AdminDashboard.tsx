@@ -431,7 +431,7 @@ const AdminDashboard = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       // The DB trigger notify_verification_result will create a notification automatically
-      toast({ title: "Verification rejected — helper has been notified" });
+      toast({ title: "Verification rejected — user has been notified" });
       loadVerificationRequests();
     }
   };
