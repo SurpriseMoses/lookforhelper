@@ -7,12 +7,20 @@ import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, Clock, CheckCircle, XCircle, Loader2, CreditCard } from "lucide-react";
 import VerificationFlow from "@/components/verification/VerificationFlow";
 
-const DOC_TYPE_LABELS: Record<string, string> = {
+const HELPER_DOC_TYPE_LABELS: Record<string, string> = {
   sa_id: "SA Verified",
   passport: "Passport Verified",
   work_permit: "Permit Verified",
   asylum_permit: "Permit Verified",
   other: "Verified",
+};
+
+const SEEKER_DOC_TYPE_LABELS: Record<string, string> = {
+  sa_id: "Verified Employer",
+  passport: "Verified Employer",
+  work_permit: "Verified Employer",
+  asylum_permit: "Verified Employer",
+  other: "Verified Employer",
 };
 
 interface VerificationRequest {
@@ -30,7 +38,7 @@ interface VerificationPayment {
 }
 
 const VerificationCard = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { toast } = useToast();
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [payment, setPayment] = useState<VerificationPayment | null>(null);
@@ -113,7 +121,9 @@ const VerificationCard = () => {
 
   if (loading) return null;
 
-  const verifiedLabel = DOC_TYPE_LABELS[request?.document_type ?? "sa_id"] ?? "Verified Identity";
+  const isSeeker = role === "seeker" || role === "admin";
+  const docLabels = isSeeker ? SEEKER_DOC_TYPE_LABELS : HELPER_DOC_TYPE_LABELS;
+  const verifiedLabel = docLabels[request?.document_type ?? "sa_id"] ?? (isSeeker ? "Verified Employer" : "Verified Helper");
 
   // Already verified
   if (isVerified) {
@@ -123,7 +133,11 @@ const VerificationCard = () => {
           <ShieldCheck className="h-6 w-6 text-emerald-600" />
           <div>
             <p className="font-medium text-foreground">{verifiedLabel}</p>
-            <p className="text-sm text-muted-foreground">Your identity has been verified. Families can see a trusted badge on your profile.</p>
+            <p className="text-sm text-muted-foreground">
+              {isSeeker
+                ? "Your identity has been verified. Helpers can see a trusted employer badge on your profile."
+                : "Your identity has been verified. Families can see a trusted badge on your profile."}
+            </p>
           </div>
         </CardContent>
       </Card>

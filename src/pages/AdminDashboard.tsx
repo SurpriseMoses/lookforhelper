@@ -22,6 +22,7 @@ interface VerificationReq {
   rejection_reason: string | null;
   created_at: string;
   helper_name: string;
+  user_role: string;
   document_type: string | null;
   selfie_url: string | null;
   country_of_origin: string | null;
@@ -250,17 +251,19 @@ const AdminDashboard = () => {
     }
 
     const userIds = [...new Set(data.map((r) => r.user_id))];
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, full_name")
-      .in("user_id", userIds);
+    const [{ data: profiles }, { data: roles }] = await Promise.all([
+      supabase.from("profiles").select("user_id, full_name").in("user_id", userIds),
+      supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
+    ]);
 
     const nameMap = new Map((profiles ?? []).map((p) => [p.user_id, p.full_name]));
+    const roleMap = new Map((roles ?? []).map((r) => [r.user_id, r.role]));
 
     setVerificationRequests(
       data.map((r) => ({
         ...r,
         helper_name: nameMap.get(r.user_id) ?? "Unknown",
+        user_role: roleMap.get(r.user_id) ?? "unknown",
       }))
     );
   };
@@ -405,7 +408,7 @@ const AdminDashboard = () => {
     }
 
     // Don't set is_verified here — helper must pay R49 first to complete verification
-    toast({ title: "Document approved! Helper will be prompted to pay R49 to complete verification." });
+    toast({ title: "Document approved! User will be prompted to pay R49 to complete verification." });
     loadVerificationRequests();
   };
 
@@ -428,7 +431,7 @@ const AdminDashboard = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       // The DB trigger notify_verification_result will create a notification automatically
-      toast({ title: "Verification rejected — helper has been notified" });
+      toast({ title: "Verification rejected — user has been notified" });
       loadVerificationRequests();
     }
   };
@@ -798,7 +801,12 @@ const AdminDashboard = () => {
                         {/* Header */}
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <p className="text-sm font-medium text-foreground">{vr.helper_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium text-foreground">{vr.helper_name}</p>
+                              <Badge variant="secondary" className="text-xs">
+                                {vr.user_role === "helper" ? "Helper" : vr.user_role === "seeker" ? "Seeker" : vr.user_role}
+                              </Badge>
+                            </div>
                             <div className="flex items-center gap-2 mt-1 flex-wrap">
                               <Badge variant="outline" className="text-xs">
                                 {docTypeLabel[vr.document_type ?? "sa_id"] ?? "Unknown"}
