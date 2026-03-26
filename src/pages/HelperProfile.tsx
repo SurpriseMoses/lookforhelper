@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye, Pencil } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
