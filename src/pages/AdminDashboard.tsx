@@ -408,7 +408,7 @@ const AdminDashboard = () => {
     }
 
     // Don't set is_verified here — helper must pay R49 first to complete verification
-    toast({ title: "Document approved! Helper will be prompted to pay R49 to complete verification." });
+    toast({ title: "Document approved! User will be prompted to pay R49 to complete verification." });
     loadVerificationRequests();
   };
 
