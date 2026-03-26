@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye } from "lucide-react";
+import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye, Pencil } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
@@ -205,8 +205,15 @@ const HelperProfilePage = () => {
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                <h1 className="font-display text-2xl font-bold text-foreground flex items-center gap-2 justify-center md:justify-start">
+                <h1 className="font-display text-2xl font-bold text-foreground flex items-center gap-2 justify-center md:justify-start flex-wrap">
                   {helper.profiles?.full_name}
+                  {user?.id === userId && (
+                    <Button variant="ghost" size="sm" asChild className="h-7 px-2 text-xs">
+                      <Link to="/dashboard">
+                        <Pencil className="mr-1 h-3 w-3" /> Edit Profile
+                      </Link>
+                    </Button>
+                  )}
                   {helper.profiles?.is_verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
                       <CheckCircle className="h-3.5 w-3.5" />
