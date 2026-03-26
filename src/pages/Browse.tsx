@@ -141,10 +141,7 @@ const Browse = () => {
   };
 
   const handleHelperClick = (e: React.MouseEvent, userId: string) => {
-    if (!user) {
-      e.preventDefault();
-      navigate("/auth");
-    }
+    // Allow all users (including unauthenticated) to view helper profiles
   };
 
   const fetchHelpers = async () => {
