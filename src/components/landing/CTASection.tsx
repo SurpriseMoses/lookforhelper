@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search, UserPlus } from "lucide-react";
 
 const CTASection = () => {
   return (
@@ -19,18 +19,21 @@ const CTASection = () => {
               className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2 font-semibold px-8"
               asChild
             >
-              <Link to="/auth?tab=signup">
-                Get Started
-                <ArrowRight className="h-4 w-4" />
+              <Link to="/browse">
+                <Search className="h-4 w-4" />
+                Find a Helper
               </Link>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 font-semibold px-8"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 gap-2 font-semibold px-8"
               asChild
             >
-              <Link to="/browse">Browse Helpers</Link>
+              <Link to="/auth?tab=signup&role=helper">
+                <UserPlus className="h-4 w-4" />
+                Register as a Helper
+              </Link>
             </Button>
           </div>
         </div>
