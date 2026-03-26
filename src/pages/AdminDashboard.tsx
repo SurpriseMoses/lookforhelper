@@ -251,17 +251,19 @@ const AdminDashboard = () => {
     }
 
     const userIds = [...new Set(data.map((r) => r.user_id))];
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, full_name")
-      .in("user_id", userIds);
+    const [{ data: profiles }, { data: roles }] = await Promise.all([
+      supabase.from("profiles").select("user_id, full_name").in("user_id", userIds),
+      supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
+    ]);
 
     const nameMap = new Map((profiles ?? []).map((p) => [p.user_id, p.full_name]));
+    const roleMap = new Map((roles ?? []).map((r) => [r.user_id, r.role]));
 
     setVerificationRequests(
       data.map((r) => ({
         ...r,
         helper_name: nameMap.get(r.user_id) ?? "Unknown",
+        user_role: roleMap.get(r.user_id) ?? "unknown",
       }))
     );
   };
