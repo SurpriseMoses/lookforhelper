@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,6 +99,18 @@ const Browse = () => {
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
+  const keywordDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleKeywordChange = useCallback((value: string) => {
+    setKeywordSearch(value);
+    if (keywordDebounceRef.current) clearTimeout(keywordDebounceRef.current);
+    if (hasSearched) {
+      keywordDebounceRef.current = setTimeout(() => {
+        setCurrentPage(1);
+        document.getElementById("search-helpers-btn")?.click();
+      }, 300);
+    }
+  }, [hasSearched]);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -329,7 +341,7 @@ const Browse = () => {
             <Label className="text-xs text-muted-foreground">Search by keyword</Label>
             <Input
               value={keywordSearch}
-              onChange={(e) => setKeywordSearch(e.target.value)}
+              onChange={(e) => handleKeywordChange(e.target.value)}
               placeholder="e.g. experienced nanny, cooking, childcare..."
               className="max-w-md"
             />
