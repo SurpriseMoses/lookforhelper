@@ -289,12 +289,14 @@ const Dashboard = () => {
           </>
         )}
 
+        {/* Verification for both helpers and seekers */}
+        <VerificationCard />
+
         {/* Helper-specific fields */}
         {role === "helper" && (
           <>
            <HelperListingCard />
           <AvailabilityCard />
-           <VerificationCard />
           <BackgroundCheckCard />
           <FeaturedBoostCard />
           <HelperPerformanceCard />

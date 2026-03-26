@@ -7,12 +7,20 @@ import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, Clock, CheckCircle, XCircle, Loader2, CreditCard } from "lucide-react";
 import VerificationFlow from "@/components/verification/VerificationFlow";
 
-const DOC_TYPE_LABELS: Record<string, string> = {
+const HELPER_DOC_TYPE_LABELS: Record<string, string> = {
   sa_id: "SA Verified",
   passport: "Passport Verified",
   work_permit: "Permit Verified",
   asylum_permit: "Permit Verified",
   other: "Verified",
+};
+
+const SEEKER_DOC_TYPE_LABELS: Record<string, string> = {
+  sa_id: "Verified Employer",
+  passport: "Verified Employer",
+  work_permit: "Verified Employer",
+  asylum_permit: "Verified Employer",
+  other: "Verified Employer",
 };
 
 interface VerificationRequest {
