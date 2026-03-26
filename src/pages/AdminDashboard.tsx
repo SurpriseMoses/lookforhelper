@@ -22,6 +22,7 @@ interface VerificationReq {
   rejection_reason: string | null;
   created_at: string;
   helper_name: string;
+  user_role: string;
   document_type: string | null;
   selfie_url: string | null;
   country_of_origin: string | null;
