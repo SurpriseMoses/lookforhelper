@@ -99,6 +99,18 @@ const Browse = () => {
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
+  const keywordDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleKeywordChange = useCallback((value: string) => {
+    setKeywordSearch(value);
+    if (keywordDebounceRef.current) clearTimeout(keywordDebounceRef.current);
+    if (hasSearched) {
+      keywordDebounceRef.current = setTimeout(() => {
+        setCurrentPage(1);
+        document.getElementById("search-helpers-btn")?.click();
+      }, 300);
+    }
+  }, [hasSearched]);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
