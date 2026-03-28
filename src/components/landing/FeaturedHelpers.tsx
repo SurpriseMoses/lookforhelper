@@ -219,7 +219,7 @@ const FeaturedHelpers = () => {
 
         {/* Filter dropdown */}
         <div className="mt-8 flex items-center justify-center gap-2">
-          <FilterIcon className="h-4 w-4 text-muted-foreground" />
+          {getFilterIcon()}
           <Select value={filterMode} onValueChange={(v) => setFilterMode(v as FilterMode)}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
