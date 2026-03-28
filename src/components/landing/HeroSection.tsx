@@ -39,7 +39,7 @@ const HeroSection = () => {
             <span className="text-accent">Household Help</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-primary-foreground/80">
-            Connect with verified nannies, babysitters, cleaners, and caregivers in South Africa. Safe, simple, and professional.
+            Connect with verified nannies, babysitters, cleaners, and caregivers worldwide. Safe, simple, and professional.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
