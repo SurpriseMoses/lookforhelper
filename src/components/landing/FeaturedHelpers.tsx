@@ -37,44 +37,47 @@ const FeaturedHelpers = () => {
   const [detectedCountry, setDetectedCountry] = useState<string>("South Africa");
   const [detectedCity, setDetectedCity] = useState<string>("");
 
-  // Detect user location from IP-based geolocation or browser
+  // Detect user location: prefer stored country from user metadata, fallback to geolocation
   useEffect(() => {
     const detectLocation = async () => {
+      // Check if user is logged in and has a stored country preference
+      const { data: { session } } = await supabase.auth.getSession();
+      const userCountry = session?.user?.user_metadata?.country;
+      if (userCountry) {
+        setDetectedCountry(userCountry);
+      }
+
+      // Try browser geolocation for city detection (and country fallback)
       try {
-        // Try browser geolocation to find nearest city
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (pos) => {
               const { latitude, longitude } = pos.coords;
-              const { data } = await supabase.from("cities").select("city_name, province, country");
-              if (data && data.length > 0) {
-                // Find nearest city (rough Euclidean)
-                let nearest = data[0];
+              const { data: citiesWithCoords } = await supabase
+                .from("cities")
+                .select("city_name, province, country, latitude, longitude");
+              if (citiesWithCoords && citiesWithCoords.length > 0) {
+                let nearest = citiesWithCoords[0];
                 let minDist = Infinity;
-                // We need lat/lng from cities - refetch with coords
-                const { data: citiesWithCoords } = await supabase
-                  .from("cities")
-                  .select("city_name, province, country, latitude, longitude");
-                if (citiesWithCoords) {
-                  for (const city of citiesWithCoords) {
-                    if (city.latitude == null || city.longitude == null) continue;
-                    const dist = Math.sqrt(
-                      Math.pow(city.latitude - latitude, 2) +
-                      Math.pow(city.longitude - longitude, 2)
-                    );
-                    if (dist < minDist) {
-                      minDist = dist;
-                      nearest = city;
-                    }
+                for (const city of citiesWithCoords) {
+                  if (city.latitude == null || city.longitude == null) continue;
+                  const dist = Math.sqrt(
+                    Math.pow(city.latitude - latitude, 2) +
+                    Math.pow(city.longitude - longitude, 2)
+                  );
+                  if (dist < minDist) {
+                    minDist = dist;
+                    nearest = city;
                   }
                 }
-                setDetectedCountry(nearest.country || "South Africa");
                 setDetectedCity(nearest.city_name || "");
+                // Only use geo-detected country if user has no stored preference
+                if (!userCountry) {
+                  setDetectedCountry(nearest.country || "South Africa");
+                }
               }
             },
-            () => {
-              // Geolocation denied - keep defaults
-            },
+            () => {},
             { timeout: 5000 }
           );
         }

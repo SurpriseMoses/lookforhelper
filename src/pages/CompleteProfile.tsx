@@ -8,9 +8,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/landing/Navbar";
-import { UserCheck, Briefcase, Search } from "lucide-react";
+import { UserCheck, Briefcase, Search, Globe } from "lucide-react";
+
+interface Country {
+  id: string;
+  country_name: string;
+  country_code: string;
+}
 
 const CompleteProfile = () => {
   const { user, role, loading } = useAuth();
@@ -23,21 +36,33 @@ const CompleteProfile = () => {
   const [cityLat, setCityLat] = useState<number | undefined>();
   const [cityLng, setCityLng] = useState<number | undefined>();
   const [country, setCountry] = useState("South Africa");
+  const [countries, setCountries] = useState<Country[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch active countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name, country_code")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountries(data);
+    };
+    fetchCountries();
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
       return;
     }
-    // Pre-fill name from Google metadata
     if (user) {
       const googleName = user.user_metadata?.full_name || user.user_metadata?.name || "";
       setFullName(googleName);
     }
   }, [user, loading, navigate]);
 
-  // If user already has a role explicitly set (email signup), redirect to dashboard
   useEffect(() => {
     if (!loading && user && user.user_metadata?.role) {
       navigate("/dashboard");
@@ -50,9 +75,9 @@ const CompleteProfile = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Update user metadata with chosen role
+      // 1. Update user metadata with chosen role and country
       await supabase.auth.updateUser({
-        data: { role: selectedRole, full_name: fullName },
+        data: { role: selectedRole, full_name: fullName, country },
       });
 
       // 2. Update profile name
@@ -61,20 +86,18 @@ const CompleteProfile = () => {
         .update({ full_name: fullName })
         .eq("user_id", user.id);
 
-      // 3. Update user_roles - the trigger defaulted to 'seeker', update if 'helper'
+      // 3. Update user_roles
       if (selectedRole === "helper") {
         await supabase
           .from("user_roles")
           .update({ role: selectedRole })
           .eq("user_id", user.id);
 
-        // Create helper_details row (trigger only fires on role insert, not update)
         await supabase
           .from("helper_details")
           .upsert({ user_id: user.id, city, province, country, latitude: cityLat ?? null, longitude: cityLng ?? null } as any, { onConflict: "user_id" });
       }
 
-      // 4. Create seeker subscription if seeker (trigger fires on role insert)
       if (selectedRole === "seeker") {
         await supabase
           .from("seeker_subscriptions")
@@ -88,7 +111,6 @@ const CompleteProfile = () => {
           : "Welcome! You can now browse and contact helpers.",
       });
 
-      // Force a re-fetch of role in AuthContext
       window.location.href = "/dashboard";
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -130,6 +152,26 @@ const CompleteProfile = () => {
                   required
                   placeholder="Your full name"
                 />
+              </div>
+
+              {/* Country selector for all users */}
+              <div className="space-y-2">
+                <Label>Your Country</Label>
+                <Select value={country} onValueChange={setCountry}>
+                  <SelectTrigger>
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="Select your country" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((c) => (
+                      <SelectItem key={c.id} value={c.country_name}>
+                        {c.country_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-3">
@@ -174,7 +216,7 @@ const CompleteProfile = () => {
 
               {selectedRole === "helper" && (
                 <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
-                  <p className="text-sm font-medium text-foreground">Location</p>
+                  <p className="text-sm font-medium text-foreground">Your City</p>
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
@@ -185,21 +227,14 @@ const CompleteProfile = () => {
                           setProvince(p);
                           setCityLat(lat);
                           setCityLng(lng);
-                          setCountry("South Africa");
                         }}
                         onClear={() => { setCity(""); setProvince(""); setCityLat(undefined); setCityLng(undefined); }}
-                        placeholder="e.g. Cape Town"
+                        placeholder="e.g. Cape Town, Nairobi, London"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-2">
-                        <Label>Province</Label>
-                        <Input value={province} disabled className="bg-muted" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Country</Label>
-                        <Input value={country} disabled className="bg-muted" />
-                      </div>
+                    <div className="space-y-2">
+                      <Label>Province / Region</Label>
+                      <Input value={province} disabled className="bg-muted" />
                     </div>
                   </div>
                 </div>
