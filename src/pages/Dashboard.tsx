@@ -29,6 +29,7 @@ import DataExportCard from "@/components/dashboard/DataExportCard";
 import SavedSearchesCard from "@/components/dashboard/SavedSearchesCard";
 import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
+import { getCurrencyForCountry } from "@/lib/currency";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];

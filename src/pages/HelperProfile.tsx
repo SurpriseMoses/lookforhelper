@@ -17,6 +17,7 @@ import TopHelperBadge from "@/components/profile/TopHelperBadge";
 import SafetyTipsBox from "@/components/profile/SafetyTipsBox";
 import WhatsAppShareButton from "@/components/profile/WhatsAppShareButton";
 import ProfilePhotoGallery from "@/components/profile/ProfilePhotoGallery";
+import { formatSalary } from "@/lib/currency";
 
 const WORK_AUTH_LABELS: Record<string, string> = {
   citizen: "Citizen",
