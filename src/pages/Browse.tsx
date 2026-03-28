@@ -199,6 +199,9 @@ const Browse = () => {
     if (workTypeFilter !== "all") {
       query = query.contains("work_type", [workTypeFilter]);
     }
+    if (countryFilter !== "all") {
+      query = query.eq("country", countryFilter);
+    }
     if (workAuthFilter !== "all") {
       query = query.eq("work_authorization_status", workAuthFilter);
     }
