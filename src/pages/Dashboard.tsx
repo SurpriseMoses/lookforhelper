@@ -42,6 +42,7 @@ const Dashboard = () => {
 
   const [profile, setProfile] = useState({ full_name: "", avatar_url: "" });
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [countriesList, setCountriesList] = useState<{ id: string; country_name: string }[]>([]);
   const [helperDetails, setHelperDetails] = useState({
     age: "",
     gender: "",
