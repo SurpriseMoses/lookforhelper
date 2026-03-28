@@ -53,11 +53,13 @@ interface HelperWithProfile {
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 
 const WORK_AUTH_LABELS: Record<string, string> = {
-  sa_citizen: "SA Citizen",
+  citizen: "Citizen",
+  sa_citizen: "Citizen",
   permanent_resident: "Permanent Resident",
   work_permit: "Work Permit",
-  asylum_permit: "Asylum Permit",
-  refugee_permit: "Refugee Permit",
+  asylum_permit: "Asylum / Refugee Permit",
+  refugee_permit: "Asylum / Refugee Permit",
+  temporary_visa: "Temporary Visa",
   prefer_not_to_say: "Prefer not to specify",
 };
 
@@ -459,11 +461,11 @@ const Browse = () => {
                 <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="sa_citizen">SA Citizen</SelectItem>
+                  <SelectItem value="citizen">Citizen</SelectItem>
                   <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
                   <SelectItem value="work_permit">Work Permit</SelectItem>
-                  <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
-                  <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                  <SelectItem value="asylum_permit">Asylum / Refugee Permit</SelectItem>
+                  <SelectItem value="temporary_visa">Temporary Visa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
