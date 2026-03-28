@@ -333,7 +333,7 @@ const Dashboard = () => {
                   <CityAutocomplete
                     value={helperDetails.city}
                     onCitySelect={(city, province, lat, lng) => {
-                      setHelperDetails((h) => ({ ...h, city, province, country: "South Africa", latitude: lat ?? null, longitude: lng ?? null }));
+                      setHelperDetails((h) => ({ ...h, city, province, latitude: lat ?? null, longitude: lng ?? null }));
                     }}
                     onClear={() => setHelperDetails((h) => ({ ...h, city: "", province: "", latitude: null, longitude: null }))}
                   />
@@ -344,7 +344,22 @@ const Dashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Country</Label>
-                  <Input value={helperDetails.country} disabled className="bg-muted" />
+                  <Select
+                    value={helperDetails.country}
+                    onValueChange={(v) => setHelperDetails((h) => ({ ...h, country: v }))}
+                  >
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <SelectValue placeholder="Select country" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countriesList.map((c) => (
+                        <SelectItem key={c.id} value={c.country_name}>{c.country_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Phone Number</Label>
