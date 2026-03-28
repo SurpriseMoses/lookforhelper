@@ -77,6 +77,19 @@ const Dashboard = () => {
     }
   }, [authLoading, user, profileComplete, navigate]);
 
+  // Fetch active countries for dropdown
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountriesList(data);
+    };
+    fetchCountries();
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const load = async () => {
