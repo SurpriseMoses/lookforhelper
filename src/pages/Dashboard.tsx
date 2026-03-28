@@ -362,7 +362,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Salary Min (ZAR/month)</Label>
+                  <Label>Salary Min ({getCurrencyForCountry(helperDetails.country).code}/month)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 3000"
@@ -371,7 +371,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Salary Max (ZAR/month)</Label>
+                  <Label>Salary Max ({getCurrencyForCountry(helperDetails.country).code}/month)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 8000"

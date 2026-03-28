@@ -387,9 +387,9 @@ const HelperProfilePage = () => {
                   <div>
                     <span className="text-sm font-medium text-foreground">Salary Range</span>
                     <p className="text-muted-foreground">
-                      {helper.salary_min ? `R${helper.salary_min.toLocaleString()}` : "—"}
+                      {helper.salary_min ? formatSalary(helper.salary_min, helper.country) : "—"}
                       {" – "}
-                      {helper.salary_max ? `R${helper.salary_max.toLocaleString()}` : "—"}
+                      {helper.salary_max ? formatSalary(helper.salary_max, helper.country) : "—"}
                       /month
                       {helper.salary_negotiable && " (Negotiable)"}
                     </p>
