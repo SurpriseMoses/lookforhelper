@@ -141,7 +141,7 @@ const FeaturedHelpers = () => {
       (profiles || []).forEach((p) => { profileMap[p.user_id] = p; });
 
       const merged: FeaturedHelper[] = allRaw.map((h) => {
-        const profile = profileMap.get(h.user_id);
+        const profile = profileMap[h.user_id];
         const isBoosted = boostedUserIds.has(h.user_id);
         return {
           user_id: h.user_id,
