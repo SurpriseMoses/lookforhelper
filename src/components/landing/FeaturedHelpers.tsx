@@ -199,8 +199,11 @@ const FeaturedHelpers = () => {
 
   if (loading || allHelpers.length === 0) return null;
 
-  const filterIcon = filterMode === "global" ? Globe : filterMode === "country" ? Map : Building2;
-  const FilterIcon = filterIcon;
+  const getFilterIcon = () => {
+    if (filterMode === "global") return <Globe className="h-4 w-4 text-muted-foreground" />;
+    if (filterMode === "city") return <Building2 className="h-4 w-4 text-muted-foreground" />;
+    return <Map className="h-4 w-4 text-muted-foreground" />;
+  };
 
   return (
     <section className="bg-secondary/50 py-20 md:py-28">
