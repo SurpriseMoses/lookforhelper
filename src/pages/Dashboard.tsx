@@ -468,11 +468,11 @@ const Dashboard = () => {
                 >
                   <SelectTrigger><SelectValue placeholder="Select (optional)" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sa_citizen">South African Citizen</SelectItem>
+                    <SelectItem value="citizen">Citizen</SelectItem>
                     <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
-                    <SelectItem value="work_permit">Valid Work Permit</SelectItem>
-                    <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
-                    <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                    <SelectItem value="work_permit">Work Permit</SelectItem>
+                    <SelectItem value="asylum_permit">Asylum / Refugee Permit</SelectItem>
+                    <SelectItem value="temporary_visa">Temporary Visa</SelectItem>
                     <SelectItem value="prefer_not_to_say">Prefer not to specify</SelectItem>
                   </SelectContent>
                 </Select>

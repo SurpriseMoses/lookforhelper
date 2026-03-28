@@ -461,11 +461,11 @@ const Browse = () => {
                 <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="sa_citizen">SA Citizen</SelectItem>
+                  <SelectItem value="citizen">Citizen</SelectItem>
                   <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
                   <SelectItem value="work_permit">Work Permit</SelectItem>
-                  <SelectItem value="asylum_permit">Asylum Permit</SelectItem>
-                  <SelectItem value="refugee_permit">Refugee Permit</SelectItem>
+                  <SelectItem value="asylum_permit">Asylum / Refugee Permit</SelectItem>
+                  <SelectItem value="temporary_visa">Temporary Visa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
