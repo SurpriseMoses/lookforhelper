@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell, Navigation, Loader2 } from "lucide-react";
+import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell, Navigation, Loader2, Globe } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -90,6 +90,8 @@ const Browse = () => {
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
   const [keywordSearch, setKeywordSearch] = useState("");
+  const [countryFilter, setCountryFilter] = useState("all");
+  const [countriesList, setCountriesList] = useState<{ id: string; country_name: string }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSaveSearch, setShowSaveSearch] = useState(false);
   const [nearMeMode, setNearMeMode] = useState(false);
@@ -100,6 +102,24 @@ const Browse = () => {
   const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
   const keywordDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch active countries and set default from user metadata
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountriesList(data);
+
+      // Default to user's country if logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      const userCountry = session?.user?.user_metadata?.country;
+      if (userCountry) setCountryFilter(userCountry);
+    };
+    init();
+  }, []);
 
   const handleKeywordChange = useCallback((value: string) => {
     setKeywordSearch(value);
@@ -178,6 +198,9 @@ const Browse = () => {
     }
     if (workTypeFilter !== "all") {
       query = query.contains("work_type", [workTypeFilter]);
+    }
+    if (countryFilter !== "all") {
+      query = query.eq("country", countryFilter);
     }
     if (workAuthFilter !== "all") {
       query = query.eq("work_authorization_status", workAuthFilter);
@@ -345,6 +368,23 @@ const Browse = () => {
           </div>
           
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Country</Label>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="All countries" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All countries</SelectItem>
+                  {countriesList.map((c) => (
+                    <SelectItem key={c.id} value={c.country_name}>{c.country_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
               <CityAutocomplete
