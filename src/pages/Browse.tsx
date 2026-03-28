@@ -369,6 +369,23 @@ const Browse = () => {
           
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Country</Label>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="All countries" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All countries</SelectItem>
+                  {countriesList.map((c) => (
+                    <SelectItem key={c.id} value={c.country_name}>{c.country_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Search by city</Label>
               <CityAutocomplete
                 value={cityFilter}
