@@ -137,8 +137,8 @@ const FeaturedHelpers = () => {
         .select("user_id, full_name, avatar_url, is_verified")
         .in("user_id", userIds);
 
-      const profileMap = new Map<string, { user_id: string; full_name: string; avatar_url: string | null; is_verified: boolean }>();
-      (profiles || []).forEach((p) => profileMap.set(p.user_id, p));
+      const profileMap: Record<string, { full_name: string; avatar_url: string | null; is_verified: boolean }> = {};
+      (profiles || []).forEach((p) => { profileMap[p.user_id] = p; });
 
       const merged: FeaturedHelper[] = allRaw.map((h) => {
         const profile = profileMap.get(h.user_id);
