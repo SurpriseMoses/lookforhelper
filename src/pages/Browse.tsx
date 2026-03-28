@@ -90,6 +90,8 @@ const Browse = () => {
   const [verifiedFilter, setVerifiedFilter] = useState(false);
   const [workAuthFilter, setWorkAuthFilter] = useState("all");
   const [keywordSearch, setKeywordSearch] = useState("");
+  const [countryFilter, setCountryFilter] = useState("all");
+  const [countriesList, setCountriesList] = useState<{ id: string; country_name: string }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSaveSearch, setShowSaveSearch] = useState(false);
   const [nearMeMode, setNearMeMode] = useState(false);
@@ -100,6 +102,24 @@ const Browse = () => {
   const [geoError, setGeoError] = useState("");
   const ITEMS_PER_PAGE = 12;
   const keywordDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch active countries and set default from user metadata
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountriesList(data);
+
+      // Default to user's country if logged in
+      const { data: { session } } = await supabase.auth.getSession();
+      const userCountry = session?.user?.user_metadata?.country;
+      if (userCountry) setCountryFilter(userCountry);
+    };
+    init();
+  }, []);
 
   const handleKeywordChange = useCallback((value: string) => {
     setKeywordSearch(value);
