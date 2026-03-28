@@ -29,6 +29,7 @@ import DataExportCard from "@/components/dashboard/DataExportCard";
 import SavedSearchesCard from "@/components/dashboard/SavedSearchesCard";
 import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
+import { getCurrencyForCountry } from "@/lib/currency";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
@@ -362,7 +363,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Salary Min (ZAR/month)</Label>
+                  <Label>Salary Min ({getCurrencyForCountry(helperDetails.country).code}/month)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 3000"
@@ -371,7 +372,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Salary Max (ZAR/month)</Label>
+                  <Label>Salary Max ({getCurrencyForCountry(helperDetails.country).code}/month)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 8000"
