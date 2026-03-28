@@ -53,11 +53,13 @@ interface HelperWithProfile {
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
 
 const WORK_AUTH_LABELS: Record<string, string> = {
-  sa_citizen: "SA Citizen",
+  citizen: "Citizen",
+  sa_citizen: "Citizen",
   permanent_resident: "Permanent Resident",
   work_permit: "Work Permit",
-  asylum_permit: "Asylum Permit",
-  refugee_permit: "Refugee Permit",
+  asylum_permit: "Asylum / Refugee Permit",
+  refugee_permit: "Asylum / Refugee Permit",
+  temporary_visa: "Temporary Visa",
   prefer_not_to_say: "Prefer not to specify",
 };
 
