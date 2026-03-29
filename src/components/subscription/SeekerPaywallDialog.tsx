@@ -23,7 +23,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { refresh } = useSeekerSubscription();
-  const { formatAmount } = useUserCurrency();
+  const { formatPrice } = useUserCurrency();
   const [paying, setPaying] = useState(false);
 
   const handlePay = async () => {
