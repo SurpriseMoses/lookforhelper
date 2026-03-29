@@ -35,6 +35,7 @@ interface ListingStatus {
 const HelperListingCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
