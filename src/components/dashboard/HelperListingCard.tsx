@@ -260,7 +260,7 @@ const HelperListingCard = () => {
             {/* Trial users: activate */}
             {isTrialActive && !isFeaturedActive && (
               <Button onClick={handleActivate} disabled={paying} className="w-full">
-                {paying ? "Processing..." : "Activate Listing — R25/month"}
+                {paying ? "Processing..." : `Activate Listing — ${formatAmount(25)}/month`}
               </Button>
             )}
 
