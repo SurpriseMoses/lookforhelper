@@ -43,6 +43,19 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Fetch active countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountries(data);
+    };
+    fetchCountries();
+  }, []);
+
   // Redirect authenticated users away from the auth page
   useEffect(() => {
     if (user) {
