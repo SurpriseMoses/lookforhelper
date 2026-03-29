@@ -7,8 +7,21 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PLAN_AMOUNT = 2500; // R25 in cents
+// Country-specific pricing (in cents) and Paystack currency
+const COUNTRY_PRICING: Record<string, { currency: string; amount: number }> = {
+  "South Africa": { currency: "ZAR", amount: 2500 },
+  "Nigeria": { currency: "NGN", amount: 200000 },
+  "Kenya": { currency: "KES", amount: 25000 },
+  "Ghana": { currency: "GHS", amount: 2500 },
+};
+const DEFAULT_PRICING = { currency: "USD", amount: 200 };
+
 const PLAN_DAYS = 30;
+
+function getPricing(country: string | null | undefined) {
+  if (country && COUNTRY_PRICING[country]) return COUNTRY_PRICING[country];
+  return DEFAULT_PRICING;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -28,7 +41,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -67,14 +79,16 @@ serve(async (req) => {
     if (action === "initialize") {
       console.log("Initializing seeker subscription for user:", user.id);
 
-      // Get the origin from the request headers for callback
+      const userCountry = user.user_metadata?.country as string | undefined;
+      const pricing = getPricing(userCountry);
+
       const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || "";
       const callbackUrl = origin ? `${origin}/dashboard` : "";
 
       const initBody: Record<string, unknown> = {
         email: user.email,
-        amount: PLAN_AMOUNT,
-        currency: "ZAR",
+        amount: pricing.amount,
+        currency: pricing.currency,
         metadata: {
           user_id: user.id,
           feature_type: "seeker_subscription",
@@ -111,12 +125,13 @@ serve(async (req) => {
         });
       }
 
-      // Update existing seeker_subscriptions record to pending
       await supabase
         .from("seeker_subscriptions")
         .update({
           status: "pending",
-          amount: PLAN_AMOUNT / 100,
+          amount: pricing.amount / 100,
+          currency: pricing.currency,
+          payment_country: userCountry || "South Africa",
           payment_reference: paystackData.data.reference,
         })
         .eq("user_id", user.id);
@@ -162,7 +177,7 @@ serve(async (req) => {
           .from("seeker_subscriptions")
           .update({
             status: "active",
-            amount: PLAN_AMOUNT / 100,
+            amount: paystackData.data.amount / 100,
             payment_reference: reference,
             current_period_start: startDate.toISOString(),
             current_period_end: endDate.toISOString(),

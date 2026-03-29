@@ -7,6 +7,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Country-specific pricing (in cents)
+const COUNTRY_PRICING: Record<string, { currency: string; amount: number }> = {
+  "South Africa": { currency: "ZAR", amount: 4900 },
+  "Nigeria": { currency: "NGN", amount: 400000 },
+  "Kenya": { currency: "KES", amount: 50000 },
+  "Ghana": { currency: "GHS", amount: 5000 },
+};
+const DEFAULT_PRICING = { currency: "USD", amount: 300 };
+
+function getPricing(country: string | null | undefined) {
+  if (country && COUNTRY_PRICING[country]) return COUNTRY_PRICING[country];
+  return DEFAULT_PRICING;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -26,7 +40,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -49,8 +62,11 @@ serve(async (req) => {
     const { action, reference } = body;
 
     if (action === "initialize") {
-      console.log("Initializing payment for user:", user.id, "email:", user.email);
-      
+      console.log("Initializing verification payment for user:", user.id);
+
+      const userCountry = user.user_metadata?.country as string | undefined;
+      const pricing = getPricing(userCountry);
+
       const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
         method: "POST",
         headers: {
@@ -59,8 +75,8 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: 4900, // R49 in cents
-          currency: "ZAR",
+          amount: pricing.amount,
+          currency: pricing.currency,
           metadata: {
             user_id: user.id,
             purpose: "identity_verification",
@@ -70,12 +86,11 @@ serve(async (req) => {
 
       const rawText = await paystackRes.text();
       console.log("Paystack response status:", paystackRes.status);
-      console.log("Paystack response body:", rawText);
 
       let paystackData;
       try {
         paystackData = JSON.parse(rawText);
-      } catch (e) {
+      } catch {
         console.error("Failed to parse Paystack response:", rawText.substring(0, 500));
         return new Response(JSON.stringify({ error: "Invalid response from payment provider" }), {
           status: 502,
@@ -95,9 +110,11 @@ serve(async (req) => {
         .from("verification_payments")
         .insert({
           user_id: user.id,
-          amount: 49.00,
+          amount: pricing.amount / 100,
           status: "pending",
           payment_reference: paystackData.data.reference,
+          currency: pricing.currency,
+          payment_country: userCountry || "South Africa",
         });
 
       if (insertError) {
@@ -130,32 +147,28 @@ serve(async (req) => {
       });
 
       const rawText = await paystackRes.text();
-      console.log("Paystack verify response:", rawText);
-
       let paystackData;
       try {
         paystackData = JSON.parse(rawText);
-      } catch (e) {
+      } catch {
         return new Response(JSON.stringify({ error: "Invalid response from payment provider" }), {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-    if (paystackData.status && paystackData.data.status === "success") {
+      if (paystackData.status && paystackData.data.status === "success") {
         await supabase
           .from("verification_payments")
           .update({ status: "paid" })
           .eq("payment_reference", reference)
           .eq("user_id", user.id);
 
-        // Set profile as verified now that payment is confirmed
         await supabase
           .from("profiles")
           .update({ is_verified: true, verified_at: new Date().toISOString() })
           .eq("user_id", user.id);
 
-        // Link payment to the approved verification request
         const { data: paidPayment } = await supabase
           .from("verification_payments")
           .select("id")

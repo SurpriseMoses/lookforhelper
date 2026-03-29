@@ -41,7 +41,7 @@ interface VerificationPayment {
 const VerificationCard = () => {
   const { user, role } = useAuth();
   const { toast } = useToast();
-  const { formatAmount } = useUserCurrency();
+  const { formatPrice } = useUserCurrency();
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [payment, setPayment] = useState<VerificationPayment | null>(null);
   const [isVerified, setIsVerified] = useState(false);
@@ -173,11 +173,11 @@ const VerificationCard = () => {
 
               <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                 <div>
-                  <p className="font-medium text-foreground">Get Verified — {formatAmount(49)} once-off</p>
+                  <p className="font-medium text-foreground">Get Verified — {formatPrice("verification")} once-off</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Verify your identity using your ID, passport, work permit, or asylum permit. 
                     Both citizens and foreign nationals are welcome.
-                    <span className="font-medium text-foreground"> You'll only be charged {formatAmount(49)} once approved.</span>
+                    <span className="font-medium text-foreground"> You'll only be charged {formatPrice("verification")} once approved.</span>
                   </p>
                 </div>
 
@@ -187,7 +187,7 @@ const VerificationCard = () => {
                     <li>Select your document type & upload it</li>
                     <li>Take a live selfie for identity matching</li>
                     <li>Our team reviews your submission (1-2 business days)</li>
-                    <li>If approved, pay {formatAmount(49)} to complete verification</li>
+                    <li>If approved, pay {formatPrice("verification")} to complete verification</li>
                   </ol>
                 </div>
 
@@ -217,13 +217,13 @@ const VerificationCard = () => {
                 <p className="font-medium text-foreground">Documents Approved!</p>
               </div>
               <p className="text-sm text-muted-foreground">
-                Your documents have been approved. Pay {formatAmount(49)} to complete verification and get your badge.
+                Your documents have been approved. Pay {formatPrice("verification")} to complete verification and get your badge.
               </p>
               <Button onClick={handlePay} disabled={paying} className="gap-2">
                 {paying ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
                 ) : (
-                  <><CreditCard className="h-4 w-4" /> Pay {formatAmount(49)} & Complete Verification</>
+                  <><CreditCard className="h-4 w-4" /> Pay {formatPrice("verification")} & Complete Verification</>
                 )}
               </Button>
             </div>

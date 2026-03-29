@@ -12,7 +12,7 @@ import { useUserCurrency } from "@/hooks/useUserCurrency";
 const FeaturedBoostCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { formatAmount } = useUserCurrency();
+  const { formatAmount, formatPrice } = useUserCurrency();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [featuredStatus, setFeaturedStatus] = useState<{
@@ -142,7 +142,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : `7 Days — ${formatAmount(49)}`}
+                {paying ? "Processing..." : `7 Days — ${formatPrice("boost_7")}`}
               </Button>
               <Button
                 onClick={() => handleBoost("21_days")}
@@ -151,7 +151,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : `21 Days — ${formatAmount(99)}`}
+                {paying ? "Processing..." : `21 Days — ${formatPrice("boost_21")}`}
               </Button>
               <Button
                 onClick={() => handleBoost("30_days")}
@@ -160,7 +160,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : `30 Days — ${formatAmount(139)}`}
+                {paying ? "Processing..." : `30 Days — ${formatPrice("boost_30")}`}
               </Button>
             </div>
           </div>
