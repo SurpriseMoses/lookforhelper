@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Clock, CheckCircle } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const SeekerSubscriptionCard = () => {
   const { hasActiveSubscription, expiresAt, loading } = useSeekerSubscription();
+  const { formatPrice } = useUserCurrency();
   const [showPaywall, setShowPaywall] = useState(false);
 
   if (loading) return null;
@@ -46,7 +48,7 @@ const SeekerSubscriptionCard = () => {
                 Unlock messaging to contact helpers, schedule interviews, and make hires.
               </p>
               <Button onClick={() => setShowPaywall(true)} className="gap-2">
-                <MessageSquare className="h-4 w-4" /> Unlock Messaging — R25
+                <MessageSquare className="h-4 w-4" /> Unlock Messaging — {formatPrice("seeker_subscription")}
               </Button>
             </div>
           )}
