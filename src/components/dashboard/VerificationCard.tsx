@@ -177,7 +177,7 @@ const VerificationCard = () => {
                   <p className="text-sm text-muted-foreground mt-1">
                     Verify your identity using your ID, passport, work permit, or asylum permit. 
                     Both citizens and foreign nationals are welcome.
-                    <span className="font-medium text-foreground"> You'll only be charged {formatAmount(49)} once approved.</span>
+                    <span className="font-medium text-foreground"> You'll only be charged {formatPrice("verification")} once approved.</span>
                   </p>
                 </div>
 
