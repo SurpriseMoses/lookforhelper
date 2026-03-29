@@ -325,6 +325,7 @@ const Auth = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
                     <Label htmlFor="signup-referral">Referral Code (optional)</Label>
                     <Input
                       id="signup-referral"
