@@ -36,7 +36,19 @@ import useLastActive from "@/hooks/useLastActive";
 import { getCurrencyForCountry } from "@/lib/currency";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
-const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
+const LANGUAGE_OPTIONS = [
+  "Afrikaans", "Amharic", "Arabic", "Bengali", "Bulgarian", "Burmese", "Cantonese", "Cebuano", "Chichewa",
+  "Chinese (Mandarin)", "Croatian", "Czech", "Danish", "Dutch", "English", "Estonian", "Filipino (Tagalog)",
+  "Finnish", "French", "German", "Greek", "Guarani", "Gujarati", "Haitian Creole", "Hausa", "Hebrew",
+  "Hindi", "Hungarian", "Igbo", "Indonesian", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh",
+  "Khmer", "Kinyarwanda", "Kirundi", "Korean", "Kurdish", "Lao", "Latvian", "Lingala", "Lithuanian",
+  "Luganda", "Malagasy", "Malay", "Malayalam", "Maltese", "Marathi", "Mongolian", "Ndebele", "Nepali",
+  "Norwegian", "Oromo", "Pashto", "Pedi", "Persian (Farsi)", "Polish", "Portuguese", "Punjabi", "Quechua",
+  "Romanian", "Russian", "Serbian", "Sesotho", "Shona", "Sinhala", "Slovak", "Slovenian", "Somali",
+  "Spanish", "Sundanese", "Swahili", "Swati", "Swedish", "Tamil", "Telugu", "Thai", "Tigrinya",
+  "Tsonga", "Tswana", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uzbek", "Venda", "Vietnamese",
+  "Wolof", "Xhosa", "Yoruba", "Zulu"
+];
 
 const Dashboard = () => {
   const { user, role, loading: authLoading, profileComplete, signOut } = useAuth();
