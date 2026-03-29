@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Lock } from "lucide-react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface SeekerPaywallDialogProps {
   open: boolean;
