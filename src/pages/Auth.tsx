@@ -308,6 +308,23 @@ const Auth = () => {
                     </RadioGroup>
                   </div>
                   <div className="space-y-2">
+                    <Label>Your Country</Label>
+                    <Select value={signupCountry} onValueChange={setSignupCountry}>
+                      <SelectTrigger>
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Select your country" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((c) => (
+                          <SelectItem key={c.id} value={c.country_name}>
+                            {c.country_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                     <Label htmlFor="signup-referral">Referral Code (optional)</Label>
                     <Input
                       id="signup-referral"
