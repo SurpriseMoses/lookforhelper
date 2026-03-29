@@ -25,7 +25,7 @@ const PricingSection = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <PriceItem label="Unlock chat & contact with helpers (30 days)" price={`From ${formatAmount(25)}`} />
+                <PriceItem label="Unlock chat & contact with helpers (30 days)" price={`From ${formatPrice("seeker_subscription")}`} />
                 <PriceItem label="Keyword search" price="Free" highlight />
               </div>
               <p className="text-xs text-muted-foreground pt-2 border-t">
