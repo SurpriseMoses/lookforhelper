@@ -11,7 +11,7 @@ import { useUserCurrency } from "@/hooks/useUserCurrency";
 const BackgroundCheckCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { formatAmount } = useUserCurrency();
+  const { formatPrice } = useUserCurrency();
   const [requested, setRequested] = useState(false);
   const [loading, setLoading] = useState(true);
 
