@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
@@ -34,6 +35,7 @@ const HireDetails = () => {
   const { hireId } = useParams<{ hireId: string }>();
   const { user, loading: authLoading } = useAuth();
   const { hasActiveSubscription } = useSeekerSubscription();
+  const { formatPrice } = useUserCurrency();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -317,7 +319,7 @@ const HireDetails = () => {
                   Unlock chat to contact this helper
                 </p>
                 <Button size="sm" onClick={() => setShowPaywall(true)} className="gap-1.5">
-                  <MessageSquare className="h-3.5 w-3.5" /> Unlock Chat — R25
+                  <MessageSquare className="h-3.5 w-3.5" /> Unlock Chat — {formatPrice("seeker_subscription")}
                 </Button>
               </div>
             )}

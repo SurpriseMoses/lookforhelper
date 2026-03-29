@@ -155,6 +155,12 @@ const Dashboard = () => {
         .update({ full_name: profile.full_name, phone_number: phoneNumber || null } as any)
         .eq("user_id", user.id);
 
+      // Sync country to auth metadata so currency updates everywhere
+      const userCountry = role === "helper" ? helperDetails.country : user.user_metadata?.country;
+      if (userCountry) {
+        await supabase.auth.updateUser({ data: { country: userCountry } });
+      }
+
       if (role === "helper") {
         // Convert skill_experience string values to numbers
         const numericSkillExp: Record<string, number> = {};
@@ -190,7 +196,7 @@ const Dashboard = () => {
           .eq("user_id", user.id);
       }
 
-      toast({ title: "Profile saved!" });
+      toast({ title: "Profile saved! Refresh the page to see updated currency." });
     } catch (err: any) {
       toast({ title: "Error saving", description: err.message, variant: "destructive" });
     } finally {
@@ -362,7 +368,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Province</Label>
+                  <Label>Province / State</Label>
                   <Input value={helperDetails.province} disabled className="bg-muted" />
                 </div>
                 <div className="space-y-2">
