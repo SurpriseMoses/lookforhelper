@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, Clock, CheckCircle, XCircle, Loader2, CreditCard } from "lucide-react";
 import VerificationFlow from "@/components/verification/VerificationFlow";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const HELPER_DOC_TYPE_LABELS: Record<string, string> = {
   sa_id: "SA Verified",
