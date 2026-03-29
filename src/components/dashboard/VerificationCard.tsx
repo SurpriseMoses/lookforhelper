@@ -187,7 +187,7 @@ const VerificationCard = () => {
                     <li>Select your document type & upload it</li>
                     <li>Take a live selfie for identity matching</li>
                     <li>Our team reviews your submission (1-2 business days)</li>
-                    <li>If approved, pay R49 to complete verification</li>
+                    <li>If approved, pay {formatAmount(49)} to complete verification</li>
                   </ol>
                 </div>
 
