@@ -1,9 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencyForCountry } from "@/lib/currency";
+import { getPrice, getPricingForCountry, type ProductKey } from "@/lib/pricing";
 
 /**
- * Returns the current user's currency symbol based on their country.
- * Falls back to ZAR (R) if not logged in or country not set.
+ * Returns the current user's currency symbol and country-specific pricing.
  */
 export function useUserCurrency() {
   const { user } = useAuth();
@@ -13,5 +13,13 @@ export function useUserCurrency() {
   /** Format an amount with the user's currency symbol */
   const formatAmount = (amount: number) => `${symbol}${amount.toLocaleString()}`;
 
-  return { symbol, code, country, formatAmount };
+  /** Get the fixed local price for a product */
+  const price = (product: ProductKey) => getPrice(product, country);
+
+  /** Format a product's local price with currency symbol */
+  const formatPrice = (product: ProductKey) => formatAmount(price(product));
+
+  const pricing = getPricingForCountry(country);
+
+  return { symbol, code, country, formatAmount, price, formatPrice, pricing };
 }

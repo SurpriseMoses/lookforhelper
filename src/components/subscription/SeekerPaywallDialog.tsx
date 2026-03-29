@@ -75,7 +75,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
             Maybe Later
           </Button>
           <Button onClick={handlePay} disabled={paying}>
-            {paying ? "Processing..." : `Pay Now — ${formatAmount(25)}`}
+            {paying ? "Processing..." : `Pay Now — ${formatPrice("seeker_subscription")}`}
           </Button>
         </DialogFooter>
       </DialogContent>
