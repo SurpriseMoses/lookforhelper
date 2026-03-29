@@ -505,19 +505,44 @@ const Dashboard = () => {
 
               <div className="space-y-2">
                 <Label>Languages</Label>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGE_OPTIONS.map((lang) => (
-                    <Badge
-                      key={lang}
-                      variant={helperDetails.languages.includes(lang) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => toggleLanguage(lang)}
-                    >
-                      {lang}
-                      {helperDetails.languages.includes(lang) && <X className="ml-1 h-3 w-3" />}
-                    </Badge>
-                  ))}
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" role="combobox" className="w-full justify-between h-auto min-h-10">
+                      <span className="flex flex-wrap gap-1 text-left">
+                        {helperDetails.languages.length > 0
+                          ? helperDetails.languages.join(", ")
+                          : "Select languages..."}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full min-w-[300px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search languages..." />
+                      <CommandList>
+                        <CommandEmpty>No language found.</CommandEmpty>
+                        <CommandGroup className="max-h-64 overflow-auto">
+                          {LANGUAGE_OPTIONS.map((lang) => (
+                            <CommandItem key={lang} value={lang} onSelect={() => toggleLanguage(lang)}>
+                              <Check className={cn("mr-2 h-4 w-4", helperDetails.languages.includes(lang) ? "opacity-100" : "opacity-0")} />
+                              {lang}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {helperDetails.languages.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {helperDetails.languages.map((lang) => (
+                      <Badge key={lang} variant="default" className="cursor-pointer" onClick={() => toggleLanguage(lang)}>
+                        {lang}
+                        <X className="ml-1 h-3 w-3" />
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Work Authorization */}
