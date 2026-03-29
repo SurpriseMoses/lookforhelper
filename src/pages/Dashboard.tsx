@@ -14,7 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { X, Globe } from "lucide-react";
+import { X, Globe, Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import VerificationCard from "@/components/dashboard/VerificationCard";
 import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
 import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
