@@ -173,7 +173,7 @@ const VerificationCard = () => {
 
               <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                 <div>
-                  <p className="font-medium text-foreground">Get Verified — {formatAmount(49)} once-off</p>
+                  <p className="font-medium text-foreground">Get Verified — {formatPrice("verification")} once-off</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Verify your identity using your ID, passport, work permit, or asylum permit. 
                     Both citizens and foreign nationals are welcome.
