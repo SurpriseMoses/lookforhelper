@@ -209,7 +209,7 @@ const VerificationCard = () => {
             </div>
           )}
 
-          {/* Approved — pay R49 */}
+          {/* Approved — pay to complete */}
           {request && request.status === "approved" && !payment && !isVerified && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
               <div className="flex items-center gap-2">
