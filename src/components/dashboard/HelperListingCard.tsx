@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Clock, AlertTriangle, XCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface ListingStatus {
   status: string;
