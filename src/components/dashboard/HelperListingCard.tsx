@@ -277,7 +277,7 @@ const HelperListingCard = () => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reactivate your subscription?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Your automatic billing will resume and your profile will stay visible to seekers after the current period ends. You will be charged R25 on the next billing cycle.
+                        Your automatic billing will resume and your profile will stay visible to seekers after the current period ends. You will be charged {formatAmount(25)} on the next billing cycle.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
