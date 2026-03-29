@@ -342,7 +342,7 @@ const HelperListingCard = () => {
               </p>
             </div>
             <Button onClick={handleActivate} disabled={paying} className="w-full">
-              {paying ? "Processing..." : "Subscribe — R25/month"}
+              {paying ? "Processing..." : `Subscribe — ${formatAmount(25)}/month`}
             </Button>
           </>
         )}

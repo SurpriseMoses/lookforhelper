@@ -37,7 +37,7 @@ const HowItWorks = () => {
     {
       icon: MessageSquare,
       title: "Connect & Chat",
-      description: "Pay R25 to unlock chat and contact helpers directly for 30 days.",
+      description: "Pay a small fee to unlock chat and contact helpers directly for 30 days.",
       buttonLabel: hasActiveSubscription ? "Go to Messages" : "Unlock Chat",
       onClick: handleUnlockChat,
     },

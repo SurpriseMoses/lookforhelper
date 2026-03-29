@@ -16,9 +16,9 @@ const RefundPolicy = () => {
           <h2 className="text-xl font-semibold text-foreground mb-3">2. Helper Payments</h2>
           <p className="text-muted-foreground mb-2">Payments for the following helper services are <strong>non-refundable</strong> once activated:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
-            <li>Profile visibility subscription (R25/month)</li>
-            <li>Featured Boosts (R49 / R99 / R139)</li>
-            <li>Verified Identity badge (R49)</li>
+            <li>Profile visibility subscription</li>
+            <li>Featured Boosts</li>
+            <li>Verified Identity badge</li>
             <li>Background Check</li>
           </ul>
         </section>

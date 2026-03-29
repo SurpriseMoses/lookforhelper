@@ -405,7 +405,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
         <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
           <p className="text-xs text-muted-foreground">
             <span className="font-medium text-foreground">Note:</span> Our team will review your submission within 1-2 business days. 
-            You'll only be charged R49 once your documents are approved.
+            You'll only be charged once your documents are approved.
           </p>
         </div>
       </div>
