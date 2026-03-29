@@ -14,7 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { X, Globe } from "lucide-react";
+import { X, Globe, Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import VerificationCard from "@/components/dashboard/VerificationCard";
 import FeaturedBoostCard from "@/components/dashboard/FeaturedBoostCard";
 import SeekerSubscriptionCard from "@/components/dashboard/SeekerSubscriptionCard";
@@ -33,7 +36,19 @@ import useLastActive from "@/hooks/useLastActive";
 import { getCurrencyForCountry } from "@/lib/currency";
 
 const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
-const LANGUAGE_OPTIONS = ["English", "Afrikaans", "Zulu", "Xhosa", "Sotho", "Tswana", "Pedi", "Venda", "Tsonga", "Swati", "Ndebele", "French", "Portuguese"];
+const LANGUAGE_OPTIONS = [
+  "Afrikaans", "Amharic", "Arabic", "Bengali", "Bulgarian", "Burmese", "Cantonese", "Cebuano", "Chichewa",
+  "Chinese (Mandarin)", "Croatian", "Czech", "Danish", "Dutch", "English", "Estonian", "Filipino (Tagalog)",
+  "Finnish", "French", "German", "Greek", "Guarani", "Gujarati", "Haitian Creole", "Hausa", "Hebrew",
+  "Hindi", "Hungarian", "Igbo", "Indonesian", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh",
+  "Khmer", "Kinyarwanda", "Kirundi", "Korean", "Kurdish", "Lao", "Latvian", "Lingala", "Lithuanian",
+  "Luganda", "Malagasy", "Malay", "Malayalam", "Maltese", "Marathi", "Mongolian", "Ndebele", "Nepali",
+  "Norwegian", "Oromo", "Pashto", "Pedi", "Persian (Farsi)", "Polish", "Portuguese", "Punjabi", "Quechua",
+  "Romanian", "Russian", "Serbian", "Sesotho", "Shona", "Sinhala", "Slovak", "Slovenian", "Somali",
+  "Spanish", "Sundanese", "Swahili", "Swati", "Swedish", "Tamil", "Telugu", "Thai", "Tigrinya",
+  "Tsonga", "Tswana", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uzbek", "Venda", "Vietnamese",
+  "Wolof", "Xhosa", "Yoruba", "Zulu"
+];
 
 const Dashboard = () => {
   const { user, role, loading: authLoading, profileComplete, signOut } = useAuth();
@@ -490,19 +505,44 @@ const Dashboard = () => {
 
               <div className="space-y-2">
                 <Label>Languages</Label>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGE_OPTIONS.map((lang) => (
-                    <Badge
-                      key={lang}
-                      variant={helperDetails.languages.includes(lang) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => toggleLanguage(lang)}
-                    >
-                      {lang}
-                      {helperDetails.languages.includes(lang) && <X className="ml-1 h-3 w-3" />}
-                    </Badge>
-                  ))}
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" role="combobox" className="w-full justify-between h-auto min-h-10">
+                      <span className="flex flex-wrap gap-1 text-left">
+                        {helperDetails.languages.length > 0
+                          ? helperDetails.languages.join(", ")
+                          : "Select languages..."}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full min-w-[300px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search languages..." />
+                      <CommandList>
+                        <CommandEmpty>No language found.</CommandEmpty>
+                        <CommandGroup className="max-h-64 overflow-auto">
+                          {LANGUAGE_OPTIONS.map((lang) => (
+                            <CommandItem key={lang} value={lang} onSelect={() => toggleLanguage(lang)}>
+                              <Check className={cn("mr-2 h-4 w-4", helperDetails.languages.includes(lang) ? "opacity-100" : "opacity-0")} />
+                              {lang}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {helperDetails.languages.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {helperDetails.languages.map((lang) => (
+                      <Badge key={lang} variant="default" className="cursor-pointer" onClick={() => toggleLanguage(lang)}>
+                        {lang}
+                        <X className="ml-1 h-3 w-3" />
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Work Authorization */}
