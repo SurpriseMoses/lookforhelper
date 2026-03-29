@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Search, MessageSquare, Calendar, LayoutDashboard } from "lucide-react";
+import { Home, Search, MessageSquare, Briefcase, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
