@@ -184,7 +184,7 @@ const VerificationFlow = ({ open, onOpenChange, onComplete }: VerificationFlowPr
 
       toast({
         title: "Verification submitted!",
-        description: "Our team will review it within 1-2 business days. You'll only be charged R49 if approved.",
+        description: "Our team will review it within 1-2 business days. You'll only be charged once approved.",
       });
 
       resetFlow();
