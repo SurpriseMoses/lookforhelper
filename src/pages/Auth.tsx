@@ -9,8 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/landing/Navbar";
+import { Globe } from "lucide-react";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +33,8 @@ const Auth = () => {
   const [signupName, setSignupName] = useState("");
   const [signupRole, setSignupRole] = useState<"seeker" | "helper">(defaultRole as "seeker" | "helper");
   const [signupReferralCode, setSignupReferralCode] = useState(searchParams.get("ref") || "");
+  const [signupCountry, setSignupCountry] = useState("South Africa");
+  const [countries, setCountries] = useState<{ id: string; country_name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
@@ -32,6 +42,19 @@ const Auth = () => {
   const { user, signIn, signUp, profileComplete } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Fetch active countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from("countries")
+        .select("id, country_name")
+        .eq("is_active", true)
+        .order("country_name");
+      if (data) setCountries(data);
+    };
+    fetchCountries();
+  }, []);
 
   // Redirect authenticated users away from the auth page
   useEffect(() => {
@@ -97,7 +120,7 @@ const Auth = () => {
     }
     setIsLoading(true);
     try {
-      await signUp(signupEmail, signupPassword, signupName, signupRole);
+      await signUp(signupEmail, signupPassword, signupName, signupRole, signupCountry);
 
       // If a referral code was entered, create the referral record after signup
       if (signupReferralCode.trim()) {
@@ -283,6 +306,24 @@ const Auth = () => {
                         <Label htmlFor="helper" className="cursor-pointer">Helper (looking for work)</Label>
                       </div>
                     </RadioGroup>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Your Country</Label>
+                    <Select value={signupCountry} onValueChange={setSignupCountry}>
+                      <SelectTrigger>
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Select your country" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((c) => (
+                          <SelectItem key={c.id} value={c.country_name}>
+                            {c.country_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-referral">Referral Code (optional)</Label>

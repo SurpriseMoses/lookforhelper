@@ -10,7 +10,7 @@ interface AuthContextType {
   loading: boolean;
   role: AppRole | null;
   profileComplete: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole, country?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -128,12 +128,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole) => {
+  const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole, country?: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: selectedRole },
+        data: { full_name: fullName, role: selectedRole, country: country || "South Africa" },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
