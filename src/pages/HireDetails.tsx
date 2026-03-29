@@ -319,7 +319,7 @@ const HireDetails = () => {
                   Unlock chat to contact this helper
                 </p>
                 <Button size="sm" onClick={() => setShowPaywall(true)} className="gap-1.5">
-                  <MessageSquare className="h-3.5 w-3.5" /> Unlock Chat — R25
+                  <MessageSquare className="h-3.5 w-3.5" /> Unlock Chat — {formatPrice("seeker_subscription")}
                 </Button>
               </div>
             )}
