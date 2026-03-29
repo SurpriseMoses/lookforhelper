@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const PricingSection = () => {
+  const { formatAmount } = useUserCurrency();
   return (
     <section className="py-16 bg-muted/30">
       <div className="container">
