@@ -173,11 +173,11 @@ const VerificationCard = () => {
 
               <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                 <div>
-                  <p className="font-medium text-foreground">Get Verified — R49 once-off</p>
+                  <p className="font-medium text-foreground">Get Verified — {formatAmount(49)} once-off</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Verify your identity using your SA ID, passport, work permit, or asylum permit. 
-                    Both South African citizens and foreign nationals are welcome.
-                    <span className="font-medium text-foreground"> You'll only be charged R49 once approved.</span>
+                    Verify your identity using your ID, passport, work permit, or asylum permit. 
+                    Both citizens and foreign nationals are welcome.
+                    <span className="font-medium text-foreground"> You'll only be charged {formatAmount(49)} once approved.</span>
                   </p>
                 </div>
 
