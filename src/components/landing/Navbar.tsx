@@ -76,6 +76,9 @@ const Navbar = () => {
             <Button variant="ghost" asChild className="justify-start">
               <Link to="/browse" onClick={() => setMobileOpen(false)}>Browse Helpers</Link>
             </Button>
+            <Button variant="ghost" asChild className="justify-start gap-1.5">
+              <Link to="/jobs" onClick={() => setMobileOpen(false)}><Briefcase className="h-4 w-4" /> Jobs</Link>
+            </Button>
             {user ? (
               <>
                 <Button variant="ghost" asChild className="justify-start gap-1.5">
