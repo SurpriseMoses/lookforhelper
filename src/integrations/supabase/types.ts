@@ -592,6 +592,86 @@ export type Database = {
           },
         ]
       }
+      job_responses: {
+        Row: {
+          created_at: string
+          helper_id: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          created_at?: string
+          helper_id: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          created_at?: string
+          helper_id?: string
+          id?: string
+          job_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_responses_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          location_preference: string
+          longitude: number | null
+          province: string | null
+          seeker_id: string
+          skills: string[]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_preference?: string
+          longitude?: number | null
+          province?: string | null
+          seeker_id: string
+          skills?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_preference?: string
+          longitude?: number | null
+          province?: string | null
+          seeker_id?: string
+          skills?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string

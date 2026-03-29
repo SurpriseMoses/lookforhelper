@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PostJobDialog from "@/components/jobs/PostJobDialog";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -301,6 +302,15 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             <SeekerHiresSection />
+            <Card className="mb-6">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Post a Job</p>
+                  <p className="text-xs text-muted-foreground">Post a domestic job for helpers to see</p>
+                </div>
+                <PostJobDialog trigger={<Button size="sm">Post Job</Button>} />
+              </CardContent>
+            </Card>
           </>
         )}
 

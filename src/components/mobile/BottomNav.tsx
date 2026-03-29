@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Search, MessageSquare, Calendar, LayoutDashboard } from "lucide-react";
+import { Home, Search, MessageSquare, Briefcase, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
   { path: "/browse", icon: Search, label: "Browse" },
+  { path: "/jobs", icon: Briefcase, label: "Jobs" },
   { path: "/messages", icon: MessageSquare, label: "Messages", auth: true },
-  { path: "/interviews", icon: Calendar, label: "Interviews", auth: true },
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard", auth: true },
 ];
 

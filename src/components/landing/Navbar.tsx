@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, MessageSquare, Calendar, Shield } from "lucide-react";
+import { Menu, X, MessageSquare, Calendar, Shield, Briefcase } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -25,6 +25,9 @@ const Navbar = () => {
         <div className="hidden items-center gap-3 md:flex">
           <Button variant="ghost" asChild>
             <Link to="/browse">Browse Helpers</Link>
+          </Button>
+          <Button variant="ghost" asChild className="gap-1.5">
+            <Link to="/jobs"><Briefcase className="h-4 w-4" /> Jobs</Link>
           </Button>
           {user ? (
             <>
@@ -72,6 +75,9 @@ const Navbar = () => {
           <div className="flex flex-col gap-2">
             <Button variant="ghost" asChild className="justify-start">
               <Link to="/browse" onClick={() => setMobileOpen(false)}>Browse Helpers</Link>
+            </Button>
+            <Button variant="ghost" asChild className="justify-start gap-1.5">
+              <Link to="/jobs" onClick={() => setMobileOpen(false)}><Briefcase className="h-4 w-4" /> Jobs</Link>
             </Button>
             {user ? (
               <>
