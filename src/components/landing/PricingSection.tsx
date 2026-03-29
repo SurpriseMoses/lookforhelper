@@ -1,17 +1,51 @@
-import { Check, Sparkles, Star } from "lucide-react";
+import { useState } from "react";
+import { Check, Globe, Sparkles, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUserCurrency } from "@/hooks/useUserCurrency";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
+import { getCurrencyForCountry } from "@/lib/currency";
+import { getPrice, type ProductKey } from "@/lib/pricing";
+
+const CURRENCY_OPTIONS = [
+  { country: "South Africa", label: "ZAR (R)" },
+  { country: "Nigeria", label: "NGN (₦)" },
+  { country: "Kenya", label: "KES (KSh)" },
+  { country: "Ghana", label: "GHS (GH₵)" },
+  { country: "United States", label: "USD ($)" },
+];
 
 const PricingSection = () => {
-  const { formatPrice } = useUserCurrency();
+  const { user } = useAuth();
+  const userCountry = user?.user_metadata?.country as string | undefined;
+  const [selectedCountry, setSelectedCountry] = useState<string>(userCountry || "South Africa");
+
+  const { symbol } = getCurrencyForCountry(selectedCountry);
+  const formatPrice = (product: ProductKey) =>
+    `${symbol}${getPrice(product, selectedCountry).toLocaleString()}`;
+
   return (
     <section className="py-16 bg-muted/30">
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-3">Pricing</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto mb-4">
             Simple, transparent pricing for seekers and helpers.
           </p>
+          <div className="inline-flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+              <SelectTrigger className="w-[180px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.country} value={opt.country}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
