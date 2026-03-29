@@ -12,6 +12,7 @@ import { useUserCurrency } from "@/hooks/useUserCurrency";
 const FeaturedBoostCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [featuredStatus, setFeaturedStatus] = useState<{
