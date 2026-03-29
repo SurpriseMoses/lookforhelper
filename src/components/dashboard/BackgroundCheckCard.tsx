@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Bell } from "lucide-react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const BackgroundCheckCard = () => {
   const { user } = useAuth();
