@@ -233,7 +233,7 @@ const CompleteProfile = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Province / Region</Label>
+                      <Label>Province / State</Label>
                       <Input value={province} disabled className="bg-muted" />
                     </div>
                   </div>

@@ -368,7 +368,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Province</Label>
+                  <Label>Province / State</Label>
                   <Input value={helperDetails.province} disabled className="bg-muted" />
                 </div>
                 <div className="space-y-2">
