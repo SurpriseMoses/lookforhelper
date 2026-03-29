@@ -28,9 +28,24 @@ const PricingSection = () => {
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-3">Pricing</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto mb-4">
             Simple, transparent pricing for seekers and helpers.
           </p>
+          <div className="inline-flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+              <SelectTrigger className="w-[180px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.country} value={opt.country}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
