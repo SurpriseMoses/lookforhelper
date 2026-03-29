@@ -10,7 +10,7 @@ interface AuthContextType {
   loading: boolean;
   role: AppRole | null;
   profileComplete: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole, country?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
