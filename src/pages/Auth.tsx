@@ -33,6 +33,8 @@ const Auth = () => {
   const [signupName, setSignupName] = useState("");
   const [signupRole, setSignupRole] = useState<"seeker" | "helper">(defaultRole as "seeker" | "helper");
   const [signupReferralCode, setSignupReferralCode] = useState(searchParams.get("ref") || "");
+  const [signupCountry, setSignupCountry] = useState("South Africa");
+  const [countries, setCountries] = useState<{ id: string; country_name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
