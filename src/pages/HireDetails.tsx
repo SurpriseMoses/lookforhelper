@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
