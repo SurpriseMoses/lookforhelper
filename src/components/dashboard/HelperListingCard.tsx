@@ -343,7 +343,7 @@ const HelperListingCard = () => {
               </p>
             </div>
             <Button onClick={handleActivate} disabled={paying} className="w-full">
-              {paying ? "Processing..." : `Subscribe — ${formatAmount(25)}/month`}
+              {paying ? "Processing..." : `Subscribe — ${formatPrice("helper_listing")}/month`}
             </Button>
           </>
         )}
