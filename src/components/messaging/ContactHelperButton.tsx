@@ -111,7 +111,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
 
         <p className="text-sm text-muted-foreground text-center">
           {isLocked
-            ? `Messaging requires an active plan (${formatAmount(25)} / 30 days)`
+            ? `Messaging requires an active plan (${formatPrice("seeker_subscription")} / 30 days)`
             : "Interested in this helper? Send them a message to get started."}
         </p>
         <div className="text-center">

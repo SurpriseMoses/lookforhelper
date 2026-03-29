@@ -223,7 +223,7 @@ const VerificationCard = () => {
                 {paying ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
                 ) : (
-                  <><CreditCard className="h-4 w-4" /> Pay {formatAmount(49)} & Complete Verification</>
+                  <><CreditCard className="h-4 w-4" /> Pay {formatPrice("verification")} & Complete Verification</>
                 )}
               </Button>
             </div>
