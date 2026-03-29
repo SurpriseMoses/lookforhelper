@@ -7,11 +7,32 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PLANS: Record<string, { amount: number; days: number; label: string }> = {
-  "7_days": { amount: 4900, days: 7, label: "7 Days Featured" },
-  "21_days": { amount: 9900, days: 21, label: "21 Days Featured" },
-  "30_days": { amount: 13900, days: 30, label: "30 Days Featured" },
+// Country-specific pricing (in cents) for each boost plan
+const COUNTRY_PRICING: Record<string, { currency: string; boost_7: number; boost_21: number; boost_30: number }> = {
+  "South Africa": { currency: "ZAR", boost_7: 4900, boost_21: 9900, boost_30: 13900 },
+  "Nigeria": { currency: "NGN", boost_7: 400000, boost_21: 800000, boost_30: 1100000 },
+  "Kenya": { currency: "KES", boost_7: 50000, boost_21: 100000, boost_30: 140000 },
+  "Ghana": { currency: "GHS", boost_7: 5000, boost_21: 10000, boost_30: 14000 },
 };
+const DEFAULT_PRICING = { currency: "USD", boost_7: 300, boost_21: 600, boost_30: 800 };
+
+const PLAN_DAYS: Record<string, number> = {
+  "7_days": 7,
+  "21_days": 21,
+  "30_days": 30,
+};
+
+function getPricing(country: string | null | undefined) {
+  if (country && COUNTRY_PRICING[country]) return COUNTRY_PRICING[country];
+  return DEFAULT_PRICING;
+}
+
+function getBoostAmount(pricing: typeof DEFAULT_PRICING, plan: string): number {
+  if (plan === "7_days") return pricing.boost_7;
+  if (plan === "21_days") return pricing.boost_21;
+  if (plan === "30_days") return pricing.boost_30;
+  return 0;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,7 +52,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -68,15 +88,19 @@ serve(async (req) => {
     const { action, reference, plan } = body;
 
     if (action === "initialize") {
-      const planConfig = PLANS[plan];
-      if (!planConfig) {
+      const days = PLAN_DAYS[plan];
+      if (!days) {
         return new Response(JSON.stringify({ error: "Invalid plan" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      console.log("Initializing featured boost for user:", user.id, "plan:", plan);
+      const userCountry = user.user_metadata?.country as string | undefined;
+      const pricing = getPricing(userCountry);
+      const amount = getBoostAmount(pricing, plan);
+
+      console.log("Initializing featured boost for user:", user.id, "plan:", plan, "currency:", pricing.currency, "amount:", amount);
 
       const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
         method: "POST",
@@ -86,8 +110,8 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: planConfig.amount,
-          currency: "ZAR",
+          amount,
+          currency: pricing.currency,
           metadata: {
             user_id: user.id,
             plan,
@@ -114,15 +138,16 @@ serve(async (req) => {
         });
       }
 
-      // Insert payment record
       const { error: insertError } = await supabase
         .from("featured_payments")
         .insert({
           user_id: user.id,
-          amount: planConfig.amount / 100,
+          amount: amount / 100,
           plan,
           payment_reference: paystackData.data.reference,
           status: "pending",
+          currency: pricing.currency,
+          payment_country: userCountry || "South Africa",
         });
 
       if (insertError) {
@@ -166,7 +191,6 @@ serve(async (req) => {
       }
 
       if (paystackData.status && paystackData.data.status === "success") {
-        // Get payment record to find plan
         const { data: paymentRecord } = await supabase
           .from("featured_payments")
           .select("plan")
@@ -175,18 +199,16 @@ serve(async (req) => {
           .maybeSingle();
 
         const selectedPlan = paymentRecord?.plan || "7_days";
-        const planConfig = PLANS[selectedPlan];
+        const days = PLAN_DAYS[selectedPlan] || 7;
         const featuredUntil = new Date();
-        featuredUntil.setDate(featuredUntil.getDate() + planConfig.days);
+        featuredUntil.setDate(featuredUntil.getDate() + days);
 
-        // Update payment status
         await supabase
           .from("featured_payments")
           .update({ status: "paid" })
           .eq("payment_reference", reference)
           .eq("user_id", user.id);
 
-        // Update helper_details
         await supabase
           .from("helper_details")
           .update({

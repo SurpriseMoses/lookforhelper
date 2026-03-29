@@ -7,8 +7,21 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PLAN_AMOUNT = 2500; // R25 in cents
+// Country-specific pricing (in cents)
+const COUNTRY_PRICING: Record<string, { currency: string; amount: number }> = {
+  "South Africa": { currency: "ZAR", amount: 2500 },
+  "Nigeria": { currency: "NGN", amount: 200000 },
+  "Kenya": { currency: "KES", amount: 25000 },
+  "Ghana": { currency: "GHS", amount: 2500 },
+};
+const DEFAULT_PRICING = { currency: "USD", amount: 200 };
+
 const PLAN_DAYS = 30;
+
+function getPricing(country: string | null | undefined) {
+  if (country && COUNTRY_PRICING[country]) return COUNTRY_PRICING[country];
+  return DEFAULT_PRICING;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -66,13 +79,16 @@ serve(async (req) => {
     if (action === "initialize") {
       console.log("Initializing helper listing for user:", user.id);
 
+      const userCountry = user.user_metadata?.country as string | undefined;
+      const pricing = getPricing(userCountry);
+
       const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || "";
       const callbackUrl = origin ? `${origin}/dashboard` : "";
 
       const initBody: Record<string, unknown> = {
         email: user.email,
-        amount: PLAN_AMOUNT,
-        currency: "ZAR",
+        amount: pricing.amount,
+        currency: pricing.currency,
         metadata: {
           user_id: user.id,
           feature_type: "helper_listing",
@@ -176,7 +192,6 @@ serve(async (req) => {
     }
 
     if (action === "cancel") {
-      // Cancel subscription - keep active until expiry
       const { data: sub } = await supabase
         .from("helper_subscriptions")
         .select("featured_expires_at, featured_active")
