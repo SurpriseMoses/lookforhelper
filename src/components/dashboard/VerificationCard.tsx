@@ -217,7 +217,7 @@ const VerificationCard = () => {
                 <p className="font-medium text-foreground">Documents Approved!</p>
               </div>
               <p className="text-sm text-muted-foreground">
-                Your documents have been approved. Pay R49 to complete verification and get your badge.
+                Your documents have been approved. Pay {formatAmount(49)} to complete verification and get your badge.
               </p>
               <Button onClick={handlePay} disabled={paying} className="gap-2">
                 {paying ? (
