@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, Lock, ShieldAlert } from "lucide-react";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface Props {
   helperUserId: string;
