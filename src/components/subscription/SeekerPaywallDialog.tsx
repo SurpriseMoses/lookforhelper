@@ -58,7 +58,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
         <div className="space-y-4 py-2">
           <div className="rounded-lg border bg-muted/50 p-4 text-center space-y-2">
             <MessageSquare className="mx-auto h-10 w-10 text-primary/60" />
-            <h3 className="font-semibold text-foreground text-lg">R25 for 30 days</h3>
+            <h3 className="font-semibold text-foreground text-lg">{formatAmount(25)} for 30 days</h3>
             <p className="text-sm text-muted-foreground">
               Get unlimited access to message helpers, schedule interviews, and make hires.
             </p>
