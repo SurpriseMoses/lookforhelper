@@ -35,6 +35,7 @@ const HireDetails = () => {
   const { hireId } = useParams<{ hireId: string }>();
   const { user, loading: authLoading } = useAuth();
   const { hasActiveSubscription } = useSeekerSubscription();
+  const { formatPrice } = useUserCurrency();
   const navigate = useNavigate();
   const { toast } = useToast();
 
