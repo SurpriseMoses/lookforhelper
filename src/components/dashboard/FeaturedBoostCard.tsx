@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Sparkles, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const FeaturedBoostCard = () => {
   const { user } = useAuth();
