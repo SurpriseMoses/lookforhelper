@@ -218,14 +218,23 @@ const Browse = () => {
     if (helperRows.length > 0) {
       const userIds = helperRows.map((h: any) => h.user_id);
 
-      // Fetch subscriptions to filter eligible helpers
+      // Fetch subscriptions to filter eligible helpers (trial or active, with valid dates)
       const { data: subsData } = await supabase
         .from("helper_subscriptions")
-        .select("user_id")
+        .select("user_id, status, trial_end, current_period_end, featured_active, featured_expires_at")
         .in("user_id", userIds)
         .in("status", ["trial", "active"]);
 
-      const eligibleIds = new Set((subsData ?? []).map((s: any) => s.user_id));
+      const nowISO = new Date().toISOString();
+      const eligibleIds = new Set(
+        (subsData ?? [])
+          .filter((s: any) => {
+            if (s.status === "trial") return s.trial_end && s.trial_end > nowISO;
+            if (s.status === "active") return true;
+            return false;
+          })
+          .map((s: any) => s.user_id)
+      );
       const eligibleHelpers = helperRows.filter((h: any) => eligibleIds.has(h.user_id));
 
       if (eligibleHelpers.length === 0) {
