@@ -26,6 +26,9 @@ const Navbar = () => {
           <Button variant="ghost" asChild>
             <Link to="/browse">Browse Helpers</Link>
           </Button>
+          <Button variant="ghost" asChild className="gap-1.5">
+            <Link to="/jobs"><Briefcase className="h-4 w-4" /> Jobs</Link>
+          </Button>
           {user ? (
             <>
               <Button variant="ghost" asChild className="gap-1.5">
