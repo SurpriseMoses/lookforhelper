@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, Lock, ShieldAlert } from "lucide-react";
 import { useSeekerSubscription } from "@/contexts/SeekerSubscriptionContext";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface Props {
   helperUserId: string;
@@ -18,6 +19,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasActiveSubscription } = useSeekerSubscription();
+  const { formatAmount } = useUserCurrency();
   const [loading, setLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [acknowledged, setAcknowledged] = useState(false);
@@ -109,7 +111,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
 
         <p className="text-sm text-muted-foreground text-center">
           {isLocked
-            ? "Messaging requires an active plan (R25 / 30 days)"
+            ? `Messaging requires an active plan (${formatAmount(25)} / 30 days)`
             : "Interested in this helper? Send them a message to get started."}
         </p>
         <div className="text-center">

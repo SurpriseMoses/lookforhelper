@@ -1,7 +1,9 @@
 import { Check, Sparkles, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const PricingSection = () => {
+  const { formatAmount } = useUserCurrency();
   return (
     <section className="py-16 bg-muted/30">
       <div className="container">
@@ -23,7 +25,7 @@ const PricingSection = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <PriceItem label="Unlock chat & contact with helpers (30 days)" price="From R25" />
+                <PriceItem label="Unlock chat & contact with helpers (30 days)" price={`From ${formatAmount(25)}`} />
                 <PriceItem label="Keyword search" price="Free" highlight />
               </div>
               <p className="text-xs text-muted-foreground pt-2 border-t">
@@ -43,14 +45,14 @@ const PricingSection = () => {
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <PriceItem label="30-day free trial after signup" price="Free" highlight />
-                <PriceItem label="Profile visibility subscription" price="R25/mo" />
+                <PriceItem label="Profile visibility subscription" price={`${formatAmount(25)}/mo`} />
                 <div className="pl-4 border-l-2 border-primary/20 space-y-2">
                   <p className="text-sm font-medium text-foreground">Featured Boost:</p>
-                  <PriceItem label="7 days" price="R49" compact />
-                  <PriceItem label="21 days" price="R99" compact />
-                  <PriceItem label="30 days" price="R139" compact />
+                  <PriceItem label="7 days" price={formatAmount(49)} compact />
+                  <PriceItem label="21 days" price={formatAmount(99)} compact />
+                  <PriceItem label="30 days" price={formatAmount(139)} compact />
                 </div>
-                <PriceItem label="Verified Identity badge" price="R49" />
+                <PriceItem label="Verified Identity badge" price={formatAmount(49)} />
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="h-4 w-4 text-muted-foreground/50" />
                   <span>Background Check — <em>Coming Soon</em></span>

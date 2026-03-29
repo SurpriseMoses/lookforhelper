@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Sparkles, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const FeaturedBoostCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [featuredStatus, setFeaturedStatus] = useState<{
@@ -140,7 +142,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "7 Days — R49"}
+                {paying ? "Processing..." : `7 Days — ${formatAmount(49)}`}
               </Button>
               <Button
                 onClick={() => handleBoost("21_days")}
@@ -149,7 +151,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "21 Days — R99"}
+                {paying ? "Processing..." : `21 Days — ${formatAmount(99)}`}
               </Button>
               <Button
                 onClick={() => handleBoost("30_days")}
@@ -158,7 +160,7 @@ const FeaturedBoostCard = () => {
                 className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 <Star className="h-4 w-4" />
-                {paying ? "Processing..." : "30 Days — R139"}
+                {paying ? "Processing..." : `30 Days — ${formatAmount(139)}`}
               </Button>
             </div>
           </div>

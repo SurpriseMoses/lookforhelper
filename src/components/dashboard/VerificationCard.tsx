@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, Clock, CheckCircle, XCircle, Loader2, CreditCard } from "lucide-react";
 import VerificationFlow from "@/components/verification/VerificationFlow";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const HELPER_DOC_TYPE_LABELS: Record<string, string> = {
   sa_id: "SA Verified",
@@ -40,6 +41,7 @@ interface VerificationPayment {
 const VerificationCard = () => {
   const { user, role } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [payment, setPayment] = useState<VerificationPayment | null>(null);
   const [isVerified, setIsVerified] = useState(false);
@@ -171,11 +173,11 @@ const VerificationCard = () => {
 
               <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                 <div>
-                  <p className="font-medium text-foreground">Get Verified — R49 once-off</p>
+                  <p className="font-medium text-foreground">Get Verified — {formatAmount(49)} once-off</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Verify your identity using your SA ID, passport, work permit, or asylum permit. 
-                    Both South African citizens and foreign nationals are welcome.
-                    <span className="font-medium text-foreground"> You'll only be charged R49 once approved.</span>
+                    Verify your identity using your ID, passport, work permit, or asylum permit. 
+                    Both citizens and foreign nationals are welcome.
+                    <span className="font-medium text-foreground"> You'll only be charged {formatAmount(49)} once approved.</span>
                   </p>
                 </div>
 
@@ -185,7 +187,7 @@ const VerificationCard = () => {
                     <li>Select your document type & upload it</li>
                     <li>Take a live selfie for identity matching</li>
                     <li>Our team reviews your submission (1-2 business days)</li>
-                    <li>If approved, pay R49 to complete verification</li>
+                    <li>If approved, pay {formatAmount(49)} to complete verification</li>
                   </ol>
                 </div>
 
@@ -207,7 +209,7 @@ const VerificationCard = () => {
             </div>
           )}
 
-          {/* Approved — pay R49 */}
+          {/* Approved — pay to complete */}
           {request && request.status === "approved" && !payment && !isVerified && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
               <div className="flex items-center gap-2">
@@ -215,13 +217,13 @@ const VerificationCard = () => {
                 <p className="font-medium text-foreground">Documents Approved!</p>
               </div>
               <p className="text-sm text-muted-foreground">
-                Your documents have been approved. Pay R49 to complete verification and get your badge.
+                Your documents have been approved. Pay {formatAmount(49)} to complete verification and get your badge.
               </p>
               <Button onClick={handlePay} disabled={paying} className="gap-2">
                 {paying ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
                 ) : (
-                  <><CreditCard className="h-4 w-4" /> Pay R49 & Complete Verification</>
+                  <><CreditCard className="h-4 w-4" /> Pay {formatAmount(49)} & Complete Verification</>
                 )}
               </Button>
             </div>

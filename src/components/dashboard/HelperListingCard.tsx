@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Clock, AlertTriangle, XCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface ListingStatus {
   status: string;
@@ -34,6 +35,7 @@ interface ListingStatus {
 const HelperListingCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -250,7 +252,7 @@ const HelperListingCard = () => {
                     Expiring soon
                   </p>
                   <p className="text-xs text-amber-700 dark:text-amber-300">
-                    Renew your listing to stay visible. R25 for 30 days.
+                    Renew your listing to stay visible. {formatAmount(25)} for 30 days.
                   </p>
                 </div>
               </div>
@@ -259,7 +261,7 @@ const HelperListingCard = () => {
             {/* Trial users: activate */}
             {isTrialActive && !isFeaturedActive && (
               <Button onClick={handleActivate} disabled={paying} className="w-full">
-                {paying ? "Processing..." : "Activate Listing — R25/month"}
+                {paying ? "Processing..." : `Activate Listing — ${formatAmount(25)}/month`}
               </Button>
             )}
 
@@ -276,7 +278,7 @@ const HelperListingCard = () => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reactivate your subscription?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Your automatic billing will resume and your profile will stay visible to seekers after the current period ends. You will be charged R25 on the next billing cycle.
+                        Your automatic billing will resume and your profile will stay visible to seekers after the current period ends. You will be charged {formatAmount(25)} on the next billing cycle.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -341,7 +343,7 @@ const HelperListingCard = () => {
               </p>
             </div>
             <Button onClick={handleActivate} disabled={paying} className="w-full">
-              {paying ? "Processing..." : "Subscribe — R25/month"}
+              {paying ? "Processing..." : `Subscribe — ${formatAmount(25)}/month`}
             </Button>
           </>
         )}

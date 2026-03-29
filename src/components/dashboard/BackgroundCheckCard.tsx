@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Bell } from "lucide-react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 const BackgroundCheckCard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatAmount } = useUserCurrency();
   const [requested, setRequested] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +74,7 @@ const BackgroundCheckCard = () => {
           Build more trust with seekers by verifying your criminal record and safety status.
         </p>
         <p className="text-sm font-medium text-foreground">
-          R149 once-off <span className="text-xs text-muted-foreground font-normal">(when available)</span>
+          {formatAmount(149)} once-off <span className="text-xs text-muted-foreground font-normal">(when available)</span>
         </p>
         {requested ? (
           <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">

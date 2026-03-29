@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Lock } from "lucide-react";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 
 interface SeekerPaywallDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { refresh } = useSeekerSubscription();
+  const { formatAmount } = useUserCurrency();
   const [paying, setPaying] = useState(false);
 
   const handlePay = async () => {
@@ -56,7 +58,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
         <div className="space-y-4 py-2">
           <div className="rounded-lg border bg-muted/50 p-4 text-center space-y-2">
             <MessageSquare className="mx-auto h-10 w-10 text-primary/60" />
-            <h3 className="font-semibold text-foreground text-lg">R25 for 30 days</h3>
+            <h3 className="font-semibold text-foreground text-lg">{formatAmount(25)} for 30 days</h3>
             <p className="text-sm text-muted-foreground">
               Get unlimited access to message helpers, schedule interviews, and make hires.
             </p>
@@ -73,7 +75,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
             Maybe Later
           </Button>
           <Button onClick={handlePay} disabled={paying}>
-            {paying ? "Processing..." : "Pay Now — R25"}
+            {paying ? "Processing..." : `Pay Now — ${formatAmount(25)}`}
           </Button>
         </DialogFooter>
       </DialogContent>
