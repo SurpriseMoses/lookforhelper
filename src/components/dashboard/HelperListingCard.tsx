@@ -251,7 +251,7 @@ const HelperListingCard = () => {
                     Expiring soon
                   </p>
                   <p className="text-xs text-amber-700 dark:text-amber-300">
-                    Renew your listing to stay visible. R25 for 30 days.
+                    Renew your listing to stay visible. {formatAmount(25)} for 30 days.
                   </p>
                 </div>
               </div>
