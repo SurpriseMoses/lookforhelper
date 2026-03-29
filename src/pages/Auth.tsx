@@ -120,7 +120,7 @@ const Auth = () => {
     }
     setIsLoading(true);
     try {
-      await signUp(signupEmail, signupPassword, signupName, signupRole);
+      await signUp(signupEmail, signupPassword, signupName, signupRole, signupCountry);
 
       // If a referral code was entered, create the referral record after signup
       if (signupReferralCode.trim()) {
