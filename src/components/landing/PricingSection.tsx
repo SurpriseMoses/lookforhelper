@@ -1,9 +1,28 @@
-import { Check, Sparkles, Star } from "lucide-react";
+import { useState } from "react";
+import { Check, Globe, Sparkles, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUserCurrency } from "@/hooks/useUserCurrency";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
+import { getCurrencyForCountry } from "@/lib/currency";
+import { getPrice, type ProductKey } from "@/lib/pricing";
+
+const CURRENCY_OPTIONS = [
+  { country: "South Africa", label: "ZAR (R)" },
+  { country: "Nigeria", label: "NGN (₦)" },
+  { country: "Kenya", label: "KES (KSh)" },
+  { country: "Ghana", label: "GHS (GH₵)" },
+  { country: "United States", label: "USD ($)" },
+];
 
 const PricingSection = () => {
-  const { formatPrice } = useUserCurrency();
+  const { user } = useAuth();
+  const userCountry = user?.user_metadata?.country as string | undefined;
+  const [selectedCountry, setSelectedCountry] = useState<string>(userCountry || "South Africa");
+
+  const { symbol } = getCurrencyForCountry(selectedCountry);
+  const formatPrice = (product: ProductKey) =>
+    `${symbol}${getPrice(product, selectedCountry).toLocaleString()}`;
+
   return (
     <section className="py-16 bg-muted/30">
       <div className="container">
