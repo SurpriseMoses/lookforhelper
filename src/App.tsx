@@ -24,6 +24,7 @@ import CancellationPolicy from "./pages/CancellationPolicy";
 import Contact from "./pages/Contact";
 import ResetPassword from "./pages/ResetPassword";
 import SavedHelpers from "./pages/SavedHelpers";
+import Jobs from "./pages/Jobs";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
