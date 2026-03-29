@@ -19,7 +19,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { hasActiveSubscription } = useSeekerSubscription();
-  const { formatAmount } = useUserCurrency();
+  const { formatPrice } = useUserCurrency();
   const [loading, setLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [acknowledged, setAcknowledged] = useState(false);
