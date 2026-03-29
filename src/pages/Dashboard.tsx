@@ -311,6 +311,7 @@ const Dashboard = () => {
                 <PostJobDialog trigger={<Button size="sm">Post Job</Button>} />
               </CardContent>
             </Card>
+          </>
         )}
 
         {/* Verification for both helpers and seekers */}
