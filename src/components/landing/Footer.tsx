@@ -63,10 +63,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Compliance note */}
-          <p className="text-center text-xs text-muted-foreground">
-            Look for Helper is currently onboarding early users across South Africa.
-          </p>
         </div>
       </div>
     </footer>
