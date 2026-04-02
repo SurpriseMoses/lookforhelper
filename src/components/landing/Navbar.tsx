@@ -14,7 +14,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Look For Helper" className="h-8 w-auto" />
+          <img src={logo} alt="Look For Helper" className="h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}
