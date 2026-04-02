@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Top row */}
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center">
-              <img src={logo} alt="Look For Helper" className="h-10 w-auto" />
+              <img src={logo} alt="Look For Helper" className="h-8 w-auto" />
             </div>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/browse" className="hover:text-foreground transition-colors">
