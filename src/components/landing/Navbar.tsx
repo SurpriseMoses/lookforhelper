@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X, MessageSquare, Calendar, Shield, Briefcase } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
