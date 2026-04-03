@@ -1,4 +1,3 @@
-import logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,8 +9,13 @@ const Footer = () => {
         <div className="flex flex-col gap-8">
           {/* Top row */}
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <div className="flex items-center">
-              <img src={logo} alt="Look For Helper" className="h-8 w-auto" />
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">L</span>
+              </div>
+              <span className="font-display text-lg font-bold text-foreground">
+                Look For Helper
+              </span>
             </div>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/browse" className="hover:text-foreground transition-colors">
