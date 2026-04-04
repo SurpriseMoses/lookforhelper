@@ -4,6 +4,7 @@ import { Menu, X, MessageSquare, Calendar, Shield, Briefcase } from "lucide-reac
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import logo from "@/assets/logo.png";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
