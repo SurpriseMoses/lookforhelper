@@ -13,9 +13,8 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 border-b bg-card backdrop-blur-md overflow-hidden">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Look For Helper" className="h-8 w-auto object-contain" />
-          <span className="text-sm font-bold tracking-tight whitespace-nowrap text-foreground">LOOK FOR HELPER.</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Look For Helper" className="h-28 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav */}
