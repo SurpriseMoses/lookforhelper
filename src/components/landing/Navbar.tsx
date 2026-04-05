@@ -11,10 +11,10 @@ const Navbar = () => {
   const { user, role } = useAuth();
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 border-b bg-card backdrop-blur-md overflow-hidden">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Look For Helper" className="h-14 w-auto object-contain" />
+          <img src={logo} alt="Look For Helper" className="h-10 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav */}
