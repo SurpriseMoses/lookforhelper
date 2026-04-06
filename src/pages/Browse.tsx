@@ -50,7 +50,7 @@ interface HelperWithProfile {
   } | null;
 }
 
-const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
+const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener", "Lawn Mowing Operator"];
 
 const WORK_AUTH_LABELS: Record<string, string> = {
   citizen: "Citizen",
