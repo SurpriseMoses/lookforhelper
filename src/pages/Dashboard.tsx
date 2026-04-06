@@ -35,7 +35,7 @@ import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
 import { getCurrencyForCountry } from "@/lib/currency";
 
-const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
+const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener", "Lawn Mowing Operator"];
 const LANGUAGE_OPTIONS = [
   "Afrikaans", "Amharic", "Arabic", "Bengali", "Bulgarian", "Burmese", "Cantonese", "Cebuano", "Chichewa",
   "Chinese (Mandarin)", "Croatian", "Czech", "Danish", "Dutch", "English", "Estonian", "Filipino (Tagalog)",

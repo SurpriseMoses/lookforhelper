@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Plus, AlertTriangle } from "lucide-react";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 
-const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener"];
+const SKILL_OPTIONS = ["Nanny", "Babysitter", "Cleaner", "Caregiver", "Cook", "Driver", "Gardener", "Lawn Mowing Operator"];
 
 interface PostJobDialogProps {
   onJobPosted?: () => void;
