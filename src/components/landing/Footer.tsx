@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="flex flex-col gap-8">
           {/* Top row */}
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center overflow-hidden h-16">
               <img src={logo} alt="Look For Helper" className="h-28 w-auto object-contain" />
             </Link>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
