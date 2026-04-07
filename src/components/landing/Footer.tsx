@@ -13,7 +13,6 @@ const Footer = () => {
             <Link to="/" className="flex items-center">
               <img src={logo} alt="Look For Helper" className="h-28 w-auto object-contain" />
             </Link>
-            </div>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/browse" className="hover:text-foreground transition-colors">
                 Browse Helpers
