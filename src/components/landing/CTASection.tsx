@@ -11,7 +11,7 @@ const CTASection = () => {
             Ready to Get Started?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-primary-foreground/80">
-            Whether you're looking for help or looking for work, join thousands of South Africans on Look For Helper.
+            Whether you're looking for help or looking for work, join thousands of individuals on Look For Helper.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
