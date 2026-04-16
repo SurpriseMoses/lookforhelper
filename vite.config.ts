@@ -20,9 +20,9 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: [
         "favicon.ico",
-        "pwa-192x192-v2.png",
-        "pwa-512x512-v2.png",
-        "pwa-maskable-512x512-v2.png",
+        "pwa-192x192-v4.png",
+        "pwa-512x512-v4.png",
+        "pwa-maskable-512x512-v4.png",
       ],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
@@ -40,19 +40,19 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "/pwa-192x192-v2.png",
+            src: "/pwa-192x192-v4.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "/pwa-512x512-v2.png",
+            src: "/pwa-512x512-v4.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "/pwa-maskable-512x512-v2.png",
+            src: "/pwa-maskable-512x512-v4.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
