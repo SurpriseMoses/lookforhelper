@@ -58,15 +58,14 @@ serve(async (req) => {
       });
     }
 
-    // Verify user is a seeker
+    // Verify user is a seeker or admin
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .eq("role", "seeker")
-      .maybeSingle();
+      .in("role", ["seeker", "admin"]);
 
-    if (!roleData) {
+    if (!roleData || roleData.length === 0) {
       return new Response(JSON.stringify({ error: "Only seekers can purchase messaging access" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
