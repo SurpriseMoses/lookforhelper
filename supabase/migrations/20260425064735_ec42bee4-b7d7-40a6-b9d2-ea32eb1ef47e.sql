@@ -1,0 +1,1 @@
+ALTER TABLE public.helper_details ALTER COLUMN is_published SET DEFAULT true;
