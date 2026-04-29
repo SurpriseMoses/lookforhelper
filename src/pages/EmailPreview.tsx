@@ -25,7 +25,11 @@ const TEMPLATE_NAMES = [
   "helper-reminder-3-final",
 ];
 
-export default function EmailPreview() {
+interface EmailPreviewProps {
+  embedded?: boolean;
+}
+
+export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [name, setName] = useState("Thandi");
@@ -73,7 +77,7 @@ export default function EmailPreview() {
   if (isAdmin === null) return null;
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 px-4 space-y-6">
+    <div className={embedded ? "space-y-6" : "container mx-auto max-w-6xl py-8 px-4 space-y-6"}>
       <div>
         <h1 className="text-3xl font-bold">Helper Reminder Email Preview</h1>
         <p className="text-muted-foreground mt-1">
