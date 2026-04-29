@@ -619,6 +619,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="bg-checks" className="gap-1.5">
               <Search className="h-4 w-4" /> BG Checks
             </TabsTrigger>
+            <TabsTrigger value="email-preview" className="gap-1.5">
+              <Mail className="h-4 w-4" /> Email Preview
+            </TabsTrigger>
           </TabsList>
 
           {/* Reports Tab */}
@@ -1054,6 +1057,11 @@ const AdminDashboard = () => {
             <p className="mt-4 text-sm text-muted-foreground">
               This list shows helpers who clicked "Notify Me" and are interested in Background Checks when the feature launches.
             </p>
+          </TabsContent>
+
+          {/* Email Preview Tab */}
+          <TabsContent value="email-preview">
+            <EmailPreview embedded />
           </TabsContent>
         </Tabs>
       </div>
