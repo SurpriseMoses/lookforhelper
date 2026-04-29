@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import ResetPassword from "./pages/ResetPassword";
 import SavedHelpers from "./pages/SavedHelpers";
 import Jobs from "./pages/Jobs";
+import Unsubscribe from "./pages/Unsubscribe";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/saved-helpers" element={<SavedHelpers />} />
                 <Route path="/jobs" element={<Jobs />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
