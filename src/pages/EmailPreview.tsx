@@ -25,7 +25,11 @@ const TEMPLATE_NAMES = [
   "helper-reminder-3-final",
 ];
 
-export default function EmailPreview() {
+interface EmailPreviewProps {
+  embedded?: boolean;
+}
+
+export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [name, setName] = useState("Thandi");
@@ -36,6 +40,11 @@ export default function EmailPreview() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (embedded) {
+      setIsAdmin(true);
+      return;
+    }
+
     if (!user) return;
     supabase
       .from("user_roles")
@@ -44,7 +53,7 @@ export default function EmailPreview() {
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
-  }, [user]);
+  }, [embedded, user]);
 
   const generate = async () => {
     setBusy(true);
@@ -68,12 +77,12 @@ export default function EmailPreview() {
   };
 
   if (loading) return null;
-  if (!user) return <Navigate to="/auth" replace />;
-  if (isAdmin === false) return <Navigate to="/" replace />;
+  if (!user) return embedded ? null : <Navigate to="/auth" replace />;
+  if (!embedded && isAdmin === false) return <Navigate to="/" replace />;
   if (isAdmin === null) return null;
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 px-4 space-y-6">
+    <div className={embedded ? "space-y-6" : "container mx-auto max-w-6xl py-8 px-4 space-y-6"}>
       <div>
         <h1 className="text-3xl font-bold">Helper Reminder Email Preview</h1>
         <p className="text-muted-foreground mt-1">
