@@ -40,6 +40,11 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (embedded) {
+      setIsAdmin(true);
+      return;
+    }
+
     if (!user) return;
     supabase
       .from("user_roles")
@@ -48,7 +53,7 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
-  }, [user]);
+  }, [embedded, user]);
 
   const generate = async () => {
     setBusy(true);
@@ -72,8 +77,8 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   };
 
   if (loading) return null;
-  if (!user) return <Navigate to="/auth" replace />;
-  if (isAdmin === false) return <Navigate to="/" replace />;
+  if (!user) return embedded ? null : <Navigate to="/auth" replace />;
+  if (!embedded && isAdmin === false) return <Navigate to="/" replace />;
   if (isAdmin === null) return null;
 
   return (
