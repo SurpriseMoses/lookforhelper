@@ -448,6 +448,36 @@ export type Database = {
         }
         Relationships: []
       }
+      helper_reminder_tracking: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          email_step: number
+          last_reminder_sent_at: string | null
+          unsubscribed: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          email_step?: number
+          last_reminder_sent_at?: string | null
+          unsubscribed?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          email_step?: number
+          last_reminder_sent_at?: string | null
+          unsubscribed?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       helper_reviews: {
         Row: {
           comment: string | null
