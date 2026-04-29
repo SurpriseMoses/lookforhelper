@@ -26,6 +26,7 @@ import ResetPassword from "./pages/ResetPassword";
 import SavedHelpers from "./pages/SavedHelpers";
 import Jobs from "./pages/Jobs";
 import Unsubscribe from "./pages/Unsubscribe";
+import EmailPreview from "./pages/EmailPreview";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/saved-helpers" element={<SavedHelpers />} />
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
+                <Route path="/admin/email-preview" element={<EmailPreview />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
