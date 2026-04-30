@@ -80,6 +80,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // If this is a password recovery flow, do NOT populate session-derived state
+      // so the user cannot access authenticated areas (e.g. /dashboard) until they
+      // complete (or abandon) the reset on /reset-password.
+      if (event === "PASSWORD_RECOVERY") {
+        sessionStorage.setItem("password_recovery_in_progress", "true");
+        roleRequestIdRef.current += 1;
+        setSession(null);
+        setUser(null);
+        setRole(null);
+        setLoading(false);
+        return;
+      }
+
+      if (sessionStorage.getItem("password_recovery_in_progress") === "true") {
+        // Ignore SIGNED_IN / TOKEN_REFRESHED events emitted by the recovery link
+        roleRequestIdRef.current += 1;
+        setSession(null);
+        setUser(null);
+        setRole(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
 
@@ -109,6 +132,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      // If we are mid password-recovery, ignore the recovery session entirely
+      if (sessionStorage.getItem("password_recovery_in_progress") === "true") {
+        setSession(null);
+        setUser(null);
+        setRole(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
 
