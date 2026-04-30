@@ -132,6 +132,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      // If we are mid password-recovery, ignore the recovery session entirely
+      if (sessionStorage.getItem("password_recovery_in_progress") === "true") {
+        setSession(null);
+        setUser(null);
+        setRole(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
 
