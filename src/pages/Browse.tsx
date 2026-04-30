@@ -72,6 +72,13 @@ const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * 2 * Math.asin(Math.sqrt(a));
 };
 
+const hasSearchRequiredProfileFields = (helper: Pick<HelperWithProfile, "city" | "skills">) => {
+  const hasCity = typeof helper.city === "string" && helper.city.trim().length > 0;
+  const hasWrittenSkill = Array.isArray(helper.skills) && helper.skills.some((skill) => skill.trim().length > 0);
+
+  return hasCity && hasWrittenSkill;
+};
+
 const Browse = () => {
   const [helpers, setHelpers] = useState<HelperWithProfile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -216,9 +223,7 @@ const Browse = () => {
     query = query.order("created_at", { ascending: false });
 
     const { data } = await query;
-    const helperRows = (data ?? []).filter(
-      (h: any) => h.city && h.city.trim() !== "" && Array.isArray(h.skills) && h.skills.length > 0
-    );
+    const helperRows = (data ?? []).filter(hasSearchRequiredProfileFields);
 
     // Filter by active subscription (trial or active)
     if (helperRows.length > 0) {
@@ -320,7 +325,7 @@ const Browse = () => {
       }
 
       // Filter verified only if toggle is on
-      const filtered = verifiedFilter ? results.filter((h) => h.is_verified) : results;
+      const filtered = (verifiedFilter ? results.filter((h) => h.is_verified) : results).filter(hasSearchRequiredProfileFields);
 
       // Sort
       if (sortBy === "nearest" && refLat != null) {
