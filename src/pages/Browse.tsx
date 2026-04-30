@@ -216,7 +216,9 @@ const Browse = () => {
     query = query.order("created_at", { ascending: false });
 
     const { data } = await query;
-    const helperRows = data ?? [];
+    const helperRows = (data ?? []).filter(
+      (h: any) => h.city && h.city.trim() !== "" && Array.isArray(h.skills) && h.skills.length > 0
+    );
 
     // Filter by active subscription (trial or active)
     if (helperRows.length > 0) {
