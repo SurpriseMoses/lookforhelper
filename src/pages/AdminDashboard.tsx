@@ -594,7 +594,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs defaultValue="reports">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 flex w-full flex-wrap h-auto justify-start">
             <TabsTrigger value="reports" className="gap-1.5">
               <Flag className="h-4 w-4" /> Reports {pendingReports.length > 0 && `(${pendingReports.length})`}
             </TabsTrigger>
