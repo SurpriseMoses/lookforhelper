@@ -138,7 +138,6 @@ Deno.serve(async (req) => {
 
     if (action === 'send') {
       const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
-      console.log('[send] targetIds:', targetIds.length, 'incompleteList:', incompleteList.length)
       if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
 
       const targetSet = new Set(targetIds)
@@ -147,7 +146,6 @@ Deno.serve(async (req) => {
       let skipped = 0
       const results: Array<{ user_id: string; status: string; step?: number; error?: string }> = []
       const matched = incompleteList.filter((h) => targetSet.has(h.user_id))
-      console.log('[send] matched targets in incompleteList:', matched.length)
 
 
       for (const h of incompleteList) {
@@ -164,7 +162,7 @@ Deno.serve(async (req) => {
         }
 
         try {
-          const { error: sendErr } = await admin.functions.invoke('send-transactional-email', {
+          const { data: sendData, error: sendErr } = await userClient.functions.invoke('send-transactional-email', {
             body: {
               templateName: STEP_TEMPLATES[h.next_step],
               recipientEmail: h.email,
@@ -175,7 +173,21 @@ Deno.serve(async (req) => {
               },
             },
           })
-          if (sendErr) throw new Error(sendErr.message)
+          if (sendErr) {
+            const context = (sendErr as { context?: unknown }).context
+            let detail = sendErr.message
+            if (context instanceof Response) {
+              const responseText = await context.text().catch(() => '')
+              if (responseText) detail = `${detail}: ${responseText}`
+            }
+            throw new Error(detail)
+          }
+
+          if (sendData?.success === false) {
+            skipped++
+            results.push({ user_id: h.user_id, status: sendData.reason || 'skipped' })
+            continue
+          }
 
           await admin.from('helper_reminder_tracking').upsert({
             user_id: h.user_id,
