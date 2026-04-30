@@ -138,7 +138,6 @@ Deno.serve(async (req) => {
 
     if (action === 'send') {
       const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
-      console.log('[send] targetIds:', targetIds.length, 'incompleteList:', incompleteList.length)
       if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
 
       const targetSet = new Set(targetIds)
@@ -147,7 +146,6 @@ Deno.serve(async (req) => {
       let skipped = 0
       const results: Array<{ user_id: string; status: string; step?: number; error?: string }> = []
       const matched = incompleteList.filter((h) => targetSet.has(h.user_id))
-      console.log('[send] matched targets in incompleteList:', matched.length)
 
 
       for (const h of incompleteList) {
