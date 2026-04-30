@@ -14,10 +14,14 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    // Mark this session as a recovery flow so AuthContext / route guards can block dashboard access
+    sessionStorage.setItem("password_recovery_in_progress", "true");
+
     // Listen for PASSWORD_RECOVERY event from the redirect
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -33,6 +37,26 @@ const ResetPassword = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // If user navigates away (closes tab / clicks elsewhere) without completing reset, sign them out
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!completed) {
+        // Best-effort: clear local session so they can't end up authenticated
+        void supabase.auth.signOut();
+        sessionStorage.removeItem("password_recovery_in_progress");
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (!completed) {
+        // Component unmounting without completion -> sign out
+        void supabase.auth.signOut();
+        sessionStorage.removeItem("password_recovery_in_progress");
+      }
+    };
+  }, [completed]);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
