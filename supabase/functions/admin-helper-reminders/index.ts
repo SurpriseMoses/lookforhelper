@@ -156,6 +156,9 @@ Deno.serve(async (req) => {
       full_name: string
       first_name: string
       city: string | null
+      country: string | null
+      years_experience: number | null
+      skills: string[]
       skills_count: number
       current_step: number
       next_step: number | null
@@ -192,6 +195,9 @@ Deno.serve(async (req) => {
         full_name: fullName,
         first_name: fullName.split(' ')[0] || '',
         city: det.city,
+        country: det.country ?? null,
+        years_experience: det.years_experience ?? null,
+        skills: Array.isArray(det.skills) ? det.skills : [],
         skills_count: Array.isArray(det.skills) ? det.skills.length : 0,
         current_step: currentStep,
         next_step: nextStep,
@@ -206,17 +212,29 @@ Deno.serve(async (req) => {
       return json({ helpers: incompleteList })
     }
 
-    if (action === 'send') {
-      const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
-      if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
+    if (action === 'send' || action === 'send_batch') {
+      let targetSet: Set<string>
+      if (action === 'send_batch') {
+        // Send next reminder to all eligible helpers
+        targetSet = new Set(
+          incompleteList
+            .filter((h) => !h.unsubscribed && h.next_step !== null)
+            .map((h) => h.user_id)
+        )
+      } else {
+        const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
+        if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
+        targetSet = new Set(targetIds)
+      }
 
-      const targetSet = new Set(targetIds)
+      if (targetSet.size === 0) {
+        return json({ sent: 0, skipped: 0, errors: [], results: [] })
+      }
+
       const errors: string[] = []
       let sent = 0
       let skipped = 0
       const results: Array<{ user_id: string; status: string; step?: number; error?: string }> = []
-      const matched = incompleteList.filter((h) => targetSet.has(h.user_id))
-
 
       for (const h of incompleteList) {
         if (!targetSet.has(h.user_id)) continue
