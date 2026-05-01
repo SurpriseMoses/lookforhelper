@@ -59,6 +59,76 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}))
     const action = body.action as string
 
+    // ---------- Settings actions ----------
+    if (action === 'get_settings') {
+      const { data: s } = await admin
+        .from('admin_settings')
+        .select('helper_reminders_enabled, updated_at')
+        .eq('id', 1)
+        .maybeSingle()
+      return json({ settings: s ?? { helper_reminders_enabled: true } })
+    }
+
+    if (action === 'toggle_automation') {
+      const enabled = !!body.enabled
+      const { error: updErr } = await admin
+        .from('admin_settings')
+        .update({ helper_reminders_enabled: enabled, updated_at: new Date().toISOString() })
+        .eq('id', 1)
+      if (updErr) return json({ error: updErr.message }, 500)
+      return json({ success: true, enabled })
+    }
+
+    // ---------- Insights action ----------
+    if (action === 'insights') {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0)
+
+      const [helpersAll, detailsAll, trackingAll, sentLog, completionsLog] = await Promise.all([
+        admin.from('user_roles').select('user_id', { count: 'exact', head: true }).eq('role', 'helper'),
+        admin.from('helper_details').select('user_id, skills, city'),
+        admin.from('helper_reminder_tracking').select('user_id, email_step, last_reminder_sent_at, unsubscribed, completed_at'),
+        admin.from('email_send_log').select('message_id, status, created_at, template_name', { count: 'exact' })
+          .in('template_name', ['helper-reminder-1-friendly', 'helper-reminder-2-urgency', 'helper-reminder-3-final'])
+          .gte('created_at', sevenDaysAgo)
+          .eq('status', 'sent'),
+        admin.from('helper_reminder_tracking').select('user_id', { count: 'exact', head: true })
+          .not('completed_at', 'is', null)
+          .gte('completed_at', sevenDaysAgo),
+      ])
+
+      const detailsArr = detailsAll.data ?? []
+      const trackArr = trackingAll.data ?? []
+      const trackByUser = new Map(trackArr.map((t: any) => [t.user_id, t]))
+
+      let eligible = 0
+      for (const d of detailsArr) {
+        const complete = Array.isArray(d.skills) && d.skills.length > 0 && !!d.city && d.city.trim().length > 0
+        if (complete) continue
+        const t: any = trackByUser.get(d.user_id) || {}
+        if (t.unsubscribed) continue
+        if ((t.email_step ?? 0) >= 3) continue
+        eligible++
+      }
+
+      const scheduledToday = trackArr.filter((t: any) => {
+        if (!t.last_reminder_sent_at) return false
+        return new Date(t.last_reminder_sent_at) >= todayStart
+      }).length
+
+      const sentLast7 = (sentLog.data ?? []).length
+
+      return json({
+        insights: {
+          total_helpers: helpersAll.count ?? 0,
+          eligible_now: eligible,
+          sent_today: scheduledToday,
+          sent_last_7_days: sentLast7,
+          completions_last_7_days: completionsLog.count ?? 0,
+        },
+      })
+    }
+
     // Build the incomplete-helpers list once (used by both actions)
     const { data: helpers, error: hErr } = await admin
       .from('user_roles')
@@ -70,7 +140,7 @@ Deno.serve(async (req) => {
     if (userIds.length === 0) return json({ helpers: [], sent: 0, errors: [] })
 
     const [{ data: details }, { data: profiles }, { data: tracking }] = await Promise.all([
-      admin.from('helper_details').select('user_id, skills, city, created_at').in('user_id', userIds),
+      admin.from('helper_details').select('user_id, skills, city, country, years_experience, created_at').in('user_id', userIds),
       admin.from('profiles').select('user_id, full_name').in('user_id', userIds),
       admin.from('helper_reminder_tracking').select('*').in('user_id', userIds),
     ])
@@ -86,6 +156,9 @@ Deno.serve(async (req) => {
       full_name: string
       first_name: string
       city: string | null
+      country: string | null
+      years_experience: number | null
+      skills: string[]
       skills_count: number
       current_step: number
       next_step: number | null
@@ -122,6 +195,9 @@ Deno.serve(async (req) => {
         full_name: fullName,
         first_name: fullName.split(' ')[0] || '',
         city: det.city,
+        country: det.country ?? null,
+        years_experience: det.years_experience ?? null,
+        skills: Array.isArray(det.skills) ? det.skills : [],
         skills_count: Array.isArray(det.skills) ? det.skills.length : 0,
         current_step: currentStep,
         next_step: nextStep,
@@ -136,17 +212,29 @@ Deno.serve(async (req) => {
       return json({ helpers: incompleteList })
     }
 
-    if (action === 'send') {
-      const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
-      if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
+    if (action === 'send' || action === 'send_batch') {
+      let targetSet: Set<string>
+      if (action === 'send_batch') {
+        // Send next reminder to all eligible helpers
+        targetSet = new Set(
+          incompleteList
+            .filter((h) => !h.unsubscribed && h.next_step !== null)
+            .map((h) => h.user_id)
+        )
+      } else {
+        const targetIds: string[] = Array.isArray(body.user_ids) ? body.user_ids : []
+        if (targetIds.length === 0) return json({ error: 'No user_ids provided' }, 400)
+        targetSet = new Set(targetIds)
+      }
 
-      const targetSet = new Set(targetIds)
+      if (targetSet.size === 0) {
+        return json({ sent: 0, skipped: 0, errors: [], results: [] })
+      }
+
       const errors: string[] = []
       let sent = 0
       let skipped = 0
       const results: Array<{ user_id: string; status: string; step?: number; error?: string }> = []
-      const matched = incompleteList.filter((h) => targetSet.has(h.user_id))
-
 
       for (const h of incompleteList) {
         if (!targetSet.has(h.user_id)) continue
