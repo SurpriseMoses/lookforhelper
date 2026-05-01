@@ -583,6 +583,18 @@ const AdminDashboard = () => {
     document.body.removeChild(link);
   };
 
+  const pendingReports = reports.filter((r) => r.status === "pending" || r.status === "reviewing");
+  const filteredUsers = users.filter((u) =>
+    u.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const tabCounts: TabCounts = useMemo(
+    () => ({
+      pendingReports: pendingReports.length,
+      pendingVerifications: verificationRequests.filter((v) => v.status === "pending").length,
+    }),
+    [pendingReports.length, verificationRequests]
+  );
+
   if (authLoading || adminCheckLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -606,18 +618,6 @@ const AdminDashboard = () => {
       </div>
     );
   }
-
-  const pendingReports = reports.filter((r) => r.status === "pending" || r.status === "reviewing");
-  const filteredUsers = users.filter((u) =>
-    u.full_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const tabCounts: TabCounts = useMemo(
-    () => ({
-      pendingReports: pendingReports.length,
-      pendingVerifications: verificationRequests.filter((v) => v.status === "pending").length,
-    }),
-    [pendingReports.length, verificationRequests]
-  );
 
   return (
     <div className="min-h-screen bg-background">
