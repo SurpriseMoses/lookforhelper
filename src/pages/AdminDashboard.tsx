@@ -626,70 +626,73 @@ const AdminDashboard = () => {
 
           {/* Reports Tab */}
           <TabsContent value="reports">
-            {loading ? (
-              <div className="py-10 text-center text-muted-foreground">Loading reports...</div>
-            ) : reports.length === 0 ? (
-              <div className="py-10 text-center text-muted-foreground">
-                <Flag className="mx-auto h-8 w-8 mb-2 opacity-30" />
-                No reports yet.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {reports.map((report) => (
-                  <Card key={report.id}>
-                    <CardContent className="p-5">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-foreground">{report.reporter_name}</span>
-                            <span className="text-xs text-muted-foreground">reported</span>
-                            <span className="text-sm font-medium text-foreground">{report.reported_name}</span>
-                          </div>
-                          <p className="mt-1 text-sm text-foreground font-medium">{report.reason}</p>
-                          {report.details && (
-                            <p className="mt-1 text-sm text-muted-foreground">{report.details}</p>
-                          )}
-                          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                            <Badge variant="outline" className="text-xs">{report.context_type}</Badge>
-                            <span>{format(new Date(report.created_at), "MMM d, yyyy HH:mm")}</span>
-                          </div>
-                          {report.admin_notes && (
-                            <p className="mt-2 text-sm text-muted-foreground italic">Admin: {report.admin_notes}</p>
-                          )}
-                        </div>
-                        <Badge className={STATUS_COLORS[report.status] ?? ""}>
-                          {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                        </Badge>
-                      </div>
-
-                      {(report.status === "pending" || report.status === "reviewing") && (
-                        <div className="mt-4 border-t pt-4 space-y-3">
-                          <Textarea
-                            placeholder="Admin notes..."
-                            value={adminNotes[report.id] ?? ""}
-                            onChange={(e) => setAdminNotes((prev) => ({ ...prev, [report.id]: e.target.value }))}
-                            rows={2}
-                          />
-                          <div className="flex gap-2 flex-wrap">
-                            {report.status === "pending" && (
-                              <Button size="sm" variant="outline" onClick={() => handleUpdateReport(report.id, "reviewing")} className="gap-1">
-                                <Eye className="h-4 w-4" /> Mark Reviewing
-                              </Button>
+            <div className="space-y-8">
+              {loading ? (
+                <div className="py-10 text-center text-muted-foreground">Loading reports...</div>
+              ) : reports.length === 0 ? (
+                <div className="py-10 text-center text-muted-foreground">
+                  <Flag className="mx-auto h-8 w-8 mb-2 opacity-30" />
+                  No reports yet.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reports.map((report) => (
+                    <Card key={report.id}>
+                      <CardContent className="p-5">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium text-foreground">{report.reporter_name}</span>
+                              <span className="text-xs text-muted-foreground">reported</span>
+                              <span className="text-sm font-medium text-foreground">{report.reported_name}</span>
+                            </div>
+                            <p className="mt-1 text-sm text-foreground font-medium">{report.reason}</p>
+                            {report.details && (
+                              <p className="mt-1 text-sm text-muted-foreground">{report.details}</p>
                             )}
-                            <Button size="sm" onClick={() => handleUpdateReport(report.id, "resolved")} className="gap-1">
-                              <CheckCircle className="h-4 w-4" /> Resolve
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => handleUpdateReport(report.id, "dismissed")} className="gap-1">
-                              <XCircle className="h-4 w-4" /> Dismiss
-                            </Button>
+                            <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                              <Badge variant="outline" className="text-xs">{report.context_type}</Badge>
+                              <span>{format(new Date(report.created_at), "MMM d, yyyy HH:mm")}</span>
+                            </div>
+                            {report.admin_notes && (
+                              <p className="mt-2 text-sm text-muted-foreground italic">Admin: {report.admin_notes}</p>
+                            )}
                           </div>
+                          <Badge className={STATUS_COLORS[report.status] ?? ""}>
+                            {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                          </Badge>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+
+                        {(report.status === "pending" || report.status === "reviewing") && (
+                          <div className="mt-4 border-t pt-4 space-y-3">
+                            <Textarea
+                              placeholder="Admin notes..."
+                              value={adminNotes[report.id] ?? ""}
+                              onChange={(e) => setAdminNotes((prev) => ({ ...prev, [report.id]: e.target.value }))}
+                              rows={2}
+                            />
+                            <div className="flex gap-2 flex-wrap">
+                              {report.status === "pending" && (
+                                <Button size="sm" variant="outline" onClick={() => handleUpdateReport(report.id, "reviewing")} className="gap-1">
+                                  <Eye className="h-4 w-4" /> Mark Reviewing
+                                </Button>
+                              )}
+                              <Button size="sm" onClick={() => handleUpdateReport(report.id, "resolved")} className="gap-1">
+                                <CheckCircle className="h-4 w-4" /> Resolve
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => handleUpdateReport(report.id, "dismissed")} className="gap-1">
+                                <XCircle className="h-4 w-4" /> Dismiss
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <EmailPreview embedded />
+            </div>
           </TabsContent>
 
           {/* Users Tab */}
