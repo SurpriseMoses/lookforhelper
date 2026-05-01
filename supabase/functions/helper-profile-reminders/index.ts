@@ -37,6 +37,18 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   const supabase = createClient(supabaseUrl, serviceKey)
 
+  // Honor admin toggle — skip entirely if disabled
+  const { data: settings } = await supabase
+    .from('admin_settings')
+    .select('helper_reminders_enabled')
+    .eq('id', 1)
+    .maybeSingle()
+  if (settings && settings.helper_reminders_enabled === false) {
+    return new Response(JSON.stringify({ skipped: true, reason: 'automation_disabled' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
   // Pull all helpers with their details
   const { data: helpers, error: hErr } = await supabase
     .from('user_roles')
