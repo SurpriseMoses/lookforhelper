@@ -611,6 +611,13 @@ const AdminDashboard = () => {
   const filteredUsers = users.filter((u) =>
     u.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const tabCounts: TabCounts = useMemo(
+    () => ({
+      pendingReports: pendingReports.length,
+      pendingVerifications: verificationRequests.filter((v) => v.status === "pending").length,
+    }),
+    [pendingReports.length, verificationRequests]
+  );
 
   return (
     <div className="min-h-screen bg-background">
