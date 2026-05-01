@@ -750,7 +750,6 @@ const AdminDashboard = () => {
                   ))}
                 </div>
               )}
-              <EmailPreview embedded />
             </div>
           </TabsContent>
 
