@@ -593,7 +593,32 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        <AdminTabsBar />
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="mb-4 -mx-1 overflow-x-auto scrollbar-thin">
+            {TAB_GROUPS.map((group) => (
+              <div key={group.label} className="mb-2 last:mb-0">
+                <p className="px-1 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {group.label}
+                </p>
+                <TabsList className="flex w-max h-auto gap-1 bg-transparent p-0">
+                  {group.tabs.map((t) => {
+                    const Icon = t.icon;
+                    const count = t.getCount?.(tabCounts);
+                    return (
+                      <TabsTrigger
+                        key={t.value}
+                        value={t.value}
+                        className="gap-1.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                      >
+                        <Icon className="h-4 w-4" /> {t.label}
+                        {count ? ` (${count})` : ""}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
+            ))}
+          </div>
 
           {/* Reports Tab */}
           <TabsContent value="reports">
