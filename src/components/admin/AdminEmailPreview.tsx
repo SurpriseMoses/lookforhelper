@@ -160,6 +160,7 @@ export default function AdminEmailPreview() {
 
   useEffect(() => {
     generate();
+    loadHelpers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
