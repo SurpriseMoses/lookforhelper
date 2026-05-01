@@ -6,7 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, Send, RefreshCw } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader2, Mail, Send, RefreshCw, Users } from "lucide-react";
 import { toast } from "sonner";
 
 interface RenderedTemplate {
@@ -17,6 +26,27 @@ interface RenderedTemplate {
   status: string;
   errorMessage?: string;
 }
+
+interface IncompleteHelper {
+  user_id: string;
+  email: string;
+  full_name: string;
+  first_name: string;
+  city: string | null;
+  skills_count: number;
+  current_step: number;
+  next_step: number | null;
+  last_reminder_sent_at: string | null;
+  unsubscribed: boolean;
+  signup_at: string | null;
+  missing: string[];
+}
+
+const STEP_LABELS: Record<number, string> = {
+  1: "Friendly",
+  2: "Urgency",
+  3: "Final",
+};
 
 // Known templates registered in the transactional registry.
 const KNOWN_TEMPLATES = [
