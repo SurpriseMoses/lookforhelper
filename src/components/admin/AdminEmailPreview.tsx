@@ -6,7 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, Send, RefreshCw } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader2, Mail, Send, RefreshCw, Users } from "lucide-react";
 import { toast } from "sonner";
 
 interface RenderedTemplate {
@@ -17,6 +26,27 @@ interface RenderedTemplate {
   status: string;
   errorMessage?: string;
 }
+
+interface IncompleteHelper {
+  user_id: string;
+  email: string;
+  full_name: string;
+  first_name: string;
+  city: string | null;
+  skills_count: number;
+  current_step: number;
+  next_step: number | null;
+  last_reminder_sent_at: string | null;
+  unsubscribed: boolean;
+  signup_at: string | null;
+  missing: string[];
+}
+
+const STEP_LABELS: Record<number, string> = {
+  1: "Friendly",
+  2: "Urgency",
+  3: "Final",
+};
 
 // Known templates registered in the transactional registry.
 const KNOWN_TEMPLATES = [
@@ -36,6 +66,70 @@ export default function AdminEmailPreview() {
   );
   const [testEmail, setTestEmail] = useState(user?.email ?? "");
   const [sending, setSending] = useState(false);
+
+  const [helpers, setHelpers] = useState<IncompleteHelper[]>([]);
+  const [loadingHelpers, setLoadingHelpers] = useState(false);
+  const [selectedHelpers, setSelectedHelpers] = useState<Set<string>>(new Set());
+  const [bulkSending, setBulkSending] = useState(false);
+
+  const loadHelpers = async () => {
+    setLoadingHelpers(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "list" } }
+      );
+      if (error) throw error;
+      setHelpers(data?.helpers || []);
+      setSelectedHelpers(new Set());
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to load helpers");
+    } finally {
+      setLoadingHelpers(false);
+    }
+  };
+
+  const eligibleHelpers = useMemo(
+    () => helpers.filter((h) => !h.unsubscribed && h.next_step !== null),
+    [helpers]
+  );
+
+  const toggleAll = () => {
+    if (selectedHelpers.size === eligibleHelpers.length && eligibleHelpers.length > 0) {
+      setSelectedHelpers(new Set());
+    } else {
+      setSelectedHelpers(new Set(eligibleHelpers.map((h) => h.user_id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    const next = new Set(selectedHelpers);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedHelpers(next);
+  };
+
+  const sendToSelected = async () => {
+    if (selectedHelpers.size === 0) {
+      toast.error("Select at least one helper");
+      return;
+    }
+    setBulkSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "send", user_ids: Array.from(selectedHelpers) } }
+      );
+      if (error) throw error;
+      toast.success(`Sent ${data?.sent ?? 0}, skipped ${data?.skipped ?? 0}`);
+      if (data?.errors?.length) console.warn("Reminder send errors:", data.errors);
+      await loadHelpers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send");
+    } finally {
+      setBulkSending(false);
+    }
+  };
 
   useEffect(() => {
     if (!testEmail && user?.email) setTestEmail(user.email);
@@ -66,6 +160,7 @@ export default function AdminEmailPreview() {
 
   useEffect(() => {
     generate();
+    loadHelpers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -219,6 +314,105 @@ export default function AdminEmailPreview() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="h-4 w-4" /> Incomplete Helpers
+            <Badge variant="secondary" className="ml-2">{helpers.length}</Badge>
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            Helpers missing skills or city — they don't appear in search. Select and send the next reminder step.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={loadHelpers} disabled={loadingHelpers}>
+              {loadingHelpers ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              Refresh list
+            </Button>
+            <Button size="sm" variant="outline" onClick={toggleAll} disabled={eligibleHelpers.length === 0}>
+              {selectedHelpers.size === eligibleHelpers.length && eligibleHelpers.length > 0
+                ? "Deselect all"
+                : `Select all eligible (${eligibleHelpers.length})`}
+            </Button>
+            <Button size="sm" onClick={sendToSelected} disabled={bulkSending || selectedHelpers.size === 0}>
+              {bulkSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+              Send next reminder ({selectedHelpers.size})
+            </Button>
+          </div>
+
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10"></TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Missing</TableHead>
+                  <TableHead>Last step</TableHead>
+                  <TableHead>Next</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loadingHelpers && helpers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                      Loading…
+                    </TableCell>
+                  </TableRow>
+                ) : helpers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                      No incomplete helpers 🎉
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  helpers.map((h) => {
+                    const eligible = !h.unsubscribed && h.next_step !== null;
+                    return (
+                      <TableRow key={h.user_id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedHelpers.has(h.user_id)}
+                            disabled={!eligible}
+                            onCheckedChange={() => toggleOne(h.user_id)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">{h.full_name || "—"}</TableCell>
+                        <TableCell className="text-xs">{h.email}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            {h.missing.map((m) => (
+                              <Badge key={m} variant="destructive" className="text-[10px]">{m}</Badge>
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {h.current_step > 0 ? STEP_LABELS[h.current_step] : "None"}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {h.next_step ? STEP_LABELS[h.next_step] : "Max"}
+                        </TableCell>
+                        <TableCell>
+                          {h.unsubscribed ? (
+                            <Badge variant="outline" className="text-[10px]">Unsubscribed</Badge>
+                          ) : eligible ? (
+                            <Badge variant="secondary" className="text-[10px]">Eligible</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px]">Done</Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
