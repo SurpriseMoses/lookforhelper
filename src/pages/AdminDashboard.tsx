@@ -131,6 +131,16 @@ const AdminDashboard = () => {
   const [makeAdminUserId, setMakeAdminUserId] = useState<string | null>(null);
   const [makingAdmin, setMakingAdmin] = useState(false);
 
+  // Persist active tab via ?tab= URL param
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab") ?? "";
+  const activeTab = ALL_TAB_VALUES.includes(tabParam) ? tabParam : DEFAULT_TAB;
+  const setActiveTab = (next: string) => {
+    const sp = new URLSearchParams(searchParams);
+    sp.set("tab", next);
+    setSearchParams(sp, { replace: true });
+  };
+
   useEffect(() => {
     let cancelled = false;
 
