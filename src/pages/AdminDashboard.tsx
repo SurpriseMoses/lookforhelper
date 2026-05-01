@@ -63,6 +63,52 @@ const STATUS_COLORS: Record<string, string> = {
   dismissed: "bg-muted text-muted-foreground",
 };
 
+interface TabCounts {
+  pendingReports: number;
+  pendingVerifications: number;
+}
+
+interface TabDef {
+  value: string;
+  label: string;
+  icon: typeof Flag;
+  getCount?: (c: TabCounts) => number | undefined;
+}
+
+const TAB_GROUPS: { label: string; tabs: TabDef[] }[] = [
+  {
+    label: "Moderation",
+    tabs: [
+      { value: "reports", label: "Reports", icon: Flag, getCount: (c) => c.pendingReports || undefined },
+      { value: "users", label: "Users", icon: UserCheck },
+      { value: "verifications", label: "Verifications", icon: ShieldCheck, getCount: (c) => c.pendingVerifications || undefined },
+    ],
+  },
+  {
+    label: "Monetization",
+    tabs: [
+      { value: "featured", label: "Featured", icon: Star },
+      { value: "seeker-plans", label: "Seeker Plans", icon: MessageSquare },
+      { value: "hires", label: "Hires", icon: Briefcase },
+    ],
+  },
+  {
+    label: "Growth",
+    tabs: [
+      { value: "referrals", label: "Referrals", icon: Gift },
+      { value: "email-preview", label: "Email Preview", icon: Mail },
+    ],
+  },
+  {
+    label: "Operations",
+    tabs: [{ value: "bg-checks", label: "BG Checks", icon: Search }],
+  },
+];
+
+const ALL_TAB_VALUES = TAB_GROUPS.flatMap((g) => g.tabs.map((t) => t.value));
+const DEFAULT_TAB = "reports";
+
+
 const AdminDashboard = () => {
   const { user, role, loading: authLoading } = useAuth();
   const { toast } = useToast();
