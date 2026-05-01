@@ -593,36 +593,7 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="reports">
-          <TabsList className="mb-4 flex w-full flex-wrap h-auto justify-start">
-            <TabsTrigger value="reports" className="gap-1.5">
-              <Flag className="h-4 w-4" /> Reports {pendingReports.length > 0 && `(${pendingReports.length})`}
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-1.5">
-              <UserCheck className="h-4 w-4" /> Users
-            </TabsTrigger>
-            <TabsTrigger value="verifications" className="gap-1.5">
-              <ShieldCheck className="h-4 w-4" /> Verifications {verificationRequests.filter(v => v.status === "pending").length > 0 && `(${verificationRequests.filter(v => v.status === "pending").length})`}
-            </TabsTrigger>
-            <TabsTrigger value="featured" className="gap-1.5">
-              <Star className="h-4 w-4" /> Featured
-            </TabsTrigger>
-            <TabsTrigger value="seeker-plans" className="gap-1.5">
-              <MessageSquare className="h-4 w-4" /> Seeker Plans
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="gap-1.5">
-              <Gift className="h-4 w-4" /> Referrals
-            </TabsTrigger>
-            <TabsTrigger value="hires" className="gap-1.5">
-              <Briefcase className="h-4 w-4" /> Hires
-            </TabsTrigger>
-            <TabsTrigger value="bg-checks" className="gap-1.5">
-              <Search className="h-4 w-4" /> BG Checks
-            </TabsTrigger>
-            <TabsTrigger value="email-preview" className="gap-1.5">
-              <Mail className="h-4 w-4" /> Email Preview
-            </TabsTrigger>
-          </TabsList>
+        <AdminTabsBar />
 
           {/* Reports Tab */}
           <TabsContent value="reports">
