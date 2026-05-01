@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
-import EmailPreview from "./EmailPreview";
+import AdminEmailPreview from "@/components/admin/AdminEmailPreview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,6 +63,52 @@ const STATUS_COLORS: Record<string, string> = {
   dismissed: "bg-muted text-muted-foreground",
 };
 
+interface TabCounts {
+  pendingReports: number;
+  pendingVerifications: number;
+}
+
+interface TabDef {
+  value: string;
+  label: string;
+  icon: typeof Flag;
+  getCount?: (c: TabCounts) => number | undefined;
+}
+
+const TAB_GROUPS: { label: string; tabs: TabDef[] }[] = [
+  {
+    label: "Moderation",
+    tabs: [
+      { value: "reports", label: "Reports", icon: Flag, getCount: (c) => c.pendingReports || undefined },
+      { value: "users", label: "Users", icon: UserCheck },
+      { value: "verifications", label: "Verifications", icon: ShieldCheck, getCount: (c) => c.pendingVerifications || undefined },
+    ],
+  },
+  {
+    label: "Monetization",
+    tabs: [
+      { value: "featured", label: "Featured", icon: Star },
+      { value: "seeker-plans", label: "Seeker Plans", icon: MessageSquare },
+      { value: "hires", label: "Hires", icon: Briefcase },
+    ],
+  },
+  {
+    label: "Growth",
+    tabs: [
+      { value: "referrals", label: "Referrals", icon: Gift },
+      { value: "email-preview", label: "Email Preview", icon: Mail },
+    ],
+  },
+  {
+    label: "Operations",
+    tabs: [{ value: "bg-checks", label: "BG Checks", icon: Search }],
+  },
+];
+
+const ALL_TAB_VALUES = TAB_GROUPS.flatMap((g) => g.tabs.map((t) => t.value));
+const DEFAULT_TAB = "reports";
+
+
 const AdminDashboard = () => {
   const { user, role, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -84,6 +130,16 @@ const AdminDashboard = () => {
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
   const [makeAdminUserId, setMakeAdminUserId] = useState<string | null>(null);
   const [makingAdmin, setMakingAdmin] = useState(false);
+
+  // Persist active tab via ?tab= URL param
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab") ?? "";
+  const activeTab = ALL_TAB_VALUES.includes(tabParam) ? tabParam : DEFAULT_TAB;
+  const setActiveTab = (next: string) => {
+    const sp = new URLSearchParams(searchParams);
+    sp.set("tab", next);
+    setSearchParams(sp, { replace: true });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -555,6 +611,13 @@ const AdminDashboard = () => {
   const filteredUsers = users.filter((u) =>
     u.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const tabCounts: TabCounts = useMemo(
+    () => ({
+      pendingReports: pendingReports.length,
+      pendingVerifications: verificationRequests.filter((v) => v.status === "pending").length,
+    }),
+    [pendingReports.length, verificationRequests]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -593,36 +656,32 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="reports">
-          <TabsList className="mb-4 flex w-full flex-wrap h-auto justify-start">
-            <TabsTrigger value="reports" className="gap-1.5">
-              <Flag className="h-4 w-4" /> Reports {pendingReports.length > 0 && `(${pendingReports.length})`}
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-1.5">
-              <UserCheck className="h-4 w-4" /> Users
-            </TabsTrigger>
-            <TabsTrigger value="verifications" className="gap-1.5">
-              <ShieldCheck className="h-4 w-4" /> Verifications {verificationRequests.filter(v => v.status === "pending").length > 0 && `(${verificationRequests.filter(v => v.status === "pending").length})`}
-            </TabsTrigger>
-            <TabsTrigger value="featured" className="gap-1.5">
-              <Star className="h-4 w-4" /> Featured
-            </TabsTrigger>
-            <TabsTrigger value="seeker-plans" className="gap-1.5">
-              <MessageSquare className="h-4 w-4" /> Seeker Plans
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="gap-1.5">
-              <Gift className="h-4 w-4" /> Referrals
-            </TabsTrigger>
-            <TabsTrigger value="hires" className="gap-1.5">
-              <Briefcase className="h-4 w-4" /> Hires
-            </TabsTrigger>
-            <TabsTrigger value="bg-checks" className="gap-1.5">
-              <Search className="h-4 w-4" /> BG Checks
-            </TabsTrigger>
-            <TabsTrigger value="email-preview" className="gap-1.5">
-              <Mail className="h-4 w-4" /> Email Preview
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="mb-4 -mx-1 overflow-x-auto scrollbar-thin">
+            {TAB_GROUPS.map((group) => (
+              <div key={group.label} className="mb-2 last:mb-0">
+                <p className="px-1 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {group.label}
+                </p>
+                <TabsList className="flex w-max h-auto gap-1 bg-transparent p-0">
+                  {group.tabs.map((t) => {
+                    const Icon = t.icon;
+                    const count = t.getCount?.(tabCounts);
+                    return (
+                      <TabsTrigger
+                        key={t.value}
+                        value={t.value}
+                        className="gap-1.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                      >
+                        <Icon className="h-4 w-4" /> {t.label}
+                        {count ? ` (${count})` : ""}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
+            ))}
+          </div>
 
           {/* Reports Tab */}
           <TabsContent value="reports">
@@ -691,7 +750,6 @@ const AdminDashboard = () => {
                   ))}
                 </div>
               )}
-              <EmailPreview embedded />
             </div>
           </TabsContent>
 
@@ -1064,7 +1122,7 @@ const AdminDashboard = () => {
 
           {/* Email Preview Tab */}
           <TabsContent value="email-preview">
-            <EmailPreview embedded />
+            <AdminEmailPreview />
           </TabsContent>
         </Tabs>
       </div>

@@ -45,6 +45,36 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}))
+
+    // Action: sendTest — invoke send-transactional-email for a single template/recipient
+    if (body.action === 'sendTest') {
+      const templateName = String(body.templateName || '')
+      const recipientEmail = String(body.recipientEmail || '')
+      const templateData: Record<string, any> = body.templateData || {}
+      if (!templateName || !TEMPLATES[templateName]) {
+        return json({ error: 'Unknown template' }, 400)
+      }
+      if (!recipientEmail || !/^\S+@\S+\.\S+$/.test(recipientEmail)) {
+        return json({ error: 'Invalid recipient email' }, 400)
+      }
+      const idempotencyKey = `admin-test-${templateName}-${userData.user.id}-${Date.now()}`
+      const { data: sendData, error: sendErr } = await adminClient.functions.invoke(
+        'send-transactional-email',
+        {
+          body: {
+            templateName,
+            recipientEmail,
+            idempotencyKey,
+            templateData: { ...(TEMPLATES[templateName].previewData || {}), ...templateData },
+          },
+        }
+      )
+      if (sendErr) {
+        return json({ error: sendErr.message || 'Failed to send' }, 500)
+      }
+      return json({ ok: true, result: sendData }, 200)
+    }
+
     const requested: string[] = Array.isArray(body.templateNames) && body.templateNames.length
       ? body.templateNames
       : Object.keys(TEMPLATES)
