@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          helper_reminders_enabled: boolean
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          helper_reminders_enabled?: boolean
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          helper_reminders_enabled?: boolean
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookmarks: {
         Row: {
           created_at: string
