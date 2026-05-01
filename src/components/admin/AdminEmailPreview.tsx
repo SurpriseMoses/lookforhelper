@@ -67,6 +67,70 @@ export default function AdminEmailPreview() {
   const [testEmail, setTestEmail] = useState(user?.email ?? "");
   const [sending, setSending] = useState(false);
 
+  const [helpers, setHelpers] = useState<IncompleteHelper[]>([]);
+  const [loadingHelpers, setLoadingHelpers] = useState(false);
+  const [selectedHelpers, setSelectedHelpers] = useState<Set<string>>(new Set());
+  const [bulkSending, setBulkSending] = useState(false);
+
+  const loadHelpers = async () => {
+    setLoadingHelpers(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "list" } }
+      );
+      if (error) throw error;
+      setHelpers(data?.helpers || []);
+      setSelectedHelpers(new Set());
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to load helpers");
+    } finally {
+      setLoadingHelpers(false);
+    }
+  };
+
+  const eligibleHelpers = useMemo(
+    () => helpers.filter((h) => !h.unsubscribed && h.next_step !== null),
+    [helpers]
+  );
+
+  const toggleAll = () => {
+    if (selectedHelpers.size === eligibleHelpers.length && eligibleHelpers.length > 0) {
+      setSelectedHelpers(new Set());
+    } else {
+      setSelectedHelpers(new Set(eligibleHelpers.map((h) => h.user_id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    const next = new Set(selectedHelpers);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedHelpers(next);
+  };
+
+  const sendToSelected = async () => {
+    if (selectedHelpers.size === 0) {
+      toast.error("Select at least one helper");
+      return;
+    }
+    setBulkSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "send", user_ids: Array.from(selectedHelpers) } }
+      );
+      if (error) throw error;
+      toast.success(`Sent ${data?.sent ?? 0}, skipped ${data?.skipped ?? 0}`);
+      if (data?.errors?.length) console.warn("Reminder send errors:", data.errors);
+      await loadHelpers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send");
+    } finally {
+      setBulkSending(false);
+    }
+  };
+
   useEffect(() => {
     if (!testEmail && user?.email) setTestEmail(user.email);
   }, [user?.email]);
