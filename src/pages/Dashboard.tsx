@@ -31,6 +31,7 @@ import HelperPerformanceCard from "@/components/dashboard/HelperPerformanceCard"
 import DeleteAccountCard from "@/components/dashboard/DeleteAccountCard";
 import DataExportCard from "@/components/dashboard/DataExportCard";
 import SavedSearchesCard from "@/components/dashboard/SavedSearchesCard";
+import ComplianceChecklistCard from "@/components/dashboard/ComplianceChecklistCard";
 import HelperPhotoGallery from "@/components/dashboard/HelperPhotoGallery";
 import useLastActive from "@/hooks/useLastActive";
 import { getCurrencyForCountry } from "@/lib/currency";
@@ -310,6 +311,7 @@ const Dashboard = () => {
         {(role === "seeker" || role === "admin") && (
           <>
             <SeekerSubscriptionCard />
+            <ComplianceChecklistCard />
             <SavedSearchesCard />
             <Card className="mb-6">
               <CardContent className="p-4 flex items-center justify-between">
