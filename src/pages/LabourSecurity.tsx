@@ -164,30 +164,11 @@ const LabourSecurity = () => {
           </CardContent>
         </Card>
 
-        {/* Employment contract */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                <BookOpen className="h-5 w-5" />
-              </div>
-              <div>
-                <CardTitle>Written Employment Contract</CardTitle>
-                <CardDescription>
-                  Required by the Basic Conditions of Employment Act (BCEA).
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-foreground">
-            <p>Your contract should include working hours, wages, leave entitlement, notice periods, and duties.</p>
-            <Button asChild variant="outline" className="gap-2">
-              <a href="https://www.labour.gov.za/basic-conditions-of-employment-act" {...ext}>
-                Download a sample contract <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* UIF Calculator */}
+        <UifCalculator />
+
+        {/* Employment contract builder */}
+        <ContractBuilder />
 
         {/* CTA */}
         <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
