@@ -13,6 +13,13 @@ const ext = {
 };
 
 const LabourSecurity = () => {
+  useEffect(() => {
+    document.title = "Labour Security: UIF & Legal Compliance Guide | Look For Helper";
+    const desc = "South African employer guide to UIF, COIDA and the National Minimum Wage (R30.23/hr) for domestic workers. Register on uFiling and stay compliant.";
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "description"); document.head.appendChild(meta); }
+    meta.setAttribute("content", desc);
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
