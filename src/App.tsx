@@ -27,6 +27,7 @@ import SavedHelpers from "./pages/SavedHelpers";
 import Jobs from "./pages/Jobs";
 import Unsubscribe from "./pages/Unsubscribe";
 import EmailPreview from "./pages/EmailPreview";
+import LabourSecurity from "./pages/LabourSecurity";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
