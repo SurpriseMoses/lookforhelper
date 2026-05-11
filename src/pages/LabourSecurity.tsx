@@ -210,11 +210,6 @@ const LabourSecurity = () => {
 
       <Footer />
 
-      <Helmet>
-        <title>Labour Security: UIF & Legal Compliance Guide | Look For Helper</title>
-        <meta name="description" content="South African employer guide to UIF, COIDA and the National Minimum Wage (R30.23/hr) for domestic workers. Register on uFiling and stay compliant." />
-        <link rel="canonical" href="/labour-security" />
-      </Helmet>
     </div>
   );
 };
