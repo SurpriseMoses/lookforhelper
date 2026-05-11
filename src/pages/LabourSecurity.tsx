@@ -5,7 +5,9 @@ import Footer from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, FileCheck2, HeartPulse, Banknote, ExternalLink, ArrowRight, BookOpen } from "lucide-react";
+import { ShieldCheck, FileCheck2, HeartPulse, Banknote, ExternalLink, ArrowRight } from "lucide-react";
+import UifCalculator from "@/components/labour/UifCalculator";
+import ContractBuilder from "@/components/labour/ContractBuilder";
 
 const ext = {
   target: "_blank" as const,
