@@ -311,6 +311,7 @@ const Dashboard = () => {
         {(role === "seeker" || role === "admin") && (
           <>
             <SeekerSubscriptionCard />
+            <ComplianceChecklistCard />
             <SavedSearchesCard />
             <Card className="mb-6">
               <CardContent className="p-4 flex items-center justify-between">
