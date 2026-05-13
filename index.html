@@ -29,6 +29,29 @@
   <meta property="og:description" content="Find trusted, verified domestic helpers near you. Browse profiles, schedule interviews, and hire with confidence.">
   <meta name="twitter:description" content="Find trusted, verified domestic helpers near you. Browse profiles, schedule interviews, and hire with confidence.">
   <link rel="icon" type="image/png" href="/favicon-v7.png?v=7">
+    <script>
+      (function() {
+        var didUnregister = false;
+        function clearAndReload() {
+          if (typeof caches !== 'undefined') {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(key) { caches.delete(key); });
+            });
+          }
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              if (regs.length) didUnregister = true;
+              regs.forEach(function(r) { r.unregister(); });
+              if (didUnregister && !window.__lfhReloaded) {
+                window.__lfhReloaded = true;
+                setTimeout(function() { window.location.reload(); }, 300);
+              }
+            });
+          }
+        }
+        clearAndReload();
+      })();
+    </script>
 </head>
 
   <body>
