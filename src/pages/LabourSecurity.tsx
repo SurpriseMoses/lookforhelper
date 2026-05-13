@@ -9,9 +9,23 @@ import { ShieldCheck, FileCheck2, HeartPulse, Banknote, ExternalLink, ArrowRight
 import UifCalculator from "@/components/labour/UifCalculator";
 import ContractBuilder from "@/components/labour/ContractBuilder";
 
+function openExternal(url: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 const ext = {
   target: "_blank" as const,
   rel: "noopener noreferrer",
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    openExternal(e.currentTarget.href);
+  },
 };
 
 const LabourSecurity = () => {
