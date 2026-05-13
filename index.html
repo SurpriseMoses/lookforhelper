@@ -7,8 +7,10 @@
     <meta name="description" content="Find trusted, verified domestic helpers near you. Browse profiles, schedule interviews, and hire with confidence.">
     <meta name="author" content="Look For Helper" />
 
-    
-    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/ca46febf-750a-4860-a292-9764be1eaae3?Expires=1772294979&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=mQfc%2BAP548E023h8qpyK4kfX%2FTooa65aoVoAcfliViSk6GuqMAMPvyTObnTKqG4SExu3BZX8Zwd0CVwjl8bZD3OmEy3jhhxwfIcRfZ0dwz3eVg0b1y6UraxgZahfDYbvdkYR9u9vwPUmGWyu6hWpUh9dgub%2FzbaZa8ram6%2BhdwEzxWct1t0gKDkL%2BDMvbvkgfQSuq%2BoHS86iLvO693vzgO5fCRwjAcJSfthZI717wtIMZLyzNYl%2FyWjPagXm%2B%2FcxL730xKG1xl6JpIg55Sf7kLw7G%2BU2uzMhmIwBU93py2zXj9vqaq44V7scpL4qa00vYEjLq9imEc3%2BxOeJDjTH9g%3D%3D">
 
@@ -20,13 +22,36 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Look For Helper" />
-    <link rel="apple-touch-icon" href="/pwa-192x192-v6.png?v=6" />
-    <link rel="manifest" href="/manifest.webmanifest?v=6" />
+    <link rel="apple-touch-icon" href="/pwa-192x192-v6.png?v=7" />
+    <link rel="manifest" href="/manifest.webmanifest?v=7" />
     <meta property="og:title" content="Look For Helper — Find Trusted Domestic Help">
   <meta name="twitter:title" content="Look For Helper — Find Trusted Domestic Help">
   <meta property="og:description" content="Find trusted, verified domestic helpers near you. Browse profiles, schedule interviews, and hire with confidence.">
   <meta name="twitter:description" content="Find trusted, verified domestic helpers near you. Browse profiles, schedule interviews, and hire with confidence.">
-  <link rel="icon" type="image/png" href="/favicon-v6.png?v=6">
+  <link rel="icon" type="image/png" href="/favicon-v6.png?v=7">
+    <script>
+      (function() {
+        var didUnregister = false;
+        function clearAndReload() {
+          if (typeof caches !== 'undefined') {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(key) { caches.delete(key); });
+            });
+          }
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              if (regs.length) didUnregister = true;
+              regs.forEach(function(r) { r.unregister(); });
+              if (didUnregister && !window.__lfhReloaded) {
+                window.__lfhReloaded = true;
+                setTimeout(function() { window.location.reload(); }, 300);
+              }
+            });
+          }
+        }
+        clearAndReload();
+      })();
+    </script>
 </head>
 
   <body>
