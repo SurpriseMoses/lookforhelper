@@ -10,13 +10,15 @@ import UifCalculator from "@/components/labour/UifCalculator";
 import ContractBuilder from "@/components/labour/ContractBuilder";
 
 function openExternal(url: string) {
-  const a = document.createElement("a");
-  a.href = url;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  try {
+    const win = window.open(url, "_blank", "noopener,noreferrer");
+    if (win) {
+      win.opener = null;
+      return;
+    }
+  } catch {}
+  // Fallback for PWA standalone where window.open may be blocked
+  window.location.href = url;
 }
 
 const ext = {
