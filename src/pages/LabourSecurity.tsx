@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,15 +31,31 @@ const ext = {
 };
 
 const LabourSecurity = () => {
-  useEffect(() => {
-    document.title = "Labour Security: UIF & Legal Compliance Guide | Look For Helper";
-    const desc = "South African employer guide to UIF, COIDA and the National Minimum Wage (R30.23/hr) for domestic workers. Register on uFiling and stay compliant.";
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "description"); document.head.appendChild(meta); }
-    meta.setAttribute("content", desc);
-  }, []);
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Labour Security: UIF & Compliance Guide | Look For Helper"
+        description="South African employer guide to UIF, COIDA and the National Minimum Wage (R30.23/hr) for domestic workers. Includes a UIF calculator and contract template."
+        path="/labour-security"
+        ogType="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: "Labour Security: UIF & Legal Compliance for Domestic Workers",
+          description:
+            "A practical employer guide to UIF, COIDA and the South African National Minimum Wage for domestic workers, with a UIF calculator and downloadable contract template.",
+          author: { "@type": "Organization", name: "Look For Helper" },
+          publisher: {
+            "@type": "Organization",
+            name: "Look For Helper",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://www.lookforhelper.co.za/pwa-512x512-v6.png",
+            },
+          },
+          mainEntityOfPage: "https://www.lookforhelper.co.za/labour-security",
+        }}
+      />
       <Navbar />
 
       {/* Hero */}
