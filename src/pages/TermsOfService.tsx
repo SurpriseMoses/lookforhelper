@@ -1,6 +1,13 @@
+import SEO from "@/components/SEO";
+
 const TermsOfService = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Terms of Service | Look For Helper"
+        description="The terms and conditions that govern your use of the Look For Helper marketplace for seekers and helpers."
+        path="/terms"
+      />
       <div className="container max-w-3xl py-12 px-4">
         <h1 className="text-3xl font-bold text-foreground mb-2">Terms of Service — Look for Helper</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: February 2026</p>

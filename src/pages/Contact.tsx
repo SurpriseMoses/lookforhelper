@@ -1,8 +1,14 @@
 import { Mail, Clock } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Contact Us | Look For Helper"
+        description="Get in touch with the Look For Helper support team. We respond to all inquiries within 24–48 hours."
+        path="/contact"
+      />
       <div className="container max-w-3xl py-12 px-4">
         <h1 className="text-3xl font-bold text-foreground mb-2">Contact Us</h1>
         <p className="text-muted-foreground mb-8">
