@@ -1,6 +1,13 @@
+import SEO from "@/components/SEO";
+
 const RefundPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Refund Policy | Look For Helper"
+        description="Look For Helper's policy on refunds for seeker contact access, helper subscriptions and featured boosts."
+        path="/refund-policy"
+      />
       <div className="container max-w-3xl py-12 px-4">
         <h1 className="text-3xl font-bold text-foreground mb-2">Refund Policy — Look for Helper</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 2026</p>

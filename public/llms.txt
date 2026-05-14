@@ -1,0 +1,21 @@
+# Look For Helper
+
+> A worldwide marketplace connecting families (seekers) with trusted, verified domestic helpers. Browse profiles, contact helpers directly, and stay compliant with local labour law.
+
+Look For Helper helps households find domestic workers — nannies, housekeepers, caregivers, gardeners and drivers — across South Africa and beyond. Helpers create rich profiles with photos, video introductions, skills, languages, references and availability. Seekers can search by location, skill and experience, save favourites, and reach helpers via secure in-app messaging.
+
+## Pages
+
+- [Home](/): Overview of the platform and featured helpers.
+- [Browse Helpers](/browse): Search and filter verified domestic helpers by city, skills, languages and availability.
+- [Jobs Board](/jobs): Seekers post jobs; helpers browse and respond.
+- [Labour Security](/labour-security): Employer guide to UIF, COIDA and the South African National Minimum Wage (R30.23/hr) for domestic workers, with a UIF calculator and downloadable employment contract template.
+- [Contact](/contact): Get in touch with the support team.
+- [Sign in or Sign up](/auth): Create a seeker or helper account.
+
+## Optional
+
+- [Privacy Policy](/privacy)
+- [Terms of Service](/terms)
+- [Refund Policy](/refund-policy)
+- [Cancellation Policy](/cancellation-policy)

@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -265,6 +266,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="My Dashboard | Look For Helper"
+        description="Manage your Look For Helper account — update your profile, manage hires, track performance and stay on top of compliance tasks."
+        path="/dashboard"
+        noindex
+      />
       <Navbar />
       <div className="container max-w-2xl py-8">
         <div className="mb-6 flex items-center justify-between">

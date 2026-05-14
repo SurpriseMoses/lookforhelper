@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Clock, Globe, ArrowLeft, Flag, CheckCircle, Star, MessageSquarePlus, Search, Briefcase, Circle, ShieldCheck, Eye, Pencil } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import ContactHelperButton from "@/components/messaging/ContactHelperButton";
 import ReportUserDialog from "@/components/moderation/ReportUserDialog";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
@@ -179,8 +180,44 @@ const HelperProfilePage = () => {
     );
   }
 
+  const helperName = helper.profiles?.full_name ?? "Helper";
+  const cityLine = [helper.city, helper.country].filter(Boolean).join(", ");
+  const skillsLine = (helper.skills ?? []).slice(0, 3).join(", ");
+  const seoTitle = `${helperName}${cityLine ? ` — ${cityLine}` : ""} | Look For Helper`;
+  const seoDesc =
+    `${helperName} is a domestic helper${cityLine ? ` based in ${cityLine}` : ""}` +
+    `${helper.years_experience ? ` with ${helper.years_experience} years' experience` : ""}` +
+    `${skillsLine ? `. Skills: ${skillsLine}` : ""}.`;
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={seoTitle}
+        description={seoDesc.slice(0, 158)}
+        path={`/helper/${userId}`}
+        ogType="profile"
+        ogImage={helper.profiles?.avatar_url ?? undefined}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: helperName,
+          jobTitle: "Domestic Helper",
+          address: cityLine
+            ? { "@type": "PostalAddress", addressLocality: helper.city, addressCountry: helper.country }
+            : undefined,
+          knowsAbout: helper.skills ?? undefined,
+          knowsLanguage: helper.languages ?? undefined,
+          image: helper.profiles?.avatar_url ?? undefined,
+          aggregateRating:
+            helper.total_reviews > 0
+              ? {
+                  "@type": "AggregateRating",
+                  ratingValue: helper.average_rating,
+                  reviewCount: helper.total_reviews,
+                }
+              : undefined,
+        }}
+      />
       <Navbar />
       <div className="container max-w-3xl py-8">
         <Button variant="ghost" asChild className="mb-6">

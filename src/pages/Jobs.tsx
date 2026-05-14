@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import JobCard from "@/components/jobs/JobCard";
 import PostJobDialog from "@/components/jobs/PostJobDialog";
 import { Briefcase } from "lucide-react";
@@ -105,6 +106,11 @@ const Jobs = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Domestic Worker Jobs Board | Look For Helper"
+        description="Browse domestic worker job postings from verified seekers — nannies, housekeepers, caregivers and more. Helpers can respond directly to families hiring near them."
+        path="/jobs"
+      />
       <Navbar />
       <div className="container max-w-3xl py-8">
         <div className="mb-6 flex items-center justify-between">

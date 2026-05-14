@@ -1,6 +1,13 @@
+import SEO from "@/components/SEO";
+
 const CancellationPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Cancellation Policy | Look For Helper"
+        description="How to cancel your Look For Helper subscription, featured boost or seeker contact access, and how account deletion works."
+        path="/cancellation-policy"
+      />
       <div className="container max-w-3xl py-12 px-4">
         <h1 className="text-3xl font-bold text-foreground mb-2">Cancellation Policy — Look for Helper</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 2026</p>

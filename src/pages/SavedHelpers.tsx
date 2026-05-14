@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,6 +102,12 @@ const SavedHelpers = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Saved Helpers | Look For Helper"
+        description="Helpers you've bookmarked for later on Look For Helper."
+        path="/saved-helpers"
+        noindex
+      />
       <Navbar />
       <div className="container py-8 max-w-3xl">
         <Button variant="ghost" asChild className="mb-4">

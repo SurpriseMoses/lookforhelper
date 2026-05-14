@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import { Globe } from "lucide-react";
 
 const Auth = () => {
@@ -141,6 +142,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Sign In or Create Your Account | Look For Helper"
+        description="Sign in or create a free Look For Helper account as a seeker or a helper. Join a worldwide marketplace connecting families with trusted domestic workers."
+        path="/auth"
+        noindex
+      />
       <Navbar />
       <div className="container flex items-center justify-center py-16">
         <Card className="w-full max-w-md">

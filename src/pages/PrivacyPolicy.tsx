@@ -1,6 +1,13 @@
+import SEO from "@/components/SEO";
+
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy | Look For Helper"
+        description="How Look For Helper collects, uses and protects your personal information when you use the platform."
+        path="/privacy"
+      />
       <div className="container max-w-3xl py-12 px-4">
         <h1 className="text-3xl font-bold text-foreground mb-2">Privacy Policy — Look for Helper</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: February 2026</p>

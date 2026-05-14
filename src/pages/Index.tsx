@@ -9,6 +9,7 @@ import FeaturedHelpers from "@/components/landing/FeaturedHelpers";
 import PricingSection from "@/components/landing/PricingSection";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +24,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Look For Helper — Find Trusted Domestic Help"
+        description="Browse verified domestic helpers — nannies, housekeepers, caregivers and more. Search by city, skills and availability, then connect directly with helpers near you."
+        path="/"
+      />
       <Navbar />
       <main>
         <HeroSection />

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, Search, CheckCircle, Star, Circle, ShieldCheck, Bell, Navigation, Loader2, Globe } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CityAutocomplete from "@/components/search/CityAutocomplete";
@@ -367,6 +368,11 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Browse Verified Domestic Helpers Near You | Look For Helper"
+        description="Search verified domestic helpers by city, skills, languages and availability. Compare profiles, ratings and experience to find the right helper for your home."
+        path="/browse"
+      />
       <Navbar />
       <div className="container py-8">
         <div className="mb-8">
