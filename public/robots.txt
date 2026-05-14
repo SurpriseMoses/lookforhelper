@@ -12,3 +12,15 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /interviews
+Disallow: /hire/
+Disallow: /complete-profile
+Disallow: /reset-password
+Disallow: /unsubscribe
+Disallow: /auth/callback
+
+Sitemap: https://www.lookforhelper.co.za/sitemap.xml
