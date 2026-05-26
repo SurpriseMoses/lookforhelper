@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Search, UserPlus, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [totalHires, setTotalHires] = useState(0);
 
   useEffect(() => {
@@ -45,23 +46,19 @@ const HeroSection = () => {
             <Button
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2 text-base font-semibold px-8"
-              asChild
+              onClick={() => navigate("/browse")}
             >
-              <Link to="/browse">
-                <Search className="h-5 w-5" />
-                Find a Helper
-              </Link>
+              <Search className="h-5 w-5" />
+              Find a Helper
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 gap-2 text-base font-semibold px-8"
-              asChild
+              onClick={() => navigate("/auth?tab=signup&role=helper")}
             >
-              <Link to="/auth?tab=signup&role=helper">
-                <UserPlus className="h-5 w-5" />
-                Register as a Helper
-              </Link>
+              <UserPlus className="h-5 w-5" />
+              Register as a Helper
             </Button>
           </div>
           {totalHires > 0 && (
