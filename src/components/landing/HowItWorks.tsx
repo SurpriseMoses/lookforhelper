@@ -119,7 +119,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="seekers" className="mt-10">
+        <Tabs defaultValue="helpers" className="mt-10">
           <TabsList className="mx-auto grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="seekers">I'm Looking to Hire</TabsTrigger>
             <TabsTrigger value="helpers">I'm Looking for Work</TabsTrigger>
