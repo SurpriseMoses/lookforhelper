@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [totalHires, setTotalHires] = useState(0);
 
   useEffect(() => {
