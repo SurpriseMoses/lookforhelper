@@ -28,6 +28,11 @@ import Jobs from "./pages/Jobs";
 import Unsubscribe from "./pages/Unsubscribe";
 import EmailPreview from "./pages/EmailPreview";
 import LabourSecurity from "./pages/LabourSecurity";
+import Institutions from "./pages/Institutions";
+import InstitutionProfile from "./pages/InstitutionProfile";
+import InstitutionSignup from "./pages/InstitutionSignup";
+import InstitutionDashboard from "./pages/InstitutionDashboard";
+import SavedInstitutions from "./pages/SavedInstitutions";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
