@@ -190,7 +190,7 @@ const LabourSecurity = () => {
               <li>Report any workplace injury within 7 days.</li>
             </ul>
             <Button asChild variant="outline" className="gap-2">
-              <a href="https://www.labour.gov.za/compensation-for-occupational-injuries-and-diseases-act" {...ext}>
+              <a href="https://www.labour.gov.za/DocumentCenter/Pages/Compensation-Fund--obligations-of-the-employer-.aspx" {...ext}>
                 COIDA information <ExternalLink className="h-4 w-4" />
               </a>
             </Button>
