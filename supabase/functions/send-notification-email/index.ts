@@ -117,9 +117,9 @@ serve(async (req) => {
               <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <tr>
                   <td style="padding: 32px; text-align: center;">
-                    <h2 style="margin: 0 0 12px; color: #1a1a2e; font-size: 20px; font-weight: 600;">${notifData.title}</h2>
-                    ${notifData.body ? `<p style="color: #666; font-size: 15px; margin: 0 0 24px; line-height: 1.5;">${notifData.body}</p>` : ""}
-                    ${notifData.link ? `<a href="${siteUrl}${notifData.link}" style="display: inline-block; background: #1a1a2e; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500;">View Details</a>` : ""}
+                    <h2 style="margin: 0 0 12px; color: #1a1a2e; font-size: 20px; font-weight: 600;">${esc(notifData.title)}</h2>
+                    ${notifData.body ? `<p style="color: #666; font-size: 15px; margin: 0 0 24px; line-height: 1.5;">${esc(notifData.body)}</p>` : ""}
+                    ${notifData.link ? `<a href="${siteUrl}${esc(notifData.link)}" style="display: inline-block; background: #1a1a2e; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500;">View Details</a>` : ""}
                   </td>
                 </tr>
               </table>
