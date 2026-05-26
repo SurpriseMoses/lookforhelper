@@ -18,7 +18,34 @@ serve(async (req) => {
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // AUTHZ: only allow internal/admin callers. Accept either the service-role key
+    // (used by db triggers / internal callers) or a JWT from an authenticated admin user.
+    const authHeader = req.headers.get("Authorization") || "";
+    const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    let authorized = false;
+    if (bearer && bearer === supabaseServiceKey) {
+      authorized = true;
+    } else if (bearer) {
+      const { data: { user } } = await supabase.auth.getUser(bearer);
+      if (user) {
+        const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+        if (isAdmin) authorized = true;
+      }
+    }
+    if (!authorized) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Escape HTML to prevent injection via caller-supplied title/body/link
+    const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, (c) => (
+      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string
+    ));
+
     const { notification_id, type, user_id, title, body, link } = await req.json();
+
     
     // Support both direct params and notification_id lookup
     let notifData = { type, user_id, title, body, link };
