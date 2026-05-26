@@ -1126,6 +1126,11 @@ const AdminDashboard = () => {
           <TabsContent value="email-preview">
             <AdminEmailPreview />
           </TabsContent>
+
+          {/* Institutions Tab */}
+          <TabsContent value="institutions">
+            <InstitutionsAdminTab />
+          </TabsContent>
         </Tabs>
       </div>
 
