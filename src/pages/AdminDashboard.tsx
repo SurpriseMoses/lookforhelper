@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/landing/Navbar";
 import AdminEmailPreview from "@/components/admin/AdminEmailPreview";
+import InstitutionsAdminTab from "@/components/admin/InstitutionsAdminTab";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw, Mail } from "lucide-react";
+import { Shield, Flag, UserCheck, Ban, CheckCircle, XCircle, Eye, ShieldCheck, FileText, Star, MessageSquare, Gift, Search, Briefcase, Download, X, Camera, Globe, AlertTriangle, RefreshCw, Mail, GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
@@ -82,6 +83,7 @@ const TAB_GROUPS: { label: string; tabs: TabDef[] }[] = [
       { value: "reports", label: "Reports", icon: Flag, getCount: (c) => c.pendingReports || undefined },
       { value: "users", label: "Users", icon: UserCheck },
       { value: "verifications", label: "Verifications", icon: ShieldCheck, getCount: (c) => c.pendingVerifications || undefined },
+      { value: "institutions", label: "Institutions", icon: GraduationCap },
     ],
   },
   {
@@ -1123,6 +1125,11 @@ const AdminDashboard = () => {
           {/* Email Preview Tab */}
           <TabsContent value="email-preview">
             <AdminEmailPreview />
+          </TabsContent>
+
+          {/* Institutions Tab */}
+          <TabsContent value="institutions">
+            <InstitutionsAdminTab />
           </TabsContent>
         </Tabs>
       </div>

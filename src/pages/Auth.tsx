@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
@@ -369,6 +369,12 @@ const Auth = () => {
                 </form>
               </TabsContent>
             </Tabs>
+            <div className="mt-4 border-t pt-4 text-center text-sm text-muted-foreground">
+              Are you a training institution?{" "}
+              <Link to="/auth/institution" className="font-medium text-primary hover:underline">
+                Register here
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

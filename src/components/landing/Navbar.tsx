@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, MessageSquare, Calendar, Shield, Briefcase, ShieldCheck } from "lucide-react";
+import { Menu, X, MessageSquare, Calendar, Shield, Briefcase, ShieldCheck, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -24,6 +24,9 @@ const Navbar = () => {
           </Button>
           <Button variant="ghost" asChild className="gap-1.5">
             <Link to="/jobs"><Briefcase className="h-4 w-4" /> Jobs</Link>
+          </Button>
+          <Button variant="ghost" asChild className="gap-1.5">
+            <Link to="/institutions"><GraduationCap className="h-4 w-4" /> Institutions</Link>
           </Button>
           <Button variant="ghost" asChild className="gap-1.5">
             <Link to="/labour-security"><ShieldCheck className="h-4 w-4" /> Labour Security</Link>
@@ -77,6 +80,9 @@ const Navbar = () => {
             </Button>
             <Button variant="ghost" asChild className="justify-start gap-1.5">
               <Link to="/jobs" onClick={() => setMobileOpen(false)}><Briefcase className="h-4 w-4" /> Jobs</Link>
+            </Button>
+            <Button variant="ghost" asChild className="justify-start gap-1.5">
+              <Link to="/institutions" onClick={() => setMobileOpen(false)}><GraduationCap className="h-4 w-4" /> Institutions</Link>
             </Button>
             <Button variant="ghost" asChild className="justify-start gap-1.5">
               <Link to="/labour-security" onClick={() => setMobileOpen(false)}><ShieldCheck className="h-4 w-4" /> Labour Security</Link>

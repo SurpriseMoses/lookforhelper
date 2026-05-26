@@ -28,6 +28,11 @@ import Jobs from "./pages/Jobs";
 import Unsubscribe from "./pages/Unsubscribe";
 import EmailPreview from "./pages/EmailPreview";
 import LabourSecurity from "./pages/LabourSecurity";
+import Institutions from "./pages/Institutions";
+import InstitutionProfile from "./pages/InstitutionProfile";
+import InstitutionSignup from "./pages/InstitutionSignup";
+import InstitutionDashboard from "./pages/InstitutionDashboard";
+import SavedInstitutions from "./pages/SavedInstitutions";
 import BottomNav from "./components/mobile/BottomNav";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
@@ -65,6 +70,11 @@ const App = () => (
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/admin/email-preview" element={<EmailPreview />} />
                 <Route path="/labour-security" element={<LabourSecurity />} />
+                <Route path="/institutions" element={<Institutions />} />
+                <Route path="/institution/:id" element={<InstitutionProfile />} />
+                <Route path="/auth/institution" element={<InstitutionSignup />} />
+                <Route path="/institution-dashboard" element={<InstitutionDashboard />} />
+                <Route path="/saved-institutions" element={<SavedInstitutions />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
