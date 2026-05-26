@@ -83,6 +83,7 @@ const TAB_GROUPS: { label: string; tabs: TabDef[] }[] = [
       { value: "reports", label: "Reports", icon: Flag, getCount: (c) => c.pendingReports || undefined },
       { value: "users", label: "Users", icon: UserCheck },
       { value: "verifications", label: "Verifications", icon: ShieldCheck, getCount: (c) => c.pendingVerifications || undefined },
+      { value: "institutions", label: "Institutions", icon: GraduationCap },
     ],
   },
   {
