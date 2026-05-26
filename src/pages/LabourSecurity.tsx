@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, FileCheck2, HeartPulse, Banknote, ExternalLink, ArrowRight } from "lucide-react";
 import UifCalculator from "@/components/labour/UifCalculator";
 import ContractBuilder from "@/components/labour/ContractBuilder";
+import { useAuth } from "@/contexts/AuthContext";
 
 function openExternal(url: string) {
   try {
