@@ -21,6 +21,8 @@ function openExternal(url: string) {
   window.location.href = url;
 }
 
+const UFILING_UIF_APPLICATION_URL = "https://ufiling.labour.gov.za/uif/register";
+
 const ext = {
   target: "_blank" as const,
   rel: "noopener noreferrer",
@@ -74,7 +76,7 @@ const LabourSecurity = () => {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild size="lg" className="gap-2">
-                <a href="https://www.ufiling.co.za/uif/" {...ext}>
+                <a href={UFILING_UIF_APPLICATION_URL} {...ext}>
                   Register on uFiling <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
@@ -142,14 +144,14 @@ const LabourSecurity = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <ol className="list-decimal pl-5 text-sm text-foreground space-y-2">
-              <li>Register as an employer on <a className="text-primary underline" href="https://www.ufiling.co.za/uif/" {...ext}>uFiling</a>.</li>
+              <li>Register as an employer on <a className="text-primary underline" href={UFILING_UIF_APPLICATION_URL} {...ext}>uFiling</a>.</li>
               <li>Add your domestic worker as an employee (you'll need their ID number).</li>
               <li>Contribute <strong>2% of monthly wages</strong> — 1% deducted from the worker, 1% paid by you.</li>
               <li>Submit declarations and pay UIF monthly through uFiling.</li>
             </ol>
             <div className="flex flex-wrap gap-3">
               <Button asChild className="gap-2">
-                <a href="https://www.ufiling.co.za/uif/" {...ext}>
+                <a href={UFILING_UIF_APPLICATION_URL} {...ext}>
                   Register on uFiling <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
