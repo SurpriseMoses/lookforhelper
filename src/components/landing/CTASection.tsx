@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Search, UserPlus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CTASection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <section className="py-20 md:py-28">
