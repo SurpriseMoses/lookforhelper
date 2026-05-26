@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Search, UserPlus, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [totalHires, setTotalHires] = useState(0);
 
   useEffect(() => {
