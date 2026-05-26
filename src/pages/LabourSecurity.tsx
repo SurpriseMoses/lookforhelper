@@ -26,10 +26,6 @@ const UFILING_UIF_APPLICATION_URL = "https://ufiling.labour.gov.za/uif/register"
 const ext = {
   target: "_blank" as const,
   rel: "noopener noreferrer",
-  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    openExternal(e.currentTarget.href);
-  },
 };
 
 const LabourSecurity = () => {
