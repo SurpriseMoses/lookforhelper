@@ -18,7 +18,7 @@ const DataExportCard = () => {
     try {
       // Fetch all user data in parallel
       const [profileRes, helperRes, messagesRes, hiresRes, reviewsRes, bookmarksRes, notificationsRes] = await Promise.all([
-        supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("profiles").select("user_id, full_name, avatar_url, is_verified, last_active_at, referral_code, referred_by, created_at, updated_at").eq("user_id", user.id).maybeSingle(),
         supabase.from("helper_details").select("*").eq("user_id", user.id).maybeSingle(),
         supabase.from("messages").select("content, created_at, conversation_id").eq("sender_id", user.id),
         supabase.from("hires").select("*").or(`helper_id.eq.${user.id},seeker_id.eq.${user.id}`),
