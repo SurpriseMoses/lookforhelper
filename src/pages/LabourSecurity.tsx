@@ -119,7 +119,7 @@ const LabourSecurity = () => {
               <li>Overtime, Sunday and public holiday rates apply per the BCEA.</li>
             </ul>
             <Button asChild variant="outline" size="sm" className="gap-2">
-              <a href="https://www.labour.gov.za/national-minimum-wage" {...ext}>
+              <a href="https://www.labour.gov.za/Media-Desk/Media-Statements/Pages/Minister-of-Employment-and-Labour%2C-Meth-increases-the-statutory-National-Minimum-Wage-to-R30%2C23-per-hour.aspx" {...ext}>
                 Read the official NMW notice <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </Button>
@@ -190,7 +190,7 @@ const LabourSecurity = () => {
               <li>Report any workplace injury within 7 days.</li>
             </ul>
             <Button asChild variant="outline" className="gap-2">
-              <a href="https://www.labour.gov.za/compensation-for-occupational-injuries-and-diseases-act" {...ext}>
+              <a href="https://www.labour.gov.za/DocumentCenter/Pages/Compensation-Fund--obligations-of-the-employer-.aspx" {...ext}>
                 COIDA information <ExternalLink className="h-4 w-4" />
               </a>
             </Button>
