@@ -155,7 +155,7 @@ const LabourSecurity = () => {
                 </a>
               </Button>
               <Button asChild variant="outline" className="gap-2">
-                <a href="https://www.labour.gov.za/uif" {...ext}>
+                <a href="https://ufiling.labour.gov.za/uif/" {...ext}>
                   UIF guidance <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
