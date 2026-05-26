@@ -621,6 +621,269 @@ export type Database = {
           },
         ]
       }
+      institution_announcements: {
+        Row: {
+          caption: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          image_url: string | null
+          institution_id: string
+          is_paid: boolean
+          payment_reference: string | null
+          title: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          image_url?: string | null
+          institution_id: string
+          is_paid?: boolean
+          payment_reference?: string | null
+          title: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          image_url?: string | null
+          institution_id?: string
+          is_paid?: boolean
+          payment_reference?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_announcements_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_courses: {
+        Row: {
+          category: string
+          certificate_included: boolean
+          course_name: string
+          created_at: string
+          currency: string
+          description: string | null
+          duration: string | null
+          fee: number | null
+          id: string
+          installments_available: boolean
+          institution_id: string
+          requirements: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          certificate_included?: boolean
+          course_name: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string | null
+          fee?: number | null
+          id?: string
+          installments_available?: boolean
+          institution_id: string
+          requirements?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          certificate_included?: boolean
+          course_name?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string | null
+          fee?: number | null
+          id?: string
+          installments_available?: boolean
+          institution_id?: string
+          requirements?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_courses_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_gallery: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          institution_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          institution_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          institution_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_gallery_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institution_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          institution_id: string
+          payment_country: string | null
+          payment_provider: string
+          payment_reference: string | null
+          payment_status: string
+          payment_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id: string
+          payment_country?: string | null
+          payment_provider?: string
+          payment_reference?: string | null
+          payment_status?: string
+          payment_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          institution_id?: string
+          payment_country?: string | null
+          payment_provider?: string
+          payment_reference?: string | null
+          payment_status?: string
+          payment_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institution_payments_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      institutions: {
+        Row: {
+          banner_url: string | null
+          city: string | null
+          country: string
+          created_at: string
+          description: string | null
+          email: string | null
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          institution_name: string
+          is_suspended: boolean
+          logo_url: string | null
+          phone: string | null
+          registration_document_url: string | null
+          registration_number: string | null
+          rejection_reason: string | null
+          tiktok_url: string | null
+          updated_at: string
+          user_id: string
+          verification_paid: boolean
+          verification_status: string
+          verified_at: string | null
+          website: string | null
+        }
+        Insert: {
+          banner_url?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          institution_name?: string
+          is_suspended?: boolean
+          logo_url?: string | null
+          phone?: string | null
+          registration_document_url?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          tiktok_url?: string | null
+          updated_at?: string
+          user_id: string
+          verification_paid?: boolean
+          verification_status?: string
+          verified_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          banner_url?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          institution_name?: string
+          is_suspended?: boolean
+          logo_url?: string | null
+          phone?: string | null
+          registration_document_url?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          tiktok_url?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_paid?: boolean
+          verification_status?: string
+          verified_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       interviews: {
         Row: {
           conversation_id: string | null
@@ -1093,6 +1356,35 @@ export type Database = {
           },
         ]
       }
+      saved_institutions: {
+        Row: {
+          created_at: string
+          helper_id: string
+          id: string
+          institution_id: string
+        }
+        Insert: {
+          created_at?: string
+          helper_id: string
+          id?: string
+          institution_id: string
+        }
+        Update: {
+          created_at?: string
+          helper_id?: string
+          id?: string
+          institution_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_institutions_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_searches: {
         Row: {
           created_at: string
@@ -1338,6 +1630,7 @@ export type Database = {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
+      is_verified_institution: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1379,7 +1672,7 @@ export type Database = {
       update_last_active: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "seeker" | "helper" | "admin"
+      app_role: "seeker" | "helper" | "admin" | "institution"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1507,7 +1800,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["seeker", "helper", "admin"],
+      app_role: ["seeker", "helper", "admin", "institution"],
     },
   },
 } as const

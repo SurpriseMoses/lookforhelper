@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, ReactNode } fro
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type AppRole = "seeker" | "helper" | "admin";
+type AppRole = "seeker" | "helper" | "admin" | "institution";
 
 interface AuthContextType {
   user: User | null;
@@ -42,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const roles = (data || []).map((r) => r.role as string);
     if (roles.includes("admin")) setRole("admin");
+    else if (roles.includes("institution")) setRole("institution");
     else if (roles.includes("helper")) setRole("helper");
     else if (roles.includes("seeker")) setRole("seeker");
     else setRole(fallbackRole ?? null);
@@ -80,9 +81,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      // If this is a password recovery flow, do NOT populate session-derived state
-      // so the user cannot access authenticated areas (e.g. /dashboard) until they
-      // complete (or abandon) the reset on /reset-password.
       if (event === "PASSWORD_RECOVERY") {
         sessionStorage.setItem("password_recovery_in_progress", "true");
         roleRequestIdRef.current += 1;
@@ -94,7 +92,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (sessionStorage.getItem("password_recovery_in_progress") === "true") {
-        // Ignore SIGNED_IN / TOKEN_REFRESHED events emitted by the recovery link
         roleRequestIdRef.current += 1;
         setSession(null);
         setUser(null);
@@ -132,7 +129,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      // If we are mid password-recovery, ignore the recovery session entirely
       if (sessionStorage.getItem("password_recovery_in_progress") === "true") {
         setSession(null);
         setUser(null);
@@ -171,7 +167,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     if (error) throw error;
 
-    // Supabase returns a user with empty identities when the email already exists
     if (data?.user && data.user.identities && data.user.identities.length === 0) {
       throw new Error("An account with this email already exists. Please log in instead.");
     }
