@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Search, UserPlus, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [totalHires, setTotalHires] = useState(0);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               className="bg-blue-500 text-white hover:bg-blue-600 gap-2 text-base font-semibold px-8"
-              onClick={() => navigate("/auth?tab=signup&role=helper")}
+              onClick={() => navigate(user ? "/dashboard" : "/auth?tab=signup&role=helper")}
             >
               <UserPlus className="h-5 w-5" />
               Register as a Helper

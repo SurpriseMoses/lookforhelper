@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Search, UserPlus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CTASection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <section className="py-20 md:py-28">
@@ -27,7 +29,7 @@ const CTASection = () => {
             <Button
               size="lg"
               className="bg-blue-500 text-white hover:bg-blue-600 gap-2 font-semibold px-8"
-              onClick={() => navigate("/auth?tab=signup&role=helper")}
+              onClick={() => navigate(user ? "/dashboard" : "/auth?tab=signup&role=helper")}
             >
               <UserPlus className="h-4 w-4" />
               Register as a Helper
