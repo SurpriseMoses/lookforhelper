@@ -113,13 +113,15 @@ const Dashboard = () => {
     const load = async () => {
       const { data: p } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url, phone_number")
+        .select("full_name, avatar_url")
         .eq("user_id", user.id)
         .maybeSingle();
       if (p) {
         setProfile({ full_name: p.full_name, avatar_url: (p as any).avatar_url ?? "" });
-        setPhoneNumber((p as any).phone_number ?? "");
       }
+      // Phone number is read via a secure RPC so it's never exposed in public profile reads
+      const { data: phone } = await supabase.rpc("get_my_phone");
+      setPhoneNumber((phone as string | null) ?? "");
 
       if (role === "helper") {
         const { data: h } = await supabase
