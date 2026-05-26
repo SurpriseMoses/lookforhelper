@@ -70,6 +70,11 @@ const App = () => (
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="/admin/email-preview" element={<EmailPreview />} />
                 <Route path="/labour-security" element={<LabourSecurity />} />
+                <Route path="/institutions" element={<Institutions />} />
+                <Route path="/institution/:id" element={<InstitutionProfile />} />
+                <Route path="/auth/institution" element={<InstitutionSignup />} />
+                <Route path="/institution-dashboard" element={<InstitutionDashboard />} />
+                <Route path="/saved-institutions" element={<SavedInstitutions />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
