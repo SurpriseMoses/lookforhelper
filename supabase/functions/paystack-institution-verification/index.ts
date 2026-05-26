@@ -66,14 +66,27 @@ serve(async (req) => {
 
     if (action === "verify") {
       if (!reference) return new Response(JSON.stringify({ error: "Reference required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+      // SECURITY: ensure the reference was created by THIS user for THIS institution
+      const { data: pending } = await supabase
+        .from("institution_payments")
+        .select("id")
+        .eq("payment_reference", reference)
+        .eq("user_id", user.id)
+        .eq("institution_id", inst.id)
+        .maybeSingle();
+      if (!pending) {
+        return new Response(JSON.stringify({ error: "Payment reference not found for this account" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
       const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, { headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` } });
       const d = await res.json();
       if (d.status && d.data.status === "success") {
-        await supabase.from("institution_payments").update({ payment_status: "paid" }).eq("payment_reference", reference);
+        await supabase.from("institution_payments").update({ payment_status: "paid" }).eq("payment_reference", reference).eq("user_id", user.id);
         await supabase.from("institutions").update({ verification_paid: true, verification_status: "pending" }).eq("id", inst.id);
         return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      await supabase.from("institution_payments").update({ payment_status: "failed" }).eq("payment_reference", reference);
+      await supabase.from("institution_payments").update({ payment_status: "failed" }).eq("payment_reference", reference).eq("user_id", user.id);
       return new Response(JSON.stringify({ success: false }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
