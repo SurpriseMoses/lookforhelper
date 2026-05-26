@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, FileCheck2, HeartPulse, Banknote, ExternalLink, ArrowRight } from "lucide-react";
 import UifCalculator from "@/components/labour/UifCalculator";
 import ContractBuilder from "@/components/labour/ContractBuilder";
+import { useAuth } from "@/contexts/AuthContext";
 
 function openExternal(url: string) {
   try {
@@ -29,6 +30,8 @@ const ext = {
 };
 
 const LabourSecurity = () => {
+  const { role } = useAuth();
+  const isSeeker = role === "seeker";
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -152,7 +155,7 @@ const LabourSecurity = () => {
                 </a>
               </Button>
               <Button asChild variant="outline" className="gap-2">
-                <a href="https://www.labour.gov.za/uif" {...ext}>
+                <a href="https://ufiling.labour.gov.za/uif/" {...ext}>
                   UIF guidance <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
@@ -200,20 +203,22 @@ const LabourSecurity = () => {
         {/* Employment contract builder */}
         <ContractBuilder />
 
-        {/* CTA */}
-        <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
-          <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground">Track your compliance progress</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Use the Compliance Checklist on your dashboard to tick off each step.
-              </p>
-            </div>
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/dashboard">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* CTA — only seekers (employers) have the compliance checklist on their dashboard */}
+        {isSeeker && (
+          <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20">
+            <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">Track your compliance progress</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Use the Compliance Checklist on your dashboard to tick off each step.
+                </p>
+              </div>
+              <Button asChild size="lg" className="gap-2">
+                <Link to="/dashboard">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         <p className="text-xs text-muted-foreground text-center">
           This page is general guidance only and does not constitute legal advice. Always confirm details on
