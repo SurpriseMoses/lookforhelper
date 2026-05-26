@@ -53,8 +53,7 @@ const HeroSection = () => {
             </Button>
             <Button
               size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 gap-2 text-base font-semibold px-8"
+              className="bg-blue-500 text-white hover:bg-blue-600 gap-2 text-base font-semibold px-8"
               onClick={() => navigate("/auth?tab=signup&role=helper")}
             >
               <UserPlus className="h-5 w-5" />
