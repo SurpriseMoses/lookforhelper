@@ -1,0 +1,1 @@
+GRANT SELECT (work_authorization_status) ON public.helper_details TO anon;
