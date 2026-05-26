@@ -32,7 +32,7 @@ const SavedInstitutions = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Saved Institutions | Look For Helper" path="/saved-institutions" noindex />
+      <SEO title="Saved Institutions | Look For Helper" description="Institutions you've bookmarked on Look For Helper." path="/saved-institutions" noindex />
       <Navbar />
       <div className="container py-8">
         <div className="mb-6 flex items-center gap-2">
