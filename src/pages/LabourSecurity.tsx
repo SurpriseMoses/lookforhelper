@@ -30,7 +30,8 @@ const ext = {
 };
 
 const LabourSecurity = () => {
-  return (
+  const { role } = useAuth();
+  const isSeeker = role === "seeker";
     <div className="min-h-screen bg-background">
       <SEO
         title="Labour Security: UIF & Compliance Guide | Look For Helper"
