@@ -1619,6 +1619,11 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_helper_references_full: { Args: { _user_id: string }; Returns: Json }
+      get_helper_references_public: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
       get_my_phone: { Args: never; Returns: string }
       has_role: {
         Args: {
