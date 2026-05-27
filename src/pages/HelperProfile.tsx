@@ -85,9 +85,12 @@ const HelperProfilePage = () => {
     const fetchHelper = async () => {
       const { data: helperData } = await supabase
         .from("helper_details")
-        .select("*")
+        .select("id,user_id,age,gender,city,province,country,latitude,longitude,willing_to_work_abroad,years_experience,skills,skill_experience,languages,salary_expectation,salary_min,salary_max,salary_negotiable,about_me,video_introduction_url,video_views,is_published,is_featured,featured_until,featured_status,featured_type,work_authorization_status,preferred_hours,work_type,available_from,availability_status,background_check_available,background_check_requested,background_check_status,total_reviews,average_rating,created_at,updated_at")
         .eq("user_id", userId)
         .maybeSingle();
+
+      // helper_references is column-restricted; fetch redacted (name + relationship only) via RPC
+      const { data: refsData } = await supabase.rpc("get_helper_references_public", { _user_id: userId });
 
       if (!helperData) {
         setLoading(false);
