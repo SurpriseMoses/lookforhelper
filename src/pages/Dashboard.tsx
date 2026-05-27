@@ -156,7 +156,7 @@ const Dashboard = () => {
             salary_negotiable: h.salary_negotiable ?? true,
             about_me: h.about_me ?? "",
             video_introduction_url: (h as any).video_introduction_url ?? "",
-            helper_references: (h.helper_references as any[]) ?? [],
+            helper_references: ((ownerRefs as any[]) ?? []),
             is_published: h.is_published ?? false,
             work_authorization_status: (h as any).work_authorization_status ?? "",
           });
