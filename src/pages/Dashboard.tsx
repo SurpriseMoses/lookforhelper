@@ -126,9 +126,11 @@ const Dashboard = () => {
       if (role === "helper") {
         const { data: h } = await supabase
           .from("helper_details")
-          .select("*")
+          .select("id,user_id,age,gender,city,province,country,latitude,longitude,willing_to_work_abroad,years_experience,skills,skill_experience,languages,salary_expectation,salary_min,salary_max,salary_negotiable,about_me,video_introduction_url,is_published,work_authorization_status")
           .eq("user_id", user.id)
           .maybeSingle();
+        // helper_references column is access-restricted; fetch full data via secure RPC for the owner
+        const { data: ownerRefs } = await supabase.rpc("get_helper_references_full", { _user_id: user.id });
         if (h) {
           const rawExp = (h as any).skill_experience ?? {};
           const strExp: Record<string, string> = {};
@@ -154,7 +156,7 @@ const Dashboard = () => {
             salary_negotiable: h.salary_negotiable ?? true,
             about_me: h.about_me ?? "",
             video_introduction_url: (h as any).video_introduction_url ?? "",
-            helper_references: (h.helper_references as any[]) ?? [],
+            helper_references: ((ownerRefs as any[]) ?? []),
             is_published: h.is_published ?? false,
             work_authorization_status: (h as any).work_authorization_status ?? "",
           });
