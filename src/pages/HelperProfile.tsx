@@ -127,7 +127,7 @@ const HelperProfilePage = () => {
         available_from: (helperData as any).available_from ?? null,
         work_type: (helperData as any).work_type ?? [],
         preferred_hours: (helperData as any).preferred_hours ?? null,
-        helper_references: helperData.helper_references as any,
+        helper_references: (refsData as any) ?? [],
         work_authorization_status: (helperData as any).work_authorization_status ?? null,
         skill_experience: (helperData as any).skill_experience ?? null,
         profiles: profileData ?? null,
