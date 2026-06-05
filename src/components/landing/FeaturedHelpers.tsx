@@ -101,33 +101,8 @@ const FeaturedHelpers = () => {
         .order("average_rating", { ascending: false })
         .limit(20);
 
-      const boostedUserIds = new Set((boostedData || []).map((h) => h.user_id));
+      const allRaw = boostedData || [];
 
-      const { data: listingData } = await supabase
-        .from("helper_subscriptions")
-        .select("user_id, featured_active, featured_expires_at, status")
-        .eq("featured_active", true);
-
-      const activeListingUserIds = (listingData || [])
-        .filter((s) => {
-          const hasPaidListing = s.status === "active" && s.featured_expires_at && new Date(s.featured_expires_at) > new Date();
-          return hasPaidListing && !boostedUserIds.has(s.user_id);
-        })
-        .map((s) => s.user_id);
-
-      let listingHelpers: typeof boostedData = [];
-      if (activeListingUserIds.length > 0) {
-        const { data } = await supabase
-          .from("helper_details")
-          .select("user_id, skills, years_experience, city, country, average_rating, is_featured, featured_until, availability_status")
-          .eq("is_published", true)
-          .in("user_id", activeListingUserIds)
-          .order("average_rating", { ascending: false })
-          .limit(20);
-        listingHelpers = data || [];
-      }
-
-      const allRaw = [...(boostedData || []), ...(listingHelpers || [])];
 
       if (allRaw.length === 0) {
         setLoading(false);
