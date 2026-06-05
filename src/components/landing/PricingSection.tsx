@@ -79,12 +79,13 @@ const PricingSection = () => {
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <PriceItem label="Profile listing & visibility in search" price="Free" highlight />
-
+                <div className="pl-4 border-l-2 border-primary/20 space-y-2">
                   <p className="text-sm font-medium text-foreground">Featured Boost:</p>
                   <PriceItem label="7 days" price={formatPrice("boost_7")} compact />
                   <PriceItem label="21 days" price={formatPrice("boost_21")} compact />
                   <PriceItem label="30 days" price={formatPrice("boost_30")} compact />
                 </div>
+
                 <PriceItem label="Verified Identity badge" price={formatPrice("verification")} />
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="h-4 w-4 text-muted-foreground/50" />
