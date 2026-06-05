@@ -120,7 +120,7 @@ const FeaturedHelpers = () => {
 
       const merged: FeaturedHelper[] = allRaw.map((h) => {
         const profile = profileMap[h.user_id];
-        const isBoosted = boostedUserIds.has(h.user_id);
+        const isBoosted = true;
         return {
           user_id: h.user_id,
           skills: h.skills || [],
