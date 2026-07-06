@@ -470,6 +470,24 @@ export default function AdminEmailPreview() {
                 Send batch now ({eligibleHelpers.length})
               </Button>
             </DisabledHint>
+            <DisabledHint
+              disabled={maxedResendHelpers.length === 0}
+              reason="No helpers have hit max reminders 30+ days ago"
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={resendMaxedNow}
+                disabled={resendingMaxed || maxedResendHelpers.length === 0}
+              >
+                {resendingMaxed ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Resend to maxed-out ({maxedResendHelpers.length})
+              </Button>
+            </DisabledHint>
             <Button
               size="sm"
               variant="outline"
