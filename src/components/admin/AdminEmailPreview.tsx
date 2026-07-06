@@ -273,6 +273,38 @@ export default function AdminEmailPreview() {
     }
   };
 
+  const [resendingMaxed, setResendingMaxed] = useState(false);
+  const resendMaxedNow = async () => {
+    if (maxedResendHelpers.length === 0) {
+      toast.error("No helpers eligible for a 30-day resend right now");
+      return;
+    }
+    if (
+      !confirm(
+        `Resend a fresh reminder cycle to ${maxedResendHelpers.length} helper(s) who hit max reminders 30+ days ago?`
+      )
+    )
+      return;
+    setResendingMaxed(true);
+    const t = toast.loading(`Resending to ${maxedResendHelpers.length}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "resend_maxed" } }
+      );
+      if (error) throw error;
+      toast.success(
+        `✓ Resend complete — Sent ${data?.sent ?? 0} • Skipped ${data?.skipped ?? 0}`,
+        { id: t }
+      );
+      await Promise.all([loadHelpers(), loadInsights()]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Resend failed", { id: t });
+    } finally {
+      setResendingMaxed(false);
+    }
+
+
   const toggleAutomation = async (enabled: boolean) => {
     setTogglingAutomation(true);
     try {
