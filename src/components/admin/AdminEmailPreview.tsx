@@ -186,6 +186,20 @@ export default function AdminEmailPreview() {
     [helpers]
   );
 
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const maxedResendHelpers = useMemo(
+    () =>
+      helpers.filter(
+        (h) =>
+          !h.unsubscribed &&
+          h.current_step >= 3 &&
+          h.last_reminder_sent_at &&
+          Date.now() - new Date(h.last_reminder_sent_at).getTime() >= THIRTY_DAYS_MS
+      ),
+    [helpers]
+  );
+
+
   const toggleAll = () => {
     if (selectedHelpers.size === eligibleHelpers.length && eligibleHelpers.length > 0) {
       setSelectedHelpers(new Set());
