@@ -209,8 +209,86 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'list') {
-      return json({ helpers: incompleteList })
+      // Attach a computed flag: eligible for a "resend after 30 days" if
+      // helper hit max reminders and last send was >=30 days ago.
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
+      const now = Date.now()
+      const maxed = incompleteList.filter(
+        (h) =>
+          !h.unsubscribed &&
+          h.current_step >= 3 &&
+          h.last_reminder_sent_at &&
+          now - new Date(h.last_reminder_sent_at).getTime() >= THIRTY_DAYS_MS,
+      )
+      return json({ helpers: incompleteList, maxed_resend_count: maxed.length })
     }
+
+    if (action === 'resend_maxed') {
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
+      const now = Date.now()
+      const cycleTag = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+      const targets = incompleteList.filter(
+        (h) =>
+          !h.unsubscribed &&
+          h.current_step >= 3 &&
+          h.last_reminder_sent_at &&
+          now - new Date(h.last_reminder_sent_at).getTime() >= THIRTY_DAYS_MS,
+      )
+
+      if (targets.length === 0) {
+        return json({ sent: 0, skipped: 0, errors: [], results: [], eligible: 0 })
+      }
+
+      const errors: string[] = []
+      let sent = 0
+      let skipped = 0
+      const results: Array<{ user_id: string; status: string; step?: number; error?: string }> = []
+
+      for (const h of targets) {
+        try {
+          const { data: sendData, error: sendErr } = await userClient.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: STEP_TEMPLATES[1],
+              recipientEmail: h.email,
+              idempotencyKey: `helper-reminder-${h.user_id}-cycle-${cycleTag}-step-1`,
+              templateData: { name: h.first_name, profile_link: PROFILE_LINK },
+            },
+          })
+          if (sendErr) {
+            const context = (sendErr as { context?: unknown }).context
+            let detail = sendErr.message
+            if (context instanceof Response) {
+              const responseText = await context.text().catch(() => '')
+              if (responseText) detail = `${detail}: ${responseText}`
+            }
+            throw new Error(detail)
+          }
+          if (sendData?.success === false) {
+            skipped++
+            results.push({ user_id: h.user_id, status: sendData.reason || 'skipped' })
+            continue
+          }
+
+          // Reset the tracking cycle: they're back at step 1.
+          await admin.from('helper_reminder_tracking').upsert({
+            user_id: h.user_id,
+            email_step: 1,
+            last_reminder_sent_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' })
+
+          sent++
+          results.push({ user_id: h.user_id, status: 'sent', step: 1 })
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e)
+          errors.push(`${h.user_id}: ${msg}`)
+          results.push({ user_id: h.user_id, status: 'error', error: msg })
+        }
+      }
+
+      return json({ sent, skipped, errors: errors.slice(0, 50), results, eligible: targets.length })
+    }
+
 
     if (action === 'send' || action === 'send_batch') {
       let targetSet: Set<string>

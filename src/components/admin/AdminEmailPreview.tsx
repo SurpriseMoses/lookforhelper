@@ -186,6 +186,20 @@ export default function AdminEmailPreview() {
     [helpers]
   );
 
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const maxedResendHelpers = useMemo(
+    () =>
+      helpers.filter(
+        (h) =>
+          !h.unsubscribed &&
+          h.current_step >= 3 &&
+          h.last_reminder_sent_at &&
+          Date.now() - new Date(h.last_reminder_sent_at).getTime() >= THIRTY_DAYS_MS
+      ),
+    [helpers]
+  );
+
+
   const toggleAll = () => {
     if (selectedHelpers.size === eligibleHelpers.length && eligibleHelpers.length > 0) {
       setSelectedHelpers(new Set());
@@ -258,6 +272,41 @@ export default function AdminEmailPreview() {
       setBatchSending(false);
     }
   };
+
+  const [resendingMaxed, setResendingMaxed] = useState(false);
+  const resendMaxedNow = async () => {
+    if (maxedResendHelpers.length === 0) {
+      toast.error("No helpers eligible for a 30-day resend right now");
+      return;
+    }
+    if (
+      !confirm(
+        `Resend a fresh reminder cycle to ${maxedResendHelpers.length} helper(s) who hit max reminders 30+ days ago?`
+      )
+    )
+      return;
+    setResendingMaxed(true);
+    const t = toast.loading(`Resending to ${maxedResendHelpers.length}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "resend_maxed" } }
+      );
+      if (error) throw error;
+      toast.success(
+        `✓ Resend complete — Sent ${data?.sent ?? 0} • Skipped ${data?.skipped ?? 0}`,
+        { id: t }
+      );
+      await Promise.all([loadHelpers(), loadInsights()]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Resend failed", { id: t });
+    } finally {
+      setResendingMaxed(false);
+    }
+  };
+
+
+
 
   const toggleAutomation = async (enabled: boolean) => {
     setTogglingAutomation(true);
@@ -419,6 +468,24 @@ export default function AdminEmailPreview() {
                   <Send className="mr-2 h-4 w-4" />
                 )}
                 Send batch now ({eligibleHelpers.length})
+              </Button>
+            </DisabledHint>
+            <DisabledHint
+              disabled={maxedResendHelpers.length === 0}
+              reason="No helpers have hit max reminders 30+ days ago"
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={resendMaxedNow}
+                disabled={resendingMaxed || maxedResendHelpers.length === 0}
+              >
+                {resendingMaxed ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Resend to maxed-out ({maxedResendHelpers.length})
               </Button>
             </DisabledHint>
             <Button
