@@ -126,11 +126,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.lookforhelper.co.za/helper/a35c11e7-16d2-4847-a709-6d40ddf144e1</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://www.lookforhelper.co.za/helper/18b721a0-4557-4d04-8c27-96559c2258b9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -141,12 +136,47 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://www.lookforhelper.co.za/helper/a35c11e7-16d2-4847-a709-6d40ddf144e1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.lookforhelper.co.za/helper/4758db3b-74ac-4201-ab9c-e82f3dc5546d</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.lookforhelper.co.za/helper/317dcd77-881b-4f45-b78f-75a1c81f2e91</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/3f6b1da8-0f15-43ae-8df3-79b3558f3147</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/d9371b5d-717d-4fbe-ad53-575a24182fee</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/2f640f38-918e-4d89-b4fd-dfe51079637e</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/96de059b-3ab4-4054-b1fe-75e49e35eb87</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/f00adbe4-56e5-4560-ad6e-440624b5a018</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/45989e3f-e4ba-4daf-8e67-72679b3312d9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
