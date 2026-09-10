@@ -1611,6 +1611,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_institutions: {
+        Args: never
+        Returns: {
+          banner_url: string | null
+          city: string | null
+          country: string
+          created_at: string
+          description: string | null
+          email: string | null
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          institution_name: string
+          is_suspended: boolean
+          logo_url: string | null
+          phone: string | null
+          registration_document_url: string | null
+          registration_number: string | null
+          rejection_reason: string | null
+          tiktok_url: string | null
+          updated_at: string
+          user_id: string
+          verification_paid: boolean
+          verification_status: string
+          verified_at: string | null
+          website: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "institutions"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -1624,6 +1658,15 @@ export type Database = {
       get_helper_references_public: {
         Args: { _user_id: string }
         Returns: Json
+      }
+      get_my_institution_private: {
+        Args: never
+        Returns: {
+          id: string
+          registration_document_url: string
+          registration_number: string
+          rejection_reason: string
+        }[]
       }
       get_my_phone: { Args: never; Returns: string }
       has_role: {

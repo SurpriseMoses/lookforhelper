@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Download, FileDown } from "lucide-react";
+import { HELPER_DETAILS_COLUMNS } from "@/lib/institutionFields";
 
 const DataExportCard = () => {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ const DataExportCard = () => {
       // Fetch all user data in parallel
       const [profileRes, helperRes, messagesRes, hiresRes, reviewsRes, bookmarksRes, notificationsRes] = await Promise.all([
         supabase.from("profiles").select("user_id, full_name, avatar_url, is_verified, last_active_at, referral_code, referred_by, created_at, updated_at").eq("user_id", user.id).maybeSingle(),
-        supabase.from("helper_details").select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("helper_details").select(HELPER_DETAILS_COLUMNS).eq("user_id", user.id).maybeSingle(),
         supabase.from("messages").select("content, created_at, conversation_id").eq("sender_id", user.id),
         supabase.from("hires").select("*").or(`helper_id.eq.${user.id},seeker_id.eq.${user.id}`),
         supabase.from("helper_reviews").select("*").or(`helper_id.eq.${user.id},seeker_id.eq.${user.id}`),

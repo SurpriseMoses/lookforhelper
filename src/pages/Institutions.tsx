@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { INSTITUTION_COURSE_CATEGORIES } from "@/lib/institutionCategories";
+import { INSTITUTION_PUBLIC_COLUMNS } from "@/lib/institutionFields";
 import { GraduationCap, Search } from "lucide-react";
 
 interface Inst {
@@ -46,7 +47,7 @@ const Institutions = () => {
   useEffect(() => {
     setLoading(true);
     (async () => {
-      let q = supabase.from("institutions").select("*").eq("is_suspended", false).order("created_at", { ascending: false });
+      let q = supabase.from("institutions").select(INSTITUTION_PUBLIC_COLUMNS).eq("is_suspended", false).order("created_at", { ascending: false });
       if (verifiedOnly) q = q.eq("verification_status", "verified");
       const { data: insts } = await q;
       const list = insts || [];

@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 import DisputeDialog from "@/components/disputes/DisputeDialog";
+import { HELPER_DETAILS_COLUMNS } from "@/lib/institutionFields";
 import {
   ArrowLeft,
   Briefcase,
@@ -73,7 +74,7 @@ const HireDetails = () => {
 
     const [{ data: profile }, { data: details }] = await Promise.all([
       supabase.from("profiles").select("user_id, full_name, avatar_url, is_verified, last_active_at").eq("user_id", h.helper_id).maybeSingle(),
-      supabase.from("helper_details").select("*").eq("user_id", h.helper_id).maybeSingle(),
+      supabase.from("helper_details").select(HELPER_DETAILS_COLUMNS).eq("user_id", h.helper_id).maybeSingle(),
     ]);
 
     setHelperProfile(profile);

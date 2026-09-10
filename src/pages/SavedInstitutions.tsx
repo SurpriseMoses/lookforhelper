@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/landing/Navbar";
 import SEO from "@/components/SEO";
 import InstitutionCard from "@/components/institutions/InstitutionCard";
+import { INSTITUTION_PUBLIC_COLUMNS } from "@/lib/institutionFields";
 import { Heart } from "lucide-react";
 
 const SavedInstitutions = () => {
@@ -19,7 +20,7 @@ const SavedInstitutions = () => {
       const { data: saved } = await supabase.from("saved_institutions").select("institution_id").eq("helper_id", user.id);
       const ids = (saved || []).map((s) => s.institution_id);
       if (ids.length === 0) { setItems([]); setLoading(false); return; }
-      const { data: insts } = await supabase.from("institutions").select("*").in("id", ids);
+      const { data: insts } = await supabase.from("institutions").select(INSTITUTION_PUBLIC_COLUMNS).in("id", ids);
       const { data: cs } = await supabase.from("institution_courses").select("institution_id, course_name, fee, currency, category").in("institution_id", ids);
       setItems(insts || []);
       setCourses(cs || []);
