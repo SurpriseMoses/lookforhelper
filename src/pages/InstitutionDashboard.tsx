@@ -30,9 +30,11 @@ const InstitutionDashboard = () => {
 
   const reload = useCallback(async () => {
     if (!user) return;
-    const { data: i } = await supabase.from("institutions").select("*").eq("user_id", user.id).maybeSingle();
+    const { data: i } = await supabase.from("institutions").select(INSTITUTION_PUBLIC_COLUMNS).eq("user_id", user.id).maybeSingle();
     if (!i) { setLoading(false); return; }
-    setInst(i);
+    // restricted columns (registration details, rejection reason) via secure owner RPC
+    const { data: priv } = await supabase.rpc("get_my_institution_private");
+    setInst({ ...i, ...(((priv as any[]) || [])[0] ?? {}) });
     setProfileForm({
       institution_name: i.institution_name || "",
       description: i.description || "",
@@ -48,7 +50,7 @@ const InstitutionDashboard = () => {
     const [{ data: cs }, { data: g }, { data: a }] = await Promise.all([
       supabase.from("institution_courses").select("*").eq("institution_id", i.id).order("created_at"),
       supabase.from("institution_gallery").select("*").eq("institution_id", i.id).order("display_order"),
-      supabase.from("institution_announcements").select("*").eq("institution_id", i.id).order("created_at", { ascending: false }),
+      supabase.from("institution_announcements").select(INSTITUTION_ANNOUNCEMENT_COLUMNS).eq("institution_id", i.id).order("created_at", { ascending: false }),
     ]);
     setCourses(cs || []);
     setGallery(g || []);

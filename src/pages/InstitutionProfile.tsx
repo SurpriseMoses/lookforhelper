@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BadgeCheck, MapPin, Phone, Mail, Globe, GraduationCap, Award, Megaphone, Building2 } from "lucide-react";
 import SaveInstitutionButton from "@/components/institutions/SaveInstitutionButton";
+import { INSTITUTION_PUBLIC_COLUMNS, INSTITUTION_ANNOUNCEMENT_COLUMNS } from "@/lib/institutionFields";
 
 const InstitutionProfile = () => {
   const { id } = useParams<{ id: string }>();
