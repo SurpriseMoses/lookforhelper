@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReviewHelperDialog from "@/components/reviews/ReviewHelperDialog";
 import SeekerPaywallDialog from "@/components/subscription/SeekerPaywallDialog";
 import DisputeDialog from "@/components/disputes/DisputeDialog";
+import { HELPER_DETAILS_COLUMNS } from "@/lib/institutionFields";
 import {
   ArrowLeft,
   Briefcase,
