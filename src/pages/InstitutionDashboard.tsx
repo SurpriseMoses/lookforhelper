@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { BadgeCheck, ShieldAlert, CreditCard, Plus, Trash2, Megaphone, GraduationCap, Image as ImageIcon, Building2 } from "lucide-react";
 import { INSTITUTION_COURSE_CATEGORIES, getInstitutionPricing } from "@/lib/institutionCategories";
+import { INSTITUTION_PUBLIC_COLUMNS, INSTITUTION_ANNOUNCEMENT_COLUMNS } from "@/lib/institutionFields";
 
 const InstitutionDashboard = () => {
   const { user, role, loading: authLoading } = useAuth();
