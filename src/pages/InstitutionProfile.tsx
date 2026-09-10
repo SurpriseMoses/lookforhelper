@@ -20,12 +20,12 @@ const InstitutionProfile = () => {
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const { data: i } = await supabase.from("institutions").select("*").eq("id", id).maybeSingle();
+      const { data: i } = await supabase.from("institutions").select(INSTITUTION_PUBLIC_COLUMNS).eq("id", id).maybeSingle();
       setInst(i);
       const [{ data: cs }, { data: g }, { data: a }] = await Promise.all([
         supabase.from("institution_courses").select("*").eq("institution_id", id).order("created_at"),
         supabase.from("institution_gallery").select("*").eq("institution_id", id).order("display_order"),
-        supabase.from("institution_announcements").select("*").eq("institution_id", id).gt("expires_at", new Date().toISOString()).order("created_at", { ascending: false }),
+        supabase.from("institution_announcements").select(INSTITUTION_ANNOUNCEMENT_COLUMNS).eq("institution_id", id).gt("expires_at", new Date().toISOString()).order("created_at", { ascending: false }),
       ]);
       setCourses(cs || []);
       setGallery(g || []);

@@ -13,8 +13,9 @@ const InstitutionsAdminTab = () => {
   const [rejectionReason, setRejectionReason] = useState<Record<string, string>>({});
 
   const load = async () => {
-    const { data } = await supabase.from("institutions").select("*").order("created_at", { ascending: false });
-    setInsts(data || []);
+    // sensitive columns are column-revoked; admins read them via a secure RPC
+    const { data } = await supabase.rpc("admin_list_institutions");
+    setInsts((data as any[]) || []);
   };
   useEffect(() => { load(); }, []);
 
