@@ -307,6 +307,7 @@ export default function AdminEmailPreview() {
   };
 
   const [sendingTwoSteps, setSendingTwoSteps] = useState(false);
+  const [twoStepsRemaining, setTwoStepsRemaining] = useState<number | null>(null);
   const twoStepsTargets = useMemo(
     () => helpers.filter((h) => !h.unsubscribed),
     [helpers]
@@ -327,6 +328,7 @@ export default function AdminEmailPreview() {
     try {
       let totalSent = 0;
       let totalSkipped = 0;
+      let lastRemaining = 0;
       // The server sends in small batches to stay within its time limit —
       // keep calling until nobody is left.
       for (let round = 0; round < 40; round++) {
@@ -338,12 +340,14 @@ export default function AdminEmailPreview() {
         totalSent += data?.sent ?? 0;
         totalSkipped += data?.skipped ?? 0;
         const remaining = data?.remaining ?? 0;
+        lastRemaining = remaining;
+        setTwoStepsRemaining(remaining);
         if (!data?.eligible) break;
         if (remaining <= 0) break;
         toast.loading(`Sent ${totalSent}… ${remaining} to go`, { id: t });
       }
       toast.success(
-        `✓ Sent ${totalSent} • Skipped ${totalSkipped}`,
+        `✓ Sent ${totalSent} • Skipped ${totalSkipped} • ${lastRemaining} left`,
         { id: t }
       );
       await Promise.all([loadHelpers(), loadInsights()]);
@@ -588,7 +592,7 @@ export default function AdminEmailPreview() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
             <StatTile
               icon={Users}
               label="Eligible now"
@@ -612,6 +616,12 @@ export default function AdminEmailPreview() {
               label="Completions (7d)"
               value={insights?.completions_last_7_days ?? "—"}
               hint="Profiles completed"
+            />
+            <StatTile
+              icon={Mail}
+              label="City & skills left"
+              value={twoStepsRemaining ?? twoStepsTargets.length}
+              hint="Still to receive this month"
             />
           </div>
         </CardContent>
