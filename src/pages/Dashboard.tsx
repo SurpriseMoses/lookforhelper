@@ -211,7 +211,7 @@ const Dashboard = () => {
             about_me: helperDetails.about_me,
             video_introduction_url: helperDetails.video_introduction_url || null,
             helper_references: helperDetails.helper_references,
-            is_published: helperDetails.is_published,
+            is_published: true,
             work_authorization_status: helperDetails.work_authorization_status || null,
           } as any)
           .eq("user_id", user.id);
@@ -705,18 +705,25 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-4">
-                <Switch
-                  checked={helperDetails.is_published}
-                  onCheckedChange={(v) => setHelperDetails((h) => ({ ...h, is_published: v }))}
-                />
-                <div>
-                  <Label className="font-medium">Publish profile</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Make your profile visible to seekers on the platform.
+              {(!helperDetails.city?.trim() || (helperDetails.skills?.length ?? 0) === 0) ? (
+                <div className="rounded-lg border border-amber-400 bg-amber-50 p-4 dark:bg-amber-950/30">
+                  <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                    Your profile is not showing in search yet
+                  </p>
+                  <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">
+                    Add your <strong>city</strong> and at least one <strong>skill</strong> above, then tap Save.
+                    That is all that is needed — families will then find you.
                   </p>
                 </div>
-              </div>
+              ) : (
+                <div className="rounded-lg border bg-muted/50 p-4">
+                  <p className="text-sm font-medium">Your profile is live in search</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Anyone looking for help can find you. Keep your details up to date.
+                  </p>
+                </div>
+              )}
+
             </CardContent>
           </Card>
           </>

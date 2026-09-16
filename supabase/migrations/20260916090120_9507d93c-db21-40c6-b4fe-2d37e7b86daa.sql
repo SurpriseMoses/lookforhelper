@@ -1,0 +1,1 @@
+UPDATE public.helper_details SET is_published = true, updated_at = now() WHERE is_published IS DISTINCT FROM true;
