@@ -223,7 +223,56 @@ Deno.serve(async (req) => {
       return json({ helpers: incompleteList, maxed_resend_count: maxed.length })
     }
 
+    // One-off campaign: tell every incomplete helper that publishing is gone and
+    // only city + skills are needed. Ignores the 3-step cap (separate template),
+    // still respects unsubscribes. One send per helper per calendar month.
+    if (action === 'send_two_steps') {
+      const cycleTag = new Date().toISOString().slice(0, 7) // YYYY-MM
+      const targets = incompleteList.filter((h) => !h.unsubscribed)
+
+      const errors: string[] = []
+      let sent = 0
+      let skipped = 0
+      const results: Array<{ user_id: string; status: string; error?: string }> = []
+
+      for (const h of targets) {
+        try {
+          const { data: sendData, error: sendErr } = await userClient.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'helper-two-steps',
+              recipientEmail: h.email,
+              idempotencyKey: `helper-two-steps-${h.user_id}-${cycleTag}`,
+              templateData: { name: h.first_name, profile_link: PROFILE_LINK },
+            },
+          })
+          if (sendErr) {
+            const context = (sendErr as { context?: unknown }).context
+            let detail = sendErr.message
+            if (context instanceof Response) {
+              const responseText = await context.text().catch(() => '')
+              if (responseText) detail = `${detail}: ${responseText}`
+            }
+            throw new Error(detail)
+          }
+          if (sendData?.success === false) {
+            skipped++
+            results.push({ user_id: h.user_id, status: sendData.reason || 'skipped' })
+            continue
+          }
+          sent++
+          results.push({ user_id: h.user_id, status: 'sent' })
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e)
+          errors.push(`${h.user_id}: ${msg}`)
+          results.push({ user_id: h.user_id, status: 'error', error: msg })
+        }
+      }
+
+      return json({ sent, skipped, errors: errors.slice(0, 50), results, eligible: targets.length })
+    }
+
     if (action === 'resend_maxed') {
+
       const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
       const now = Date.now()
       const cycleTag = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
