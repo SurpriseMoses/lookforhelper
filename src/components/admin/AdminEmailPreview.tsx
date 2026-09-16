@@ -307,6 +307,7 @@ export default function AdminEmailPreview() {
   };
 
   const [sendingTwoSteps, setSendingTwoSteps] = useState(false);
+  const [twoStepsRemaining, setTwoStepsRemaining] = useState<number | null>(null);
   const twoStepsTargets = useMemo(
     () => helpers.filter((h) => !h.unsubscribed),
     [helpers]
