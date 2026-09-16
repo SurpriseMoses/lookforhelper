@@ -305,6 +305,43 @@ export default function AdminEmailPreview() {
     }
   };
 
+  const [sendingTwoSteps, setSendingTwoSteps] = useState(false);
+  const twoStepsTargets = useMemo(
+    () => helpers.filter((h) => !h.unsubscribed),
+    [helpers]
+  );
+  const sendTwoStepsNow = async () => {
+    if (twoStepsTargets.length === 0) {
+      toast.error("No incomplete helpers to email right now");
+      return;
+    }
+    if (
+      !confirm(
+        `Send the "add your city and skills" email to all ${twoStepsTargets.length} incomplete helper(s)?`
+      )
+    )
+      return;
+    setSendingTwoSteps(true);
+    const t = toast.loading(`Sending to ${twoStepsTargets.length}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-helper-reminders",
+        { body: { action: "send_two_steps" } }
+      );
+      if (error) throw error;
+      toast.success(
+        `✓ Sent ${data?.sent ?? 0} • Skipped ${data?.skipped ?? 0}`,
+        { id: t }
+      );
+      await Promise.all([loadHelpers(), loadInsights()]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Send failed", { id: t });
+    } finally {
+      setSendingTwoSteps(false);
+    }
+  };
+
+
 
 
 
