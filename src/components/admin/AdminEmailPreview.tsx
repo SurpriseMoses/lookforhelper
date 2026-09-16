@@ -313,18 +313,19 @@ export default function AdminEmailPreview() {
     [helpers]
   );
   const sendTwoStepsNow = async () => {
-    if (twoStepsTargets.length === 0) {
+    const pending = twoStepsRemaining ?? twoStepsTargets.length;
+    if (pending === 0) {
       toast.error("No incomplete helpers to email right now");
       return;
     }
     if (
       !confirm(
-        `Send the "add your city and skills" email to all ${twoStepsTargets.length} incomplete helper(s)?`
+        `Send the "add your city and skills" email to all ${pending} incomplete helper(s)?`
       )
     )
       return;
     setSendingTwoSteps(true);
-    const t = toast.loading(`Sending to ${twoStepsTargets.length}…`);
+    const t = toast.loading(`Sending to ${pending}…`);
     try {
       let totalSent = 0;
       let totalSkipped = 0;
@@ -543,21 +544,24 @@ export default function AdminEmailPreview() {
               </Button>
             </DisabledHint>
             <DisabledHint
-              disabled={twoStepsTargets.length === 0}
-              reason="No incomplete helpers to email"
+              disabled={(twoStepsRemaining ?? twoStepsTargets.length) === 0}
+              reason="Everyone has already been emailed this month"
             >
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={sendTwoStepsNow}
-                disabled={sendingTwoSteps || twoStepsTargets.length === 0}
+                disabled={
+                  sendingTwoSteps ||
+                  (twoStepsRemaining ?? twoStepsTargets.length) === 0
+                }
               >
                 {sendingTwoSteps ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                Send "city & skills" email ({twoStepsTargets.length})
+                Send "city & skills" email ({twoStepsRemaining ?? twoStepsTargets.length})
               </Button>
             </DisabledHint>
 
