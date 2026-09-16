@@ -1,3 +1,4 @@
+import { invokeWithFreshAuth } from "@/lib/adminInvoke";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -137,7 +138,7 @@ export default function AdminEmailPreview() {
   const loadHelpers = async () => {
     setLoadingHelpers(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "list" } }
       );
@@ -154,7 +155,7 @@ export default function AdminEmailPreview() {
   const loadInsights = async () => {
     setLoadingInsights(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "insights" } }
       );
@@ -169,7 +170,7 @@ export default function AdminEmailPreview() {
 
   const loadSettings = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "get_settings" } }
       );
@@ -224,7 +225,7 @@ export default function AdminEmailPreview() {
     setBulkSending(true);
     const t = toast.loading(`Sending ${selectedHelpers.size} reminder(s)…`);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "send", user_ids: Array.from(selectedHelpers) } }
       );
@@ -256,7 +257,7 @@ export default function AdminEmailPreview() {
     setBatchSending(true);
     const t = toast.loading(`Sending batch to ${eligibleHelpers.length}…`);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "send_batch" } }
       );
@@ -288,7 +289,7 @@ export default function AdminEmailPreview() {
     setResendingMaxed(true);
     const t = toast.loading(`Resending to ${maxedResendHelpers.length}…`);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "resend_maxed" } }
       );
@@ -329,7 +330,7 @@ export default function AdminEmailPreview() {
       // The server sends in small batches to stay within its time limit —
       // keep calling until nobody is left.
       for (let round = 0; round < 40; round++) {
-        const { data, error } = await supabase.functions.invoke(
+        const { data, error } = await invokeWithFreshAuth(
           "admin-helper-reminders",
           { body: { action: "send_two_steps" } }
         );
@@ -360,7 +361,7 @@ export default function AdminEmailPreview() {
   const toggleAutomation = async (enabled: boolean) => {
     setTogglingAutomation(true);
     try {
-      const { error } = await supabase.functions.invoke(
+      const { error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "toggle_automation", enabled } }
       );
@@ -386,7 +387,7 @@ export default function AdminEmailPreview() {
   const generate = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-preview-email",
         {
           body: {
@@ -428,7 +429,7 @@ export default function AdminEmailPreview() {
     setSending(true);
     const t = toast.loading(`Sending test to ${testEmail}…`);
     try {
-      const { error } = await supabase.functions.invoke("admin-preview-email", {
+      const { error } = await invokeWithFreshAuth("admin-preview-email", {
         body: {
           action: "sendTest",
           templateName: selected.templateName,
