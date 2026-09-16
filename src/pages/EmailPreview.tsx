@@ -1,3 +1,4 @@
+import { invokeWithFreshAuth } from "@/lib/adminInvoke";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,7 +94,7 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   const generate = async () => {
     setBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-preview-email",
         {
           body: {
@@ -114,7 +115,7 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
   const loadHelpers = async () => {
     setLoadingHelpers(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "list" } }
       );
@@ -153,7 +154,7 @@ export default function EmailPreview({ embedded = false }: EmailPreviewProps) {
     }
     setSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data, error } = await invokeWithFreshAuth(
         "admin-helper-reminders",
         { body: { action: "send", user_ids: Array.from(selected) } }
       );
