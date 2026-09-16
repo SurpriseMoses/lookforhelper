@@ -543,14 +543,17 @@ export default function AdminEmailPreview() {
               </Button>
             </DisabledHint>
             <DisabledHint
-              disabled={twoStepsTargets.length === 0}
-              reason="No incomplete helpers to email"
+              disabled={(twoStepsRemaining ?? twoStepsTargets.length) === 0}
+              reason="Everyone has already been emailed this month"
             >
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={sendTwoStepsNow}
-                disabled={sendingTwoSteps || twoStepsTargets.length === 0}
+                disabled={
+                  sendingTwoSteps ||
+                  (twoStepsRemaining ?? twoStepsTargets.length) === 0
+                }
               >
                 {sendingTwoSteps ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
