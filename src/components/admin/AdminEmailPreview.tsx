@@ -328,6 +328,7 @@ export default function AdminEmailPreview() {
     try {
       let totalSent = 0;
       let totalSkipped = 0;
+      let lastRemaining = 0;
       // The server sends in small batches to stay within its time limit —
       // keep calling until nobody is left.
       for (let round = 0; round < 40; round++) {
@@ -339,12 +340,14 @@ export default function AdminEmailPreview() {
         totalSent += data?.sent ?? 0;
         totalSkipped += data?.skipped ?? 0;
         const remaining = data?.remaining ?? 0;
+        lastRemaining = remaining;
+        setTwoStepsRemaining(remaining);
         if (!data?.eligible) break;
         if (remaining <= 0) break;
         toast.loading(`Sent ${totalSent}… ${remaining} to go`, { id: t });
       }
       toast.success(
-        `✓ Sent ${totalSent} • Skipped ${totalSkipped}`,
+        `✓ Sent ${totalSent} • Skipped ${totalSkipped} • ${lastRemaining} left`,
         { id: t }
       );
       await Promise.all([loadHelpers(), loadInsights()]);
