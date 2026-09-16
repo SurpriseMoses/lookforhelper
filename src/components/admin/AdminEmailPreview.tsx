@@ -525,6 +525,25 @@ export default function AdminEmailPreview() {
                 Resend to maxed-out ({maxedResendHelpers.length})
               </Button>
             </DisabledHint>
+            <DisabledHint
+              disabled={twoStepsTargets.length === 0}
+              reason="No incomplete helpers to email"
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={sendTwoStepsNow}
+                disabled={sendingTwoSteps || twoStepsTargets.length === 0}
+              >
+                {sendingTwoSteps ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Send "city & skills" email ({twoStepsTargets.length})
+              </Button>
+            </DisabledHint>
+
             <Button
               size="sm"
               variant="outline"
