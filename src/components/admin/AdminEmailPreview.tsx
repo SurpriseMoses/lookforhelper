@@ -557,7 +557,7 @@ export default function AdminEmailPreview() {
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                Send "city & skills" email ({twoStepsTargets.length})
+                Send "city & skills" email ({twoStepsRemaining ?? twoStepsTargets.length})
               </Button>
             </DisabledHint>
 
