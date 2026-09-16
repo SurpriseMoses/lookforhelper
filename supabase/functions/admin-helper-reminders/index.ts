@@ -289,7 +289,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      return json({ sent, skipped, errors: errors.slice(0, 50), results, eligible: targets.length })
+      return json({ sent, skipped, errors: errors.slice(0, 50), results, eligible: targets.length, remaining })
     }
 
     if (action === 'resend_maxed') {
