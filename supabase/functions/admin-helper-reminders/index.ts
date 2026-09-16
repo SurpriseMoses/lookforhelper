@@ -228,7 +228,28 @@ Deno.serve(async (req) => {
     // still respects unsubscribes. One send per helper per calendar month.
     if (action === 'send_two_steps') {
       const cycleTag = new Date().toISOString().slice(0, 7) // YYYY-MM
-      const targets = incompleteList.filter((h) => !h.unsubscribed)
+      const BATCH_SIZE = 25
+
+      // Skip anyone already emailed this template during the current month —
+      // lets the admin UI call this repeatedly until everyone is covered
+      // without the function timing out on one huge loop.
+      const monthStart = `${cycleTag}-01T00:00:00.000Z`
+      const { data: alreadyLogged } = await admin
+        .from('email_send_log')
+        .select('recipient_email')
+        .eq('template_name', 'helper-two-steps')
+        .gte('created_at', monthStart)
+      const done = new Set(
+        (alreadyLogged ?? []).map((r: { recipient_email: string }) =>
+          (r.recipient_email || '').toLowerCase(),
+        ),
+      )
+
+      const pending = incompleteList.filter(
+        (h) => !h.unsubscribed && h.email && !done.has(h.email.toLowerCase()),
+      )
+      const targets = pending.slice(0, BATCH_SIZE)
+      const remaining = Math.max(pending.length - targets.length, 0)
 
       const errors: string[] = []
       let sent = 0
