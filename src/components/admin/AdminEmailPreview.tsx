@@ -324,13 +324,25 @@ export default function AdminEmailPreview() {
     setSendingTwoSteps(true);
     const t = toast.loading(`Sending to ${twoStepsTargets.length}…`);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "admin-helper-reminders",
-        { body: { action: "send_two_steps" } }
-      );
-      if (error) throw error;
+      let totalSent = 0;
+      let totalSkipped = 0;
+      // The server sends in small batches to stay within its time limit —
+      // keep calling until nobody is left.
+      for (let round = 0; round < 40; round++) {
+        const { data, error } = await supabase.functions.invoke(
+          "admin-helper-reminders",
+          { body: { action: "send_two_steps" } }
+        );
+        if (error) throw error;
+        totalSent += data?.sent ?? 0;
+        totalSkipped += data?.skipped ?? 0;
+        const remaining = data?.remaining ?? 0;
+        if (!data?.eligible) break;
+        if (remaining <= 0) break;
+        toast.loading(`Sent ${totalSent}… ${remaining} to go`, { id: t });
+      }
       toast.success(
-        `✓ Sent ${data?.sent ?? 0} • Skipped ${data?.skipped ?? 0}`,
+        `✓ Sent ${totalSent} • Skipped ${totalSkipped}`,
         { id: t }
       );
       await Promise.all([loadHelpers(), loadInsights()]);
