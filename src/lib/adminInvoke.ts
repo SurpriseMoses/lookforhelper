@@ -1,14 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Invoke an admin edge function with a guaranteed-fresh session token.
- * Long-running admin pages can hold an expired access token, which makes the
- * function reply "Unauthorized" even though the admin is still signed in.
+ * Drop-in replacement for supabase.functions.invoke that guarantees a fresh
+ * access token. Long-running admin pages can hold an expired token, which makes
+ * edge functions reply "Unauthorized" even though the admin is still signed in.
  */
-export async function invokeAdminFunction<T = any>(
+export async function invokeWithFreshAuth(
   name: string,
-  body: Record<string, unknown>
-): Promise<T> {
+  options: { body?: unknown } = {}
+): Promise<{ data: any; error: Error | null }> {
   let { data: sessionData } = await supabase.auth.getSession();
   let session = sessionData.session;
 
@@ -19,21 +19,16 @@ export async function invokeAdminFunction<T = any>(
   }
 
   if (!session) {
-    throw new Error("Your session expired — please sign in again.");
+    return {
+      data: null,
+      error: new Error("Your session expired — please sign in again."),
+    };
   }
 
   const { data, error } = await supabase.functions.invoke(name, {
-    body,
+    ...options,
     headers: { Authorization: `Bearer ${session.access_token}` },
   });
 
-  if (error) {
-    throw new Error(
-      error.message?.includes("401")
-        ? "Your session expired — please sign in again."
-        : error.message || "Request failed"
-    );
-  }
-
-  return data as T;
+  return { data, error: error ? new Error(error.message) : null };
 }
