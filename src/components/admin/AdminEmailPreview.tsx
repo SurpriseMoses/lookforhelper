@@ -592,7 +592,7 @@ export default function AdminEmailPreview() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
             <StatTile
               icon={Users}
               label="Eligible now"
@@ -616,6 +616,12 @@ export default function AdminEmailPreview() {
               label="Completions (7d)"
               value={insights?.completions_last_7_days ?? "—"}
               hint="Profiles completed"
+            />
+            <StatTile
+              icon={Mail}
+              label="City & skills left"
+              value={twoStepsRemaining ?? twoStepsTargets.length}
+              hint="Still to receive this month"
             />
           </div>
         </CardContent>
