@@ -313,18 +313,19 @@ export default function AdminEmailPreview() {
     [helpers]
   );
   const sendTwoStepsNow = async () => {
-    if (twoStepsTargets.length === 0) {
+    const pending = twoStepsRemaining ?? twoStepsTargets.length;
+    if (pending === 0) {
       toast.error("No incomplete helpers to email right now");
       return;
     }
     if (
       !confirm(
-        `Send the "add your city and skills" email to all ${twoStepsTargets.length} incomplete helper(s)?`
+        `Send the "add your city and skills" email to all ${pending} incomplete helper(s)?`
       )
     )
       return;
     setSendingTwoSteps(true);
-    const t = toast.loading(`Sending to ${twoStepsTargets.length}…`);
+    const t = toast.loading(`Sending to ${pending}…`);
     try {
       let totalSent = 0;
       let totalSkipped = 0;
