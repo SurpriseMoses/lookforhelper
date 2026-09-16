@@ -12,9 +12,12 @@ export interface TemplateEntry {
 import { template as helperReminder1 } from './helper-reminder-1-friendly.tsx'
 import { template as helperReminder2 } from './helper-reminder-2-urgency.tsx'
 import { template as helperReminder3 } from './helper-reminder-3-final.tsx'
+import { template as helperTwoSteps } from './helper-two-steps.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'helper-reminder-1-friendly': helperReminder1,
   'helper-reminder-2-urgency': helperReminder2,
   'helper-reminder-3-final': helperReminder3,
+  'helper-two-steps': helperTwoSteps,
 }
+
