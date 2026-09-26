@@ -71,6 +71,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://www.lookforhelper.co.za/helper/0258426b-1d9d-4c8c-929c-2cfd8fec9b4f</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.lookforhelper.co.za/helper/10ad45dd-dbfa-4e4b-a7ce-ed3ec8db517c</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -126,12 +131,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.lookforhelper.co.za/helper/18b721a0-4557-4d04-8c27-96559c2258b9</loc>
+    <loc>https://www.lookforhelper.co.za/helper/7a6d5049-d874-4e6e-bf94-6e8789f4cb19</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.lookforhelper.co.za/helper/7a6d5049-d874-4e6e-bf94-6e8789f4cb19</loc>
+    <loc>https://www.lookforhelper.co.za/helper/18b721a0-4557-4d04-8c27-96559c2258b9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -177,6 +182,46 @@
   </url>
   <url>
     <loc>https://www.lookforhelper.co.za/helper/45989e3f-e4ba-4daf-8e67-72679b3312d9</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/e9396e7a-6553-46fb-bd2f-a52bfdd840c5</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/141efaa7-5c77-471e-8388-b255986134b9</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/36236fa7-5f9d-42a2-bed7-9917be13837e</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/3170e9f8-cbb9-4c92-a0d5-c44445977fcf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/14d5cedc-1d67-49f3-ab0d-d7b3c88333e8</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/48751a90-3a81-4fa5-8073-c849cdb81cf7</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/dfaea0bc-1e02-41cc-aaab-b63e12d2d592</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/5b292b6c-b143-4790-8623-487dd2619926</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
