@@ -112,18 +112,20 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
         <p className="text-sm text-muted-foreground text-center">
           {isLocked
             ? `Messaging requires an active plan (${formatPrice("seeker_subscription")} / 30 days)`
-            : "Interested in this helper? Send them a message to get started."}
+            : isSeeker
+              ? "✓ Messaging is active. Send this helper a message to get started."
+              : "Interested in this helper? Send them a message to get started."}
         </p>
         <div className="text-center">
           <Button
             onClick={handleContact}
-            disabled={loading || (isSeeker && !isLocked && !acknowledged)}
+            disabled={loading}
             className="mt-3 gap-2"
           >
             {isLocked ? (
               <><Lock className="h-4 w-4" /> Unlock Messaging</>
             ) : (
-              <><MessageSquare className="h-4 w-4" /> {loading ? "Starting..." : "Contact Helper"}</>
+              <><MessageSquare className="h-4 w-4" /> {loading ? "Opening chat..." : "Send Message"}</>
             )}
           </Button>
         </div>
