@@ -225,4 +225,9 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://www.lookforhelper.co.za/helper/e926d3fa-8511-4db3-8abc-a53a5cb0793c</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
