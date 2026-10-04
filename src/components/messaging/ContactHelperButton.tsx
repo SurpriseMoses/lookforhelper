@@ -34,14 +34,14 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
       return;
     }
 
-    if (!acknowledged) {
-      toast({ title: "Please acknowledge the safety reminder before continuing", variant: "destructive" });
+    // Check subscription first — locked seekers go straight to payment
+    if (!hasActiveSubscription) {
+      setShowPaywall(true);
       return;
     }
 
-    // Check subscription
-    if (!hasActiveSubscription) {
-      setShowPaywall(true);
+    if (!acknowledged) {
+      toast({ title: "Please acknowledge the safety reminder before continuing", variant: "destructive" });
       return;
     }
 
@@ -117,7 +117,7 @@ const ContactHelperButton = ({ helperUserId }: Props) => {
         <div className="text-center">
           <Button
             onClick={handleContact}
-            disabled={loading || (isSeeker && !acknowledged)}
+            disabled={loading || (isSeeker && !isLocked && !acknowledged)}
             className="mt-3 gap-2"
           >
             {isLocked ? (
