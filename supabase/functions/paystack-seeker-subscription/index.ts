@@ -79,7 +79,7 @@ serve(async (req) => {
       console.log("Initializing seeker subscription for user:", user.id);
 
       const userCountry = user.user_metadata?.country as string | undefined;
-      const pricing = getPricing(userCountry);
+      let pricing = getPricing(userCountry);
 
       const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || "";
       const callbackUrl = origin ? `${origin}/dashboard` : "";
@@ -97,29 +97,39 @@ serve(async (req) => {
         initBody.callback_url = callbackUrl;
       }
 
-      const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(initBody),
-      });
+      const callPaystack = async () => {
+        const res = await fetch("https://api.paystack.co/transaction/initialize", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(initBody),
+        });
+        const text = await res.text();
+        try { return JSON.parse(text); } catch { return null; }
+      };
 
-      const rawText = await paystackRes.text();
-      let paystackData;
-      try {
-        paystackData = JSON.parse(rawText);
-      } catch {
+      let paystackData = await callPaystack();
+      if (!paystackData) {
         return new Response(JSON.stringify({ error: "Invalid response from payment provider" }), {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
+      // Fallback: merchant account may not support the local currency — charge in ZAR instead
+      if (!paystackData.status && /currency/i.test(paystackData.message || "") && pricing.currency !== "ZAR") {
+        console.log(`Currency ${pricing.currency} not supported, falling back to ZAR`);
+        pricing = COUNTRY_PRICING["South Africa"];
+        initBody.amount = pricing.amount;
+        initBody.currency = pricing.currency;
+        paystackData = (await callPaystack()) ?? { status: false, message: "Invalid response from payment provider" };
+      }
+
       if (!paystackData.status) {
         return new Response(JSON.stringify({ error: paystackData.message || "Failed to initialize payment" }), {
-          status: 500,
+          status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
