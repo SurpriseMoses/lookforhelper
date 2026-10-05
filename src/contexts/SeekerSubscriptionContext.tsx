@@ -53,25 +53,44 @@ export const SeekerSubscriptionProvider = ({ children }: { children: React.React
   // Verify pending Paystack payment on return (runs globally on any page)
   useEffect(() => {
     if (!user || (role !== "seeker" && role !== "admin")) return;
-    const ref = localStorage.getItem("seeker_sub_ref");
-    if (!ref) return;
-
-    localStorage.removeItem("seeker_sub_ref");
 
     const verifyPayment = async () => {
+      const params = new URLSearchParams(window.location.search);
+      let ref = params.get("reference") || params.get("trxref") || localStorage.getItem("seeker_sub_ref");
+      let fromUrl = !!(params.get("reference") || params.get("trxref"));
+
+      if (!ref) {
+        const { data: sub } = await supabase
+          .from("seeker_subscriptions")
+          .select("status, payment_reference")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (sub?.status === "pending" && sub.payment_reference) ref = sub.payment_reference;
+      }
+      if (!ref) return;
+
+      if (fromUrl) {
+        params.delete("reference");
+        params.delete("trxref");
+        const qs = params.toString();
+        window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash);
+      }
+
       try {
         const { data, error } = await supabase.functions.invoke("paystack-seeker-subscription", {
           body: { action: "verify", reference: ref },
         });
         if (error) throw error;
         if (data?.success) {
+          localStorage.removeItem("seeker_sub_ref");
           toast({ title: "Messaging unlocked!", description: "You now have 30 days of messaging access." });
           await refresh();
-        } else {
-          toast({ title: "Payment failed", description: "Please try again.", variant: "destructive" });
+        } else if (data?.status === "failed") {
+          localStorage.removeItem("seeker_sub_ref");
+          if (fromUrl) toast({ title: "Payment failed", description: "Please try again.", variant: "destructive" });
         }
       } catch (err: any) {
-        toast({ title: "Verification error", description: err.message, variant: "destructive" });
+        console.error("Payment verification error:", err?.message);
       }
     };
 

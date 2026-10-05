@@ -31,7 +31,7 @@ const SeekerPaywallDialog = ({ open, onClose }: SeekerPaywallDialogProps) => {
     setPaying(true);
     try {
       const { data, error } = await supabase.functions.invoke("paystack-seeker-subscription", {
-        body: { action: "initialize" },
+        body: { action: "initialize", return_path: window.location.pathname + window.location.search },
       });
       if (error) throw error;
       if (data?.authorization_url) {
