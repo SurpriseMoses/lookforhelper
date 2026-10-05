@@ -81,8 +81,10 @@ serve(async (req) => {
       const userCountry = user.user_metadata?.country as string | undefined;
       let pricing = getPricing(userCountry);
 
-      const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || "";
-      const callbackUrl = origin ? `${origin}/dashboard` : "";
+      let origin = req.headers.get("origin") || "";
+      if (!origin) { try { origin = new URL(req.headers.get("referer") || "").origin; } catch { origin = ""; } }
+      const rp = typeof body.return_path === "string" && body.return_path.startsWith("/") && !body.return_path.startsWith("//") ? body.return_path : "/dashboard";
+      const callbackUrl = origin ? `${origin}${rp}` : "";
 
       const initBody: Record<string, unknown> = {
         email: user.email,
@@ -134,16 +136,21 @@ serve(async (req) => {
         });
       }
 
-      await supabase
-        .from("seeker_subscriptions")
-        .update({
-          status: "pending",
-          amount: pricing.amount / 100,
-          currency: pricing.currency,
-          payment_country: userCountry || "South Africa",
-          payment_reference: paystackData.data.reference,
-        })
-        .eq("user_id", user.id);
+      const { data: existingSub } = await supabase
+        .from("seeker_subscriptions").select("status, current_period_end").eq("user_id", user.id).maybeSingle();
+      const stillActive = existingSub?.status === "active" && existingSub.current_period_end && new Date(existingSub.current_period_end) > new Date();
+      const pendingFields = {
+        ...(stillActive ? {} : { status: "pending" }),
+        amount: pricing.amount / 100,
+        currency: pricing.currency,
+        payment_country: userCountry || "South Africa",
+        payment_reference: paystackData.data.reference,
+      };
+      if (existingSub) {
+        await supabase.from("seeker_subscriptions").update(pendingFields).eq("user_id", user.id);
+      } else {
+        await supabase.from("seeker_subscriptions").insert({ user_id: user.id, status: "pending", ...pendingFields });
+      }
 
       return new Response(
         JSON.stringify({
@@ -177,21 +184,26 @@ serve(async (req) => {
         });
       }
 
-      if (paystackData.status && paystackData.data.status === "success") {
+      const paidBy = paystackData?.data?.metadata?.user_id;
+      if (paystackData.status && paystackData.data.status === "success" && (!paidBy || paidBy === user.id)) {
         const startDate = new Date();
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + PLAN_DAYS);
 
-        await supabase
-          .from("seeker_subscriptions")
-          .update({
-            status: "active",
-            amount: paystackData.data.amount / 100,
-            payment_reference: reference,
-            current_period_start: startDate.toISOString(),
-            current_period_end: endDate.toISOString(),
-          })
-          .eq("user_id", user.id);
+        const fields = {
+          status: "active",
+          amount: paystackData.data.amount / 100,
+          currency: paystackData.data.currency,
+          payment_reference: reference,
+          current_period_start: startDate.toISOString(),
+          current_period_end: endDate.toISOString(),
+        };
+        const { data: existingSub } = await supabase
+          .from("seeker_subscriptions").select("user_id").eq("user_id", user.id).maybeSingle();
+        const { error: saveErr } = existingSub
+          ? await supabase.from("seeker_subscriptions").update(fields).eq("user_id", user.id)
+          : await supabase.from("seeker_subscriptions").insert({ user_id: user.id, ...fields });
+        if (saveErr) console.error("Failed saving subscription:", saveErr.message);
 
         return new Response(
           JSON.stringify({
@@ -201,11 +213,17 @@ serve(async (req) => {
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
+      } else if (paystackData?.data?.status === "abandoned" || paystackData?.data?.status === "ongoing" || paystackData?.data?.status === "pending") {
+        return new Response(
+          JSON.stringify({ success: false, status: "pending" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       } else {
         await supabase
           .from("seeker_subscriptions")
           .update({ status: "failed" })
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .eq("status", "pending");
 
         return new Response(
           JSON.stringify({ success: false, status: "failed" }),
