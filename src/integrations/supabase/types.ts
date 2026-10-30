@@ -1669,6 +1669,10 @@ export type Database = {
         }[]
       }
       get_my_phone: { Args: never; Returns: string }
+      has_active_seeker_subscription: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
